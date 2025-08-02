@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SalesDocument index{% endblock %}
+
+{% block body %}
+    <h1>SalesDocument index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Type</th>
+                <th>Reference</th>
+                <th>CreatedAt</th>
+                <th>ModifiedAt</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for sales_document in sales_documents %}
+            <tr>
+                <td>{{ sales_document.id }}</td>
+                <td>{{ sales_document.type }}</td>
+                <td>{{ sales_document.reference }}</td>
+                <td>{{ sales_document.createdAt ? sales_document.createdAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ sales_document.modifiedAt ? sales_document.modifiedAt|date('Y-m-d H:i:s') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_sales_document_show', {'id': sales_document.id}) }}">show</a>
+                    <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_sales_document_new') }}">Create new</a>
+{% endblock %}

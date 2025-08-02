@@ -1,0 +1,38 @@
+{% if items is not empty %}
+    <div class="bg-white shadow rounded p-6 mb-6">
+        {% if title is defined %}
+            <h2 class="text-xl font-semibold mb-4">{{ title }}</h2>
+        {% endif %}
+        <table class="min-w-full text-sm text-left text-gray-700">
+            <thead class="bg-gray-100 text-xs uppercase">
+            <tr>
+                <th scope="col" class="px-4 py-2">#</th>
+                <th scope="col" class="px-4 py-2">Désignation</th>
+                <th scope="col" class="px-4 py-2">Quantité</th>
+                <th scope="col" class="px-4 py-2">Prix unitaire</th>
+                <th scope="col" class="px-4 py-2">Total</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y">
+            {% for item in items %}
+
+
+                {% set currency = item.salesDocument.estimate.currency ?? item.salesDocument.project.currency ?? 'EUR' %}
+                {{ item.unitPrice|format_currency(currency, app.request.locale ?: 'fr_FR') }}
+                
+                <tr class="hover:bg-gray-50">
+                    <td class="px-4 py-2">{{ loop.index }}</td>
+                    <td class="px-4 py-2">{{ item.description }}</td>
+                    <td class="px-4 py-2">{{ item.quantity }}</td>
+                    <td class="px-4 py-2">{{ item.unitPrice|format_currency(currency, app.request.locale ?: 'fr_FR') }}</td>
+                    <td class="px-4 py-2">
+                        {{ item.lineTotal|format_currency(currency, app.request.locale ?: 'fr_FR') }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p class="text-gray-500 italic">Aucune ligne d'article enregistrée.</p>
+{% endif %}

@@ -1,0 +1,80 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projet : {{ project.name }}{% endblock %}
+
+{% block body %}
+    <div class="max-w-3xl mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-6">Détails du projet</h1>
+
+        <div class="bg-white shadow rounded p-6 mb-6">
+            <dl class="grid grid-cols-2 gap-4">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Référence Projet</dt>
+                    <dd class="text-lg text-gray-900">{{ project.projectNumber }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Nom</dt>
+                    <dd class="text-lg text-gray-900">{{ project.name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Date de début</dt>
+                    <dd class="text-lg text-gray-900">{{ project.startDate ? project.startDate|date('Y-m-d H:i') : 'N/A' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Date de fin</dt>
+                    <dd class="text-lg text-gray-900">{{ project.endDate ? project.endDate|date('Y-m-d H:i') : 'N/A' }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Statut</dt>
+                    <dd class="text-lg text-gray-900">{{ project.status }}</dd>
+                </div>
+                <div class="">
+                    <dt class="text-sm font-medium text-gray-500">Client</dt>
+                    <dd class="text-lg text-gray-900">{{ project.client.name }}</dd>
+                </div>
+                <div class="col-span-2">
+                    <dt class="text-sm font-medium text-gray-500">Montant</dt>
+                    <dd class="text-lg text-gray-900">{{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Paiements</dt>
+                    <dd class="text-lg text-gray-900">
+                        <ul class="list-disc list-inside mb-4">
+                            {% for payment in project.payments %}
+                                <li class="mb-1">
+                                    {{ payment.date|date('d/m/Y') }} — {{ payment.amount }} {{ project.currency }}
+                                    {% if payment.label %} ({{ payment.label }}) {% endif %}
+                                    <a href="{{ path('app_payment_edit', {id: payment.id}) }}" class="ml-2 text-blue-600 hover:underline">✏️</a>
+                                </li>
+                            {% else %}
+                                <li>Aucun paiement encore enregistré.</li>
+                            {% endfor %}
+                        </ul>
+                        <a href="{{ path('app_payment_new', { project: project.id }) }}"
+                           class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                            Ajouter un paiement
+                        </a>
+                    </dd>
+                </div>
+            </dl>
+        </div>
+
+        {% if project.id %}
+            <div class="mt-6 pb-4">
+                <a href="{{ path('app_sales_document_new', {'projectId': project.id}) }}"
+                   class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                    Générer un document commercial
+                </a>
+            </div>
+            {% include 'components/_list_for_estimate.html.twig' with { estimate: project } %}
+        {% endif %}
+
+        {% include 'components/_documents_list.html.twig' with { documents: project.documents } %}
+
+        <div class="mt-6 flex space-x-4">
+            <a href="{{ path('app_project_index') }}" class="text-sm text-gray-600 hover:underline">← Retour à la liste</a>
+            <a href="{{ path('app_project_edit', {'id': project.id}) }}" class="text-sm text-blue-600 hover:underline">Modifier</a>
+            {{ include('project/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détail du devis{% endblock %}
+
+{% block body %}
+    <div class="max-w-3xl mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-6">Détail du devis</h1>
+
+        <div class="bg-white shadow rounded p-6 mb-6">
+            <dl class="grid grid-cols-2 gap-4">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">ID</dt>
+                    <dd class="text-lg text-gray-900">{{ estimate.id }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Numéro</dt>
+                    <dd class="text-lg text-gray-900">{{ estimate.estimateNumber }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Montant</dt>
+                    <dd class="text-lg text-gray-900">{{ estimate.amount|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Statut</dt>
+                    <dd class="text-lg text-gray-900">{{ estimate.status }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Créé le</dt>
+                    <dd class="text-lg text-gray-900">
+                        {# {{ estimate.createdAt ? estimate.createdAt|date('Y-m-d H:i') : 'N/A' }}  #}
+                        {{ estimate.startDate ? estimate.startDate|date('Y-m-d H:i') : 'N/A' }}
+                    </dd>
+                </div>
+                <div class="col-span-2">
+                    <dt class="text-sm font-medium text-gray-500">Description</dt>
+                    <dd class="text-gray-800 whitespace-pre-line">{{ estimate.description ?: '–' }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        {% include 'components/_documents_list.html.twig' with { documents: estimate.documents } %}
+
+        {% if not estimate.project %}
+            <a href="{{ path('app_estimate_convert_to_project', { id: estimate.id }) }}"
+               class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Convertir en projet
+            </a>
+        {% else %}
+            <p class="text-green-600 mt-4">
+                Déjà converti en projet :
+                <a href="{{ path('app_project_show', { id: estimate.project.id }) }}" class="underline">voir le projet</a>
+            </p>
+        {% endif %}
+        {% if estimate.id %}
+            <div class="mt-6 pb-4">
+                <a href="{{ path('app_sales_document_new', {'estimateId': estimate.id}) }}"
+                   class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    Générer un devis commercial
+                </a>
+            </div>
+            {% include 'components/_list_for_estimate.html.twig' with { estimate: estimate } %}
+        {% endif %}
+
+
+        <div class="mt-6 flex space-x-4">
+            <a href="{{ path('app_estimate_index') }}" class="text-sm text-gray-600 hover:underline">← Retour à la liste</a>
+            <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="text-sm text-blue-600 hover:underline">Modifier</a>
+            {{ include('estimate/_delete_form.html.twig') }}
+        </div>
+    </div>
+{% endblock %}

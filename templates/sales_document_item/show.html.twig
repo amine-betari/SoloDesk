@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SalesDocumentItem{% endblock %}
+
+{% block body %}
+    <h1>SalesDocumentItem</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ sales_document_item.id }}</td>
+            </tr>
+            <tr>
+                <th>Description</th>
+                <td>{{ sales_document_item.description }}</td>
+            </tr>
+            <tr>
+                <th>UnitPrice</th>
+                <td>{{ sales_document_item.unitPrice }}</td>
+            </tr>
+            <tr>
+                <th>Quantity</th>
+                <td>{{ sales_document_item.quantity }}</td>
+            </tr>
+            <tr>
+                <th>LineTotal</th>
+                <td>{{ sales_document_item.lineTotal }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_sales_document_item_index') }}">back to list</a>
+
+    <a href="{{ path('app_sales_document_item_edit', {'id': sales_document_item.id}) }}">edit</a>
+
+    {{ include('sales_document_item/_delete_form.html.twig') }}
+{% endblock %}

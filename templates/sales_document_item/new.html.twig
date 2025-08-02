@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New SalesDocumentItem{% endblock %}
+
+{% block body %}
+    <h1>Create new SalesDocumentItem</h1>
+
+    {{ include('sales_document_item/_form.html.twig') }}
+
+    <a href="{{ path('app_sales_document_item_index') }}">back to list</a>
+{% endblock %}

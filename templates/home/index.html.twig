@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - SoloDesk{% endblock %}
+
+{% block body %}
+
+    <h2 class="text-3xl font-extrabold mb-8">Bienvenue sur SoloDesk 👋</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <div class="bg-white p-6 rounded shadow">
+            {{ render_chart(clientDataChart) }}
+        </div>
+
+        <div class="bg-white p-6 rounded shadow">
+            {{ render_chart(projectDataChart) }}
+        </div>
+
+        <div class="bg-white p-6 rounded shadow">
+            {{ render_chart(revenuesGlobalChart) }}
+            <a href="{{ path('stats_clients_trimestriels') }}">Voir plus</a>
+        </div>
+
+        <div class="bg-white p-6 rounded shadow">
+            {{ render_chart(paymentsChart) }}
+        </div>
+    </div>
+
+    <!-- Stat cards -->
+    {% include 'partials/_stats.html.twig' with { projectCount: totalProjects, clientCount: totalClients, estimateCount: totalEstimates } %}
+
+    <!-- Liste projets -->
+    {% include 'partials/_project_list.html.twig' with { projects: projects } %}
+
+    <!-- Liste clients -->
+    {% include 'partials/_client_list.html.twig' with { clients: clients } %}
+
+{% endblock %}

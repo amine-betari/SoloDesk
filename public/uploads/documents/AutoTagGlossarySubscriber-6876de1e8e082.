@@ -1,0 +1,200 @@
+<?php
+//
+
+namespace Inlexia\Ibexa\Bundle\AutoTranslate\Event\Subscriber;
+
+use DeepL\DeepLException;
+use Ibexa\AdminUi\Siteaccess\SiteaccessResolverInterface;
+use Ibexa\Contracts\Core\Repository\Events\Content\PublishVersionEvent;
+use Ibexa\Contracts\Core\Repository\Events\Trash\TrashEvent;
+use Ibexa\Contracts\Core\Repository\Exceptions\NotFoundException;
+use Ibexa\Contracts\Core\Repository\Values\Content\Content;
+use Ibexa\Contracts\Core\Repository\Values\Content\ContentInfo;
+use Ibexa\Contracts\Core\Repository\Values\Content\Location;
+use Ibexa\Contracts\Core\SiteAccess\ConfigResolverInterface;
+use Ibexa\Core\IO\TolerantIOService;
+use Ibexa\ProductCatalog\Exception\UnauthorizedException;
+use Inlexia\Ibexa\Bundle\AutoTranslate\Message\GlossaryDeleteTask;
+use Inlexia\Ibexa\Bundle\AutoTranslate\Message\GlossaryUpdateTask;
+use Inlexia\Ibexa\Bundle\AutoTranslate\Services\AutoTranslationService;
+use Inlexia\Ibexa\Contracts\AutoTranslate\AutoTransportInterface;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\Envelope;
+
+class AutoTagGlossarySubscriber implements EventSubscriberInterface
+{
+    private const FOLDER_NAME = 'Glossaires';
+
+    /**
+     * @throws DeepLException
+     */
+    public function __construct(
+        private readonly ConfigResolverInterface $configResolver,
+        private readonly SiteaccessResolverInterface $siteAccessResolver,
+        private readonly LoggerInterface $logger,
+        private readonly ParameterBagInterface $parameterBag,
+        private readonly AutoTransportInterface $transportFactory,
+        private readonly TolerantIOService $IOService,
+        private readonly AutoTranslationService $autoTranslationService,
+    ) {
+    }
+
+    public static function getSubscribedEvents(): array
+    {
+        return [
+            PublishVersionEvent::class => ['onPublishContent', 10],
+            TrashEvent::class => ['onTrash', 10],
+        ];
+    }
+
+    /**
+     * @throws NotFoundException
+     * @throws DeepLException
+     * @throws UnauthorizedException
+     */
+    public function onPublishContent(PublishVersionEvent $event): void
+    {
+        try {
+            $content = $event->getContent();
+            $this->handleGlossaries($content);
+        } catch (\Exception $e) {
+            $this->logger->error('Error On Glossary Publish Event: '.$e->getMessage());
+        }
+    }
+
+    public function onTrash(TrashEvent $event): void
+    {
+        if ($event->getTrashItem()) {
+            try {
+                $contentInfo = $event->getTrashItem()->getContentInfo();
+                $location    = $event->getLocation();
+                $this->removeGlossaries($contentInfo, $location);
+            } catch (\Exception $e) {
+                $this->logger->error('Error On Glossary Trash Event: '.$e->getMessage());
+            }
+        }
+    }
+
+    public function removeGlossaries(ContentInfo $contentInfo, Location $location): void
+    {
+        if ('file' !== $contentInfo->getContentType()->identifier || self::FOLDER_NAME !== $location->getParentLocation()->getContentInfo()->name) {
+            return;
+        }
+        $currentSiteAccess = $this->siteAccessResolver->getSiteaccessesForLocation($location);
+        $currentSiteAccess = array_values(array_filter($currentSiteAccess, function ($value) {
+            return !str_contains($value, 'admin');
+        }));
+        $currentWebsiteConfig = $this->autoTranslationService->getCurrentSiteAccessConfig($location);
+
+        $defaultApi = $currentWebsiteConfig['default_api'];
+        $prefix     = $contentInfo->name;
+
+        $transportType = $this->configResolver->hasParameter('transport', 'auto_translate') ? $this->configResolver->getParameter('transport', 'auto_translate') : 'doctrine';
+        $transport     = $this->transportFactory->createTransport($transportType);
+        $envelope      = new Envelope(new GlossaryDeleteTask($prefix, $defaultApi, $currentSiteAccess[0]));
+        $transport->send($envelope);
+    }
+
+    /**
+     * @throws DeepLException
+     */
+    public function handleGlossaries(Content $content)
+    {
+        ini_set('memory_limit', '2G'); // ← ici
+
+        if ('file' !== $content->getContentType()->identifier || self::FOLDER_NAME !== $content->contentInfo->getMainLocation()->getParentLocation()->getContentInfo()->name) {
+            return;
+        }
+        $location          = $content->getVersionInfo()->getContentInfo()->getMainLocation();
+        $currentSiteAccess = $this->siteAccessResolver->getSiteaccessesForLocation($location);
+        $currentSiteAccess = array_values(array_filter($currentSiteAccess, function ($value) {
+            return !str_contains($value, 'admin');
+        }));
+        $currentWebsiteConfig = $this->autoTranslationService->getCurrentSiteAccessConfig($location);
+
+        $path = $this->parameterBag->get('kernel.project_dir').'/var';
+
+        if ('dev' !== $this->parameterBag->get('kernel.environment') && $_SERVER['DFS_NFS_PATH']) {
+            $this->IOService->setPrefix('original');
+            $filePath = $_SERVER['DFS_NFS_PATH'].$this->IOService->loadBinaryFile($content->getFieldValue('file')->id)->uri;
+        } else {
+            $this->IOService->setPrefix('original');
+            $filePath = $this->IOService->loadBinaryFile($content->getFieldValue('file')->id)->uri;
+            $filePath = substr($filePath, 1);
+        }
+        $defaultApi = $currentWebsiteConfig['default_api'];
+        $fileName   = $content->getName();
+        $csvArrays  = $this->parseExcelToTranslationArrays($filePath);
+
+        $transport = $this->transportFactory->createTransport('doctrine');
+
+        foreach ($csvArrays as $language => $csvArray) {
+            $sourceLanguage = explode('_', $language)[0];
+            $languageValue  = explode('_', $language)[1];
+            $targetLanguage = 'EN' === $languageValue ? $languageValue.'-GB' : $languageValue;
+            $glossaryName   = $fileName.'_'.$sourceLanguage.'_'.$targetLanguage;
+            $envelope       = new Envelope(new GlossaryUpdateTask($glossaryName, $sourceLanguage, $targetLanguage, $csvArray, $defaultApi, $currentSiteAccess[0]));
+            $transport->send($envelope);
+        }
+    }
+
+    public function parseExcelToTranslationArrays($inputFilePath): array
+    {
+        ini_set('memory_limit', '2G'); // ← ici
+
+        $spreadsheet = IOFactory::load($inputFilePath);
+        $worksheet   = $spreadsheet->getActiveSheet();
+
+        $headers = [];
+        foreach ($worksheet->getRowIterator(1, 1) as $headerRow) {
+            foreach ($headerRow->getCellIterator() as $cell) {
+                $headers[] = null !== $cell->getValue() ? trim($cell->getValue()) : '';
+            }
+        }
+
+        $rows = [];
+        foreach ($worksheet->getRowIterator(2) as $row) {
+            $rowData = [];
+            foreach ($row->getCellIterator() as $cell) {
+                if ($cell->isFormula()) {
+                    $value = $cell->getOldCalculatedValue();
+                } else {
+                    $value = $cell->getValue();
+                }
+                $rowData[] = null !== $value ? trim($value) : '';
+            }
+            if (array_filter($rowData)) {
+                $rows[] = $rowData;
+            }
+        }
+
+        $columnsCount = count($rows[0] ?? []) - 1;
+        if ($columnsCount <= 0) {
+            return [];
+        }
+
+        $translationArrays = [];
+        for ($i = 1; $i <= $columnsCount; ++$i) {
+            $languageKey     = 'EN_'.($headers[$i] ?? "Language{$i}");
+            $languageEntries = [];
+
+            foreach ($rows as $row) {
+                $frenchValue      = $row[0] ?? null;
+                $translationValue = $row[$i] ?? null;
+
+                if ($frenchValue && $translationValue) {
+                    $languageEntries[$frenchValue] = $translationValue;
+                }
+            }
+
+            if (!empty($languageEntries)) {
+                $translationArrays[$languageKey] = $languageEntries;
+            }
+        }
+
+        return $translationArrays;
+    }
+}

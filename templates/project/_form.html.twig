@@ -1,0 +1,140 @@
+<div class="max-w-2xl mx-auto mt-10 bg-gray-800 p-8 rounded-lg shadow-lg text-white">
+    <h1 class="text-3xl font-bold mb-6">Créer un projet</h1>
+
+    {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+    <fieldset class="mb-6 p-4 border rounded bg-gray-700">
+        <legend class="text-lg font-semibold mb-4">Informations générales</legend>
+
+        <div>
+            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
+
+        {% if form.projectNumber is defined %}
+            <div class="mb-4">
+                {{ form_label(form.projectNumber, 'Référence') }}
+                {{ form_widget(form.projectNumber, {
+                    'attr': {
+                        'class': 'form-input mt-1 block w-full text-gray-900 bg-white border border-gray-300 rounded-md'
+                    }
+                }) }}
+                {{ form_errors(form.projectNumber) }}
+            </div>
+        {% endif %}
+
+        <div data-controller="client-modal" class="mt-4">
+            {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            <a href="{{ path('app_client_new') }}" class="text-blue-400 text-sm mt-1 inline-block">+ Ajouter un nouveau client</a>
+        </div>
+
+        <div class="mt-4">
+            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}, 'type': 'textarea'}) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="mt-4">
+            {{ form_label(form.status, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.status) }}
+        </div>
+
+        <div class="mt-4">
+            {{ form_label(form.type, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.type, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.type) }}
+        </div>
+
+        <div class="mt-4">
+            {{ form_label(form.startDate, 'Date début', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.startDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.startDate) }}
+        </div>
+
+        <div class="mt-4">
+            {{ form_label(form.endDate, 'Date fin', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.endDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.endDate) }}
+        </div>
+    </fieldset>
+
+    <fieldset class="mb-6 p-4 border rounded bg-gray-700" data-controller="toggle-vat">
+        <legend class="text-lg font-semibold mb-4">TVA</legend>
+
+        <div class="mb-4">
+            {{ form_label(form.amount, 'Montant HT', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.amount) }}
+        </div>
+
+        <div class="flex items-center space-x-2 mb-4">
+            {{ form_widget(form.noVat, {
+                'attr': {
+                    'data-toggle-vat-target': 'checkbox',
+                    'data-action': 'toggle-vat#toggle'
+                }
+            }) }}
+            {{ form_label(form.noVat, 'Pas de TVA', {'label_attr': {'class': 'text-sm'}}) }}
+        </div>
+
+        <div
+            data-toggle-vat-target="vat"
+            class="mb-4"
+        >
+            {{ form_label(form.vatRate, 'TVA (%)', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black', 'step': '0.01'}}) }}
+            {{ form_errors(form.vatRate) }}
+        </div>
+    </fieldset>
+
+    <fieldset class="mb-6 p-4 border rounded bg-gray-700" data-controller="toggle-visibility">
+        <legend class="text-lg font-semibold mb-4">Récurrence</legend>
+
+        <div class="flex items-center space-x-2 mb-4">
+            {{ form_widget(form.isRecurring, {
+                'attr': {
+                    'data-toggle-visibility-target': 'checkbox',
+                    'data-action': 'toggle-visibility#toggle'
+                }
+            }) }}
+            {{ form_label(form.isRecurring, 'Projet récurrent', {'label_attr': {'class': 'text-sm'}}) }}
+        </div>
+
+        <div
+            data-toggle-visibility-target="toggleField"
+            class="mb-4 hidden"
+        >
+            {{ form_label(form.recurringAmount, 'Montant récurrent', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.recurringAmount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.recurringAmount) }}
+        </div>
+
+        <div
+            data-toggle-visibility-target="toggleField"
+            class="mb-4 hidden"
+        >
+            {{ form_label(form.recurringPeriod, 'Périodicité', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.recurringPeriod, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.recurringPeriod) }}
+        </div>
+    </fieldset>
+    <fieldset class="mb-6 p-4 border rounded bg-gray-700">
+        <legend class="text-lg font-semibold mb-4">Documents</legend>
+        {# Manage  Documents #}
+        {% include 'partials/_documents_form.html.twig' with {
+            form: form,
+            relatedEntity: project
+        } %}
+
+        {# Manage  Documents #}
+
+    </fieldset>
+
+    <div class="flex justify-between items-center">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enregistrer</button>
+    </div>
+
+    {{ form_end(form) }}
+</div>

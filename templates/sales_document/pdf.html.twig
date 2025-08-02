@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Document Commercial</title>
+    <style>
+        body { font-family: Helvetica, sans-serif; }
+        h1 { color: #333; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+    </style>
+</head>
+<body>
+<h1>Document Commercial #{{ salesDocument.id }}</h1>
+<p>Référence : {{ salesDocument.reference }}</p>
+<p>Date : {{ salesDocument.createdAt|date('d/m/Y') }}</p>
+
+<h2>Lignes</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Article</th>
+        <th>Quantité</th>
+        <th>Prix unitaire</th>
+        <th>Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in salesDocument.salesDocumentItems %}
+        <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.unitPrice|format_currency('EUR', app.request.locale ?: 'fr_FR') }}</td>
+            <td>{{ (item.quantity * item.unitPrice)|format_currency('EUR', app.request.locale ?: 'fr_FR') }}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total global : {{ salesDocument.getTotal()|number_format(2, ',', ' ') }} €</h3>
+</body>
+</html>

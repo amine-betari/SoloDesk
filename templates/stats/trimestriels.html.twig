@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <h1>Revenus par client par trimestre</h1>
+
+    <form method="get" action="{{ path('stats_clients_trimestriels') }}" id="anneeForm" class="mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+            <label for="annee" class="text-white text-lg font-semibold">Année :</label>
+            <select id="annee" name="annee"
+                    class="bg-gray-800 text-white border border-gray-600 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    onchange="document.getElementById('anneeForm').submit()">
+                {% for annee in annees %}
+                    <option value="{{ annee }}" {% if annee == anneeSelectionnee %}selected{% endif %}>{{ annee }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </form>
+
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        {% for periode, chart in charts %}
+            <div class="bg-white p-6 rounded shadow">
+                <h3 class="text-gray-900 mb-4">{{ periode }}</h3>
+                {{ render_chart(chart) }}
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

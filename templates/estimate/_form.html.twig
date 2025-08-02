@@ -1,0 +1,107 @@
+<div class="max-w-2xl mx-auto mt-10 bg-gray-800 p-8 rounded-lg shadow-lg text-white">
+    <h1 class="text-3xl font-bold mb-6">Créer un estimate</h1>
+
+    {{ form_start(form, {
+        'attr': {
+            'class': 'space-y-6',
+            'enctype': 'multipart/form-data'
+        }
+    }) }}
+    <fieldset class="mb-6 p-4 border rounded bg-gray-700">
+        <legend class="text-lg font-semibold mb-4">Informations générales</legend>
+
+        <div>
+            {{ form_label(form.client, 'Client', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.client) }}
+            <a href="{{ path('app_client_new') }}" class="text-blue-600 text-sm mt-1 inline-block">+ Ajouter un nouveau client</a>
+        </div>
+
+        {% if form.estimateNumber is defined %}
+            <div class="mb-4">
+                {{ form_label(form.estimateNumber, 'Référence') }}
+                {{ form_widget(form.estimateNumber, {
+                    'attr': {
+                        'class': 'form-input mt-1 block w-full text-gray-900 bg-white border border-gray-300 rounded-md'
+                    }
+                }) }}
+                {{ form_errors(form.estimateNumber) }}
+            </div>
+        {% endif %}
+
+        <div>
+            {{ form_label(form.startDate, 'Date de début', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.startDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.startDate) }}
+        </div>
+
+        <div>
+            {{ form_label(form.endDate, 'Date de fin', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.endDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.endDate) }}
+        </div>
+
+
+        <div>
+            {{ form_label(form.amount, 'Montant HT', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.amount) }}
+        </div>
+
+        <div data-controller="toggle-vat">
+            <div class="flex items-center space-x-2 mb-4">
+                {{ form_widget(form.noVat, {
+                    'attr': {
+                        'data-toggle-vat-target': 'checkbox',
+                        'data-action': 'toggle-vat#toggle'
+                    }
+                }) }}
+                {{ form_label(form.noVat, 'Pas de TVA', {'label_attr': {'class': 'text-sm'}}) }}
+            </div>
+
+            <div
+                data-toggle-vat-target="vat"
+                class="mb-4"
+            >
+                {{ form_label(form.vatRate, 'TVA (%)', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+                {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black', 'step': '0.01'}}) }}
+                {{ form_errors(form.vatRate) }}
+            </div>
+        </div>
+
+
+        <div>
+            {{ form_label(form.status, 'Statut', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.status) }}
+        </div>
+
+        {# Manage  Documents #}
+        {% include 'partials/_documents_form.html.twig' with {
+            form: form,
+            relatedEntity: estimate
+        } %}
+
+        {# Manage  Documents #}
+
+
+        <div>
+            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        {# Optionnel si tu veux gérer le projet lié #}
+        {# <div>
+            {{ form_label(form.project, 'Projet lié', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+            {{ form_widget(form.project, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+            {{ form_errors(form.project) }}
+        </div> #}
+        <div class="flex justify-between items-center">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enregistrer</button>
+        </div>
+    </fieldset>
+
+
+    {{ form_end(form) }}
+</div>

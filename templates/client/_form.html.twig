@@ -1,0 +1,49 @@
+<div class="max-w-2xl mx-auto mt-10 bg-gray-800 p-8 rounded-lg shadow-lg text-white">
+    <h1 class="text-3xl font-bold mb-6">Créer un client</h1>
+
+    {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+    <div>
+        {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+        {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_errors(form.name) }}
+    </div>
+
+    <div>
+        {{ form_label(form.email, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+        {{ form_widget(form.email, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_errors(form.email) }}
+    </div>
+
+    <div>
+        {{ form_label(form.country, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+        {{ form_widget(form.country, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_errors(form.country) }}
+    </div>
+
+    <div>
+        {{ form_label(form.currency, 'Devise', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+        {{ form_widget(form.currency, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_errors(form.currency) }}
+    </div>
+
+    <div>
+        {{ form_label(form.firstContactAt, 'Premier Contact', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+        {{ form_widget(form.firstContactAt, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_errors(form.firstContactAt) }}
+    </div>
+
+    <div>
+        {{ form_label(form.notes, 'Description', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
+        {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_errors(form.notes) }}
+    </div>
+
+
+
+    <div class="flex justify-between items-center">
+        <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enregistrer</button>
+    </div>
+
+    {{ form_end(form) }}
+</div>
