@@ -1,27 +1,27 @@
 {% if estimate.salesDocuments|length > 0 %}
-    <div class="bg-green-400 shadow rounded p-6 mb-6">
-        <h2 class="text-xl font-semibold mb-4">Document générés</h2>
+    <div class="bg-gray-700 shadow rounded p-6 mb-6 text-white">
+        <h2 class="text-xl font-semibold mb-4">Documents générés</h2>
 
-        <table class="min-w-full text-sm text-left text-gray-700">
-            <thead class="bg-gray-100 text-xs uppercase">
+        <table class="min-w-full text-sm text-left text-gray-100">
+            <thead class="bg-gray-800 text-xs uppercase">
             <tr>
-                <th class="px-4 py-2">Réf.</th>
-                <th class="px-4 py-2">Type</th>
-                <th class="px-4 py-2">Date</th>
-                <th class="px-4 py-2">Actions</th>
+                <th class="px-4 py-2 border-b border-gray-600">Réf.</th>
+                <th class="px-4 py-2 border-b border-gray-600">Type</th>
+                <th class="px-4 py-2 border-b border-gray-600">Date</th>
+                <th class="px-4 py-2 border-b border-gray-600">Actions</th>
             </tr>
             </thead>
-            <tbody class="divide-y">
+            <tbody class="divide-y divide-gray-600">
             {% for doc in estimate.salesDocuments %}
-                <tr class="hover:bg-gray-50">
+                <tr class="hover:bg-gray-600">
                     <td class="px-4 py-2">{{ doc.reference }}</td>
                     <td class="px-4 py-2">{{ doc.type }}</td>
                     <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('Y-m-d') : '—' }}</td>
                     <td class="px-4 py-2">
                         <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
-                           class="text-blue-600 hover:underline">🔍 Voir</a>
+                           class="text-blue-400 hover:text-blue-500">🔍 Voir</a>
                         <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
-                           class="ml-3 text-yellow-600 hover:underline">✏️ Modifier</a>
+                           class="ml-3 text-yellow-400 hover:text-yellow-500">✏️ Modifier</a>
                     </td>
                 </tr>
             {% endfor %}

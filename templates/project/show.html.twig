@@ -3,78 +3,99 @@
 {% block title %}Projet : {{ project.name }}{% endblock %}
 
 {% block body %}
-    <div class="max-w-3xl mx-auto py-8">
-        <h1 class="text-2xl font-bold mb-6">Détails du projet</h1>
+    <div class="max-w-4xl mx-auto py-10 space-y-8">
 
-        <div class="bg-white shadow rounded p-6 mb-6">
-            <dl class="grid grid-cols-2 gap-4">
+        <h1 class="text-4xl font-bold text-white mb-6">Détails du projet</h1>
+
+        <!-- Informations principales -->
+        <div class="bg-gray-800 shadow-lg rounded-xl p-6 space-y-6">
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Référence Projet</dt>
-                    <dd class="text-lg text-gray-900">{{ project.projectNumber }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Référence Projet</dt>
+                    <dd class="text-lg font-semibold text-white">{{ project.projectNumber }}</dd>
                 </div>
+
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Nom</dt>
-                    <dd class="text-lg text-gray-900">{{ project.name }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Nom</dt>
+                    <dd class="text-lg font-semibold text-white">{{ project.name }}</dd>
                 </div>
+
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Date de début</dt>
-                    <dd class="text-lg text-gray-900">{{ project.startDate ? project.startDate|date('Y-m-d H:i') : 'N/A' }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Date de début</dt>
+                    <dd class="text-lg text-white">{{ project.startDate ? project.startDate|date('d/m/Y H:i') : 'N/A' }}</dd>
                 </div>
+
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Date de fin</dt>
-                    <dd class="text-lg text-gray-900">{{ project.endDate ? project.endDate|date('Y-m-d H:i') : 'N/A' }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Date de fin</dt>
+                    <dd class="text-lg text-white">{{ project.endDate ? project.endDate|date('d/m/Y H:i') : 'N/A' }}</dd>
                 </div>
+
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Statut</dt>
-                    <dd class="text-lg text-gray-900">{{ project.status }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Statut</dt>
+                    <dd class="text-lg text-white">{{ project.status }}</dd>
                 </div>
-                <div class="">
-                    <dt class="text-sm font-medium text-gray-500">Client</dt>
-                    <dd class="text-lg text-gray-900">{{ project.client.name }}</dd>
-                </div>
-                <div class="col-span-2">
-                    <dt class="text-sm font-medium text-gray-500">Montant</dt>
-                    <dd class="text-lg text-gray-900">{{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}</dd>
-                </div>
+
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Paiements</dt>
-                    <dd class="text-lg text-gray-900">
-                        <ul class="list-disc list-inside mb-4">
-                            {% for payment in project.payments %}
-                                <li class="mb-1">
-                                    {{ payment.date|date('d/m/Y') }} — {{ payment.amount }} {{ project.currency }}
-                                    {% if payment.label %} ({{ payment.label }}) {% endif %}
-                                    <a href="{{ path('app_payment_edit', {id: payment.id}) }}" class="ml-2 text-blue-600 hover:underline">✏️</a>
-                                </li>
-                            {% else %}
-                                <li>Aucun paiement encore enregistré.</li>
-                            {% endfor %}
-                        </ul>
-                        <a href="{{ path('app_payment_new', { project: project.id }) }}"
-                           class="inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
-                            Ajouter un paiement
-                        </a>
+                    <dt class="text-sm font-medium text-gray-400">Client</dt>
+                    <dd class="text-lg text-white">{{ project.client.name }}</dd>
+                </div>
+
+                <div class="col-span-1 md:col-span-2">
+                    <dt class="text-sm font-medium text-gray-400">Montant</dt>
+                    <dd class="text-lg text-white font-semibold">
+                        {{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
                     </dd>
                 </div>
             </dl>
         </div>
 
+        <!-- Paiements -->
+        <div class="bg-gray-800 shadow-lg rounded-xl p-6 space-y-4">
+            <h2 class="text-2xl font-semibold text-white mb-4">Paiements</h2>
+            {% if project.payments|length > 0 %}
+                <ul class="space-y-2">
+                    {% for payment in project.payments %}
+                        <li class="flex justify-between items-center bg-gray-700 p-3 rounded">
+                        <span>
+                            {{ payment.date|date('d/m/Y') }} — {{ payment.amount }} {{ project.currency }}
+                            {% if payment.label %} ({{ payment.label }}) {% endif %}
+                        </span>
+                            <a href="{{ path('app_payment_edit', {id: payment.id}) }}"
+                               class="text-blue-400 hover:underline text-sm">✏️ Modifier</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="text-gray-400">Aucun paiement encore enregistré.</p>
+            {% endif %}
+            <a href="{{ path('app_payment_new', { project: project.id }) }}"
+               class="inline-block mt-4 px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                Ajouter un paiement
+            </a>
+        </div>
+
+        <!-- Documents et actions -->
         {% if project.id %}
-            <div class="mt-6 pb-4">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
                 <a href="{{ path('app_sales_document_new', {'projectId': project.id}) }}"
-                   class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                   class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
                     Générer un document commercial
                 </a>
+                {% include 'components/_list_for_estimate.html.twig' with { estimate: project } %}
             </div>
-            {% include 'components/_list_for_estimate.html.twig' with { estimate: project } %}
         {% endif %}
 
         {% include 'components/_documents_list.html.twig' with { documents: project.documents } %}
 
-        <div class="mt-6 flex space-x-4">
-            <a href="{{ path('app_project_index') }}" class="text-sm text-gray-600 hover:underline">← Retour à la liste</a>
-            <a href="{{ path('app_project_edit', {'id': project.id}) }}" class="text-sm text-blue-600 hover:underline">Modifier</a>
+        <!-- Navigation et actions -->
+        <div class="flex flex-wrap gap-4 mt-6">
+            <a href="{{ path('app_project_index') }}"
+               class="px-4 py-2 bg-gray-700 text-gray-300 rounded hover:bg-gray-600 transition">← Retour à la liste</a>
+            <a href="{{ path('app_project_edit', {'id': project.id}) }}"
+               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Modifier</a>
             {{ include('project/_delete_form.html.twig') }}
         </div>
+
     </div>
 {% endblock %}

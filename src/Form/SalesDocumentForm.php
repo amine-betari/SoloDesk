@@ -2,14 +2,18 @@
 
 namespace App\Form;
 
+use App\Entity\Client;
 use App\Entity\Estimate;
 use App\Entity\Project;
 use App\Entity\SalesDocument;
+use App\Constants\InvoiceStatus;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -18,7 +22,6 @@ class SalesDocumentForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-          //  ->add('type')
             ->add('reference')
             ->add('salesDocumentItems', CollectionType::class, [
                 'entry_type' => SalesDocumentItemForm::class,
@@ -29,6 +32,24 @@ class SalesDocumentForm extends AbstractType
                 'label' => false,
             ])
         ;
+        // Champ client pour facture “directe”
+        $builder->add('client', EntityType::class, [
+            'class' => Client::class,
+            'choice_label' => 'name',
+            'required' => false,
+            'placeholder' => '— Sélectionner un client —',
+        ])
+
+            ->add('notes', TextareaType::class, [
+                'label' => 'Notes / Informations complémentaires',
+                'required' => false,
+                'attr' => ['class' => 'form-control', 'rows' => 3],
+            ])
+
+            ->add('status', ChoiceType::class, [
+                'label' => 'Statut',
+                'choices' => InvoiceStatus::CHOICES
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

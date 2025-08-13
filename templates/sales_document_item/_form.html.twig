@@ -1,25 +1,25 @@
 <div class="grid grid-cols-1 gap-4">
     <div>
-        {{ form_label(form.description, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.description, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_label(form.description, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+        {{ form_widget(form.description, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-800 text-gray-200'}}) }}
         {{ form_errors(form.description) }}
     </div>
 
     <div>
-        {{ form_label(form.quantity, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.quantity, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_label(form.quantity, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+        {{ form_widget(form.quantity, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-800 text-gray-200'}}) }}
         {{ form_errors(form.quantity) }}
     </div>
 
     <div>
-        {{ form_label(form.unitPrice, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.unitPrice, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_label(form.unitPrice, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+        {{ form_widget(form.unitPrice, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-800 text-gray-200'}}) }}
         {{ form_errors(form.unitPrice) }}
     </div>
 
     <div>
-        {{ form_label(form.lineTotal, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.lineTotal, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+        {{ form_label(form.lineTotal, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+        {{ form_widget(form.lineTotal, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-800 text-gray-200'}}) }}
         {{ form_errors(form.lineTotal) }}
     </div>
 </div>

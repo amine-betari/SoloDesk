@@ -3,11 +3,5 @@
 {% block title %}Edit SalesDocument{% endblock %}
 
 {% block body %}
-    <h1>Edit SalesDocument</h1>
-
     {{ include('sales_document/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('app_sales_document_index') }}">back to list</a>
-
-    {{ include('sales_document/_delete_form.html.twig') }}
 {% endblock %}

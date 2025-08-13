@@ -1,44 +1,59 @@
-<div class="max-w-2xl mx-auto mt-10 bg-gray-800 p-8 rounded-lg shadow-lg text-white">
-    <h1 class="text-3xl font-bold mb-6">Créer un paiement</h1>
+<div class="max-w-6xl mx-auto mt-12 bg-gray-900 p-8 rounded-xl shadow-xl text-white">
+    <h1 class="text-4xl font-extrabold mb-8">Créer un paiement</h1>
 
-    {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+    {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
 
-    <div>
-        {{ form_label(form.date, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.date, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
-        {{ form_errors(form.date) }}
-    </div>
+    <!-- Informations du paiement -->
+    <fieldset class="bg-gray-800 p-6 rounded-lg space-y-6">
+        <legend class="text-2xl font-semibold">Informations du paiement</legend>
 
-    <div>
-        {{ form_label(form.amount, 'Montant HT', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
-        {{ form_errors(form.amount) }}
-    </div>
+        <div class="space-y-2">
+            {{ form_label(form.date, 'Date', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+            {{ form_widget(form.date, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
+            {{ form_errors(form.date, {'attr': {'class': 'text-red-400 text-sm mt-1'}}) }}
+        </div>
 
-    <div>
-        {{ form_label(form.label, 'Libellé (LOT...)', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.label, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
-        {{ form_errors(form.label) }}
-    </div>
+        <div class="space-y-2">
+            {{ form_label(form.amount, 'Montant HT', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+            {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
+            {{ form_errors(form.amount, {'attr': {'class': 'text-red-400 text-sm mt-1'}}) }}
+        </div>
 
+        <div class="space-y-2">
+            {{ form_label(form.label, 'Libellé (LOT...)', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+            {{ form_widget(form.label, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
+            {{ form_errors(form.label, {'attr': {'class': 'text-red-400 text-sm mt-1'}}) }}
+        </div>
 
-    <div>
-        {{ form_label(form.method, 'Méthode de paiement', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.method, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
-        {{ form_errors(form.method) }}
-    </div>
+        <div class="space-y-2">
+            {{ form_label(form.method, 'Méthode de paiement', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+            {{ form_widget(form.method, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
+            {{ form_errors(form.method, {'attr': {'class': 'text-red-400 text-sm mt-1'}}) }}
+        </div>
 
-    <div>
-        {{ form_label(form.invoiceReference, 'Référence de facture', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-        {{ form_widget(form.invoiceReference, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
-        {{ form_errors(form.invoiceReference) }}
-    </div>
+        <div class="space-y-2">
+            {{ form_label(form.invoiceReference, 'Référence de facture', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
+            {{ form_widget(form.invoiceReference, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
+            {{ form_errors(form.invoiceReference, {'attr': {'class': 'text-red-400 text-sm mt-1'}}) }}
+        </div>
+    </fieldset>
 
-    <div class="flex justify-end">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-            Enregistrer
-        </button>
+    <!-- Bouton -->
+    <div class="flex justify-end mt-6">
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Enregistrer</button>
     </div>
 
     {{ form_end(form) }}
+
+    {% if button_label is defined  %}
+        <div class="flex space-x-4">
+            <a href="{{ path('app_payment_index') }}"
+               class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+
+            {{ include('payment/_delete_form.html.twig') }}
+        </div>
+    {% else %}
+        <a href="{{ path('app_payment_index') }}"
+           class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+    {% endif %}
 </div>

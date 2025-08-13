@@ -3,65 +3,64 @@
 {% block title %}Document commercial : {{ sales_document.reference }}{% endblock %}
 
 {% block body %}
-    <div class="max-w-3xl mx-auto py-8 text-gray-900">
-        <h1 class="text-2xl font-bold mb-6 text-white">Détails du document commercial</h1>
+    <div class="w-full min-h-screen bg-gray-900 p-6">
+        <div class="mx-auto max-w-6xl">
+            <h1 class="text-3xl font-bold mb-8 text-white">Détails du document commercial</h1>
 
-        <div class="bg-white shadow rounded p-6 mb-6">
-            <dl class="grid grid-cols-2 gap-4">
+            {# Infos principales #}
+            <div class="bg-gray-800 shadow rounded-lg p-6 mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Référence</dt>
-                    <dd class="text-lg text-gray-900">{{ sales_document.reference }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Référence</dt>
+                    <dd class="text-lg text-gray-200">{{ sales_document.reference }}</dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Type</dt>
-                    <dd class="text-lg text-gray-900">{{ sales_document.type }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Type</dt>
+                    <dd class="text-lg text-gray-200">{{ sales_document.type }}</dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Créé le</dt>
-                    <dd class="text-lg text-gray-900">
-                        {{ sales_document.createdAt ? sales_document.createdAt|date('Y-m-d H:i') : 'N/A' }}
-                    </dd>
+                    <dt class="text-sm font-medium text-gray-400">Créé le</dt>
+                    <dd class="text-lg text-gray-200">{{ sales_document.createdAt ? sales_document.createdAt|date('Y-m-d H:i') : 'N/A' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Modifié le</dt>
-                    <dd class="text-lg text-gray-900">
-                        {{ sales_document.modifiedAt ? sales_document.modifiedAt|date('Y-m-d H:i') : 'N/A' }}
-                    </dd>
+                    <dt class="text-sm font-medium text-gray-400">Modifié le</dt>
+                    <dd class="text-lg text-gray-200">{{ sales_document.modifiedAt ? sales_document.modifiedAt|date('Y-m-d H:i') : 'N/A' }}</dd>
                 </div>
-            </dl>
+                <div>
+                    <dt class="text-sm font-medium text-gray-400">Statut</dt>
+                    {% set status_class = sales_document.status == 'payé' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white' %}
+                    <span class="px-3 py-1 rounded-full font-semibold {{ status_class }}">
+                    {{ sales_document.status|capitalize }}
+                </span>
+                </div>
+            </div>
+
+            {# Lignes d'articles #}
+            {% if sales_document.salesDocumentItems is not empty %}
+                {% include 'components/_items_table.html.twig' with {
+                    items: sales_document.salesDocumentItems,
+                    title: "Lignes d'articles",
+                    dark_mode: true
+                } %}
+            {% else %}
+                <div class="bg-gray-800 shadow rounded-lg p-6 text-gray-400 text-center">Aucune ligne d'article enregistrée.</div>
+            {% endif %}
+
+            {# Actions #}
+            <div class="flex flex-wrap space-x-4 mt-8">
+                <a href="{{ path('app_sales_document_index') }}" class="text-sm text-gray-400 hover:underline">← Retour à la liste</a>
+                <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}" class="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500">Modifier</a>
+                {{ include('sales_document/_delete_form.html.twig') }}
+
+                <a href="{{ path('app_sales_document_generate_pdf', { id: sales_document.id }) }}" class="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-600">
+                    📄 Télécharger PDF
+                </a>
+                <a href="{{ path('app_sales_document_generate_word', { id: sales_document.id }) }}" class="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-700">
+                    📝 Télécharger Word
+                </a>
+                <a href="{{ path('app_sales_document_generate_excel', { id: sales_document.id }) }}" class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">
+                    📊 Télécharger Excel
+                </a>
+            </div>
         </div>
-
-        {% if sales_document.salesDocumentItems is not empty %}
-            {% include 'components/_items_table.html.twig' with {
-                items: sales_document.salesDocumentItems,
-                title: "Lignes d'articles"
-            } %}
-        {% else %}
-            <p class="text-white">Aucune ligne d'article enregistrée.</p>
-        {% endif %}
-
-        <div class="mt-6 flex space-x-4">
-            <a href="{{ path('app_sales_document_index') }}" class="text-sm text-gray-300 hover:underline">← Retour à la liste</a>
-            <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}" class="text-sm text-blue-400 hover:underline">Modifier</a>
-            {{ include('sales_document/_delete_form.html.twig') }}
-        </div>
-
-        <div class="flex space-x-4 mt-6">
-             <a href="{{ path('app_sales_document_generate_pdf', { id: sales_document.id }) }}"
-               class="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-700">
-                📄 Télécharger en PDF
-            </a>
-
-            <a href="{{ path('app_sales_document_generate_word', { id: sales_document.id }) }}"
-               class="bg-blue-800 text-white px-4 py-2 rounded hover:bg-blue-700">
-                📝 Télécharger en Word
-            </a>
-
-            <a href="{{ path('app_sales_document_generate_excel', { id: sales_document.id }) }}"
-               class="bg-green-700 text-white px-4 py-2 rounded hover:bg-green-800">
-                📊 Télécharger en Excel
-            </a>
-        </div>
-
     </div>
 {% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+{% block title %}Modèles de documents{% endblock %}
+
+{% block body %}
+    <h1 class="text-2xl font-bold mb-6">Modèles de documents</h1>
+
+    <a href="{{ path('app_templates_upload') }}" class="inline-block mb-4 px-4 py-2 bg-blue-600 text-white rounded">Uploader un modèle</a>
+
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg shadow">
+            <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-2 text-left">Nom</th>
+                <th class="px-4 py-2 text-left">Type</th>
+                <th class="px-4 py-2 text-left">Format</th>
+                <th class="px-4 py-2 text-left">Fichier</th>
+                <th class="px-4 py-2 text-left">Défaut</th>
+                <th class="px-4 py-2 text-left">Actions</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y">
+            {% for t in templates %}
+                <tr>
+                    <td class="px-4 py-2">{{ t.name }}</td>
+                    <td class="px-4 py-2">{{ t.type }}</td>
+                    <td class="px-4 py-2">{{ t.format }}</td>
+                    <td class="px-4 py-2"><a class="text-blue-600 underline" href="/{{ t.filePath }}" target="_blank">voir</a></td>
+                    <td class="px-4 py-2">
+                        {% if t.isDefault %}
+                            <span class="rounded bg-green-100 text-green-800 px-2 py-0.5 text-xs">Oui</span>
+                        {% else %}
+                            <span class="text-gray-500 text-xs">—</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-2">
+                        {% if not t.isDefault %}
+                            <a href="{{ path('app_templates_set_default', {id: t.id}) }}" class="text-indigo-600">Définir par défaut</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="6" class="px-4 py-4 text-center text-gray-500">Aucun modèle</td></tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

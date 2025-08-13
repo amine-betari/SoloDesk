@@ -1,14 +1,14 @@
 {% if documents|length > 0 %}
-    <div class="bg-green-400 shadow rounded p-6 mb-6">
+    <div class="bg-gray-700 shadow rounded p-6 mb-6 text-white">
         <h2 class="text-xl font-semibold mb-4">Documents liés</h2>
         <ul class="space-y-2">
             {% for document in documents %}
-                <li class="flex justify-between items-center border-b pb-2">
+                <li class="flex justify-between items-center border-b border-gray-600 pb-2">
                     <span>{{ document.filename }}</span>
                     <a
                         href="{{ asset('uploads/documents/' ~ document.filename) }}"
                         target="_blank"
-                        class="text-blue-600 hover:underline"
+                        class="text-blue-400 hover:text-blue-500"
                     >
                         Télécharger
                     </a>

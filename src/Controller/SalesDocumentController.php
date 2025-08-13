@@ -22,6 +22,7 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use PhpOffice\PhpWord\TemplateProcessor;
 
 #[Route('/sales/document')]
 final class SalesDocumentController extends AbstractController
@@ -74,10 +75,10 @@ final class SalesDocumentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
             // Mettre à jour la date de modification
             $salesDocument->setModifiedAt(new \DateTimeImmutable());
+
+            $entityManager->flush();
 
             return $this->redirectToRoute('app_sales_document_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -192,7 +193,6 @@ final class SalesDocumentController extends AbstractController
         return $this->file($tempFile, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
     }
 
-
     #[Route('/sales-document/{id}/excel', name: 'app_sales_document_generate_excel')]
     public function generateExcel(SalesDocument $salesDocument): Response
     {
@@ -267,6 +267,32 @@ final class SalesDocumentController extends AbstractController
             ]
         );
     }
+
+
+    #[Route('/invoice/new', name: 'app_invoice_new')]
+    public function createInvoice(Request $request, EntityManagerInterface $em): Response
+    {
+        $invoice = new SalesDocument();
+        $invoice->setType('invoice');
+        $invoice->setCreatedAt(new \DateTimeImmutable());
+        $invoice->setReference('INV-' . date('Ymd-His')); // à remplacer par un générateur propre
+
+        $form = $this->createForm(SalesDocumentForm::class, $invoice);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->persist($invoice);
+            $em->flush();
+
+            return $this->redirectToRoute('app_sales_document_index', [], Response::HTTP_SEE_OTHER);
+
+        }
+
+        return $this->render('sales_document/new.html.twig', [
+            'form' => $form,
+        ]);
+    }
+
 
 
 }

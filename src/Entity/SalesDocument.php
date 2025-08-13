@@ -6,6 +6,8 @@ use App\Repository\SalesDocumentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 #[ORM\Entity(repositoryClass: SalesDocumentRepository::class)]
 class SalesDocument
@@ -32,6 +34,15 @@ class SalesDocument
 
     #[ORM\ManyToOne(inversedBy: 'salesDocuments')]
     private ?Estimate $estimate = null;
+
+    #[ORM\ManyToOne(inversedBy: 'salesDocuments')]
+    private ?Client $client = null;
+
+    #[ORM\Column(length: 20)]
+    private string $status = 'draft'; // Valeur par défaut
+
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $notes = null;
 
     /**
      * @var Collection<int, SalesDocumentItem>
@@ -133,7 +144,7 @@ class SalesDocument
         if ($this->estimate !== null) {
             return $this->estimate->getClient();
         }
-        return null;
+        return $this->client;
     }
 
     /**
@@ -179,4 +190,73 @@ class SalesDocument
 
         return $total;
     }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+    public function setStatus(string $status): static
+    {
+        // On peut éventuellement vérifier que le status est valide
+        $validStatuses = ['draft', 'sent', 'partially_paid', 'paid', 'cancelled'];
+        if (!in_array($status, $validStatuses, true)) {
+            throw new \InvalidArgumentException("Statut invalide pour le SalesDocument : $status");
+        }
+
+        $this->status = $status;
+        return $this;
+    }
+
+    public function setClient(?Client $client): self
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateContext(ExecutionContextInterface $context): void
+    {
+        if (!$this->client && !$this->project && !$this->estimate) {
+            $context->buildViolation('Veuillez choisir un Client ou lier un Projet/Devis.')
+                ->atPath('client')->addViolation();
+        }
+
+        if ($this->project && $this->client && $this->project->getClient() !== $this->client) {
+            $context->buildViolation('Le client ne correspond pas à celui du projet.')
+                ->atPath('client')->addViolation();
+        }
+
+        if ($this->estimate && $this->client && $this->estimate->getClient() !== $this->client) {
+            $context->buildViolation('Le client ne correspond pas à celui du devis.')
+                ->atPath('client')->addViolation();
+        }
+    }
+
+
+    public function getResolvedClient(): ?Client
+    {
+        return $this->client
+            ?? $this->estimate?->getClient()
+            ?? $this->project?->getClient();
+    }
+
+    public function getResolvedCurrency(string $fallback = 'EUR'): string
+    {
+        return $this->estimate?->getCurrency()
+            ?? $this->project?->getCurrency()
+            ?? $this->getResolvedClient()?->getCurrency()
+            ?? $fallback;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): static
+    {
+        $this->notes = $notes;
+        return $this;
+    }
+
 }

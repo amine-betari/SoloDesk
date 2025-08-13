@@ -3,44 +3,52 @@
 {% block title %}Paiement n°{{ payment.id }}{% endblock %}
 
 {% block body %}
-    <div class="max-w-2xl mx-auto py-8">
-        <h1 class="text-2xl font-bold mb-6">Détails du paiement</h1>
+    <div class="max-w-6xl mx-auto mt-12 bg-gray-900 p-8 rounded-xl shadow-xl text-white">
+        <h1 class="text-4xl font-extrabold mb-8">Détails du paiement</h1>
 
-        <div class="bg-white shadow rounded p-6 mb-6">
-            <dl class="grid grid-cols-2 gap-4">
+        <fieldset class="bg-gray-800 p-6 rounded-lg space-y-6">
+            <legend class="text-2xl font-semibold">Informations générales</legend>
+
+            <div class="grid grid-cols-2 gap-6">
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">ID</dt>
-                    <dd class="text-lg text-gray-900">{{ payment.id }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">ID</dt>
+                    <dd class="text-lg text-gray-200">{{ payment.id }}</dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Date</dt>
-                    <dd class="text-lg text-gray-900">
+                    <dt class="text-sm font-medium text-gray-400">Date</dt>
+                    <dd class="text-lg text-gray-200">
                         {{ payment.date ? payment.date|date('d/m/Y H:i') : 'Non renseignée' }}
                     </dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Montant</dt>
-                    <dd class="text-lg text-gray-900">
+                    <dt class="text-sm font-medium text-gray-400">Montant</dt>
+                    <dd class="text-lg text-gray-200">
                         {{ payment.amount|number_format(2, ',', ' ') }} €
                     </dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Méthode</dt>
-                    <dd class="text-lg text-gray-900">{{ payment.method }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Méthode</dt>
+                    <dd class="text-lg text-gray-200">{{ payment.method }}</dd>
                 </div>
                 <div class="col-span-2">
-                    <dt class="text-sm font-medium text-gray-500">Libellé</dt>
-                    <dd class="text-lg text-gray-900">{{ payment.label ?: '—' }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Libellé</dt>
+                    <dd class="text-lg text-gray-200">{{ payment.label ?: '—' }}</dd>
                 </div>
-            </dl>
-        </div>
+                {% if payment.invoiceReference %}
+                    <div class="col-span-2">
+                        <dt class="text-sm font-medium text-gray-400">Référence facture</dt>
+                        <dd class="text-lg text-gray-200">{{ payment.invoiceReference }}</dd>
+                    </div>
+                {% endif %}
+            </div>
+        </fieldset>
 
-        <div class="flex space-x-4">
+        <div class="flex space-x-4 mt-6">
             <a href="{{ path('app_payment_index') }}"
-               class="text-sm text-gray-600 hover:underline">← Retour à la liste</a>
+               class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white text-sm transition-colors">← Retour à la liste</a>
 
             <a href="{{ path('app_payment_edit', {'id': payment.id}) }}"
-               class="text-sm text-blue-600 hover:underline">Modifier</a>
+               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm transition-colors">Modifier</a>
 
             {{ include('payment/_delete_form.html.twig') }}
         </div>

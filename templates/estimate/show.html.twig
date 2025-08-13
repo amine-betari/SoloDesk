@@ -3,37 +3,42 @@
 {% block title %}Détail du devis{% endblock %}
 
 {% block body %}
-    <div class="max-w-3xl mx-auto py-8">
-        <h1 class="text-2xl font-bold mb-6">Détail du devis</h1>
+    <div class="max-w-6xl mx-auto py-8">
+        <h1 class="text-2xl font-bold mb-6 text-white">Détail du devis</h1>
 
-        <div class="bg-white shadow rounded p-6 mb-6">
+        <div class="bg-gray-800 shadow rounded p-6 mb-6 text-gray-200">
             <dl class="grid grid-cols-2 gap-4">
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">ID</dt>
-                    <dd class="text-lg text-gray-900">{{ estimate.id }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">ID</dt>
+                    <dd class="text-lg text-white">{{ estimate.id }}</dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Numéro</dt>
-                    <dd class="text-lg text-gray-900">{{ estimate.estimateNumber }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Numéro</dt>
+                    <dd class="text-lg text-white">{{ estimate.estimateNumber }}</dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Montant</dt>
-                    <dd class="text-lg text-gray-900">{{ estimate.amount|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Montant</dt>
+                    <dd class="text-lg text-white">{{ estimate.amount|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}</dd>
                 </div>
                 <div>
-                    <dt class="text-sm font-medium text-gray-500">Statut</dt>
-                    <dd class="text-lg text-gray-900">{{ estimate.status }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-500">Créé le</dt>
-                    <dd class="text-lg text-gray-900">
-                        {# {{ estimate.createdAt ? estimate.createdAt|date('Y-m-d H:i') : 'N/A' }}  #}
-                        {{ estimate.startDate ? estimate.startDate|date('Y-m-d H:i') : 'N/A' }}
+                    <dt class="text-sm font-medium text-gray-400">Statut</dt>
+                    <dd class="text-lg">
+                        {% set color =
+                            estimate.status == 'Brouillon' ? 'gray' :
+                            estimate.status == 'Envoyé' ? 'blue' :
+                            estimate.status == 'Accepté' ? 'green' :
+                            estimate.status == 'Refusé' ? 'red' : 'gray'
+                        %}
+                        <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">{{ estimate.status }}</span>
                     </dd>
                 </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-400">Créé le</dt>
+                    <dd class="text-lg text-white">{{ estimate.startDate ? estimate.startDate|date('Y-m-d H:i') : 'N/A' }}</dd>
+                </div>
                 <div class="col-span-2">
-                    <dt class="text-sm font-medium text-gray-500">Description</dt>
-                    <dd class="text-gray-800 whitespace-pre-line">{{ estimate.description ?: '–' }}</dd>
+                    <dt class="text-sm font-medium text-gray-400">Description</dt>
+                    <dd class="text-gray-300 whitespace-pre-line">{{ estimate.description ?: '–' }}</dd>
                 </div>
             </dl>
         </div>
@@ -42,15 +47,16 @@
 
         {% if not estimate.project %}
             <a href="{{ path('app_estimate_convert_to_project', { id: estimate.id }) }}"
-               class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+               class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4">
                 Convertir en projet
             </a>
         {% else %}
-            <p class="text-green-600 mt-4">
+            <p class="text-green-400 mt-4">
                 Déjà converti en projet :
-                <a href="{{ path('app_project_show', { id: estimate.project.id }) }}" class="underline">voir le projet</a>
+                <a href="{{ path('app_project_show', { id: estimate.project.id }) }}" class="underline text-white">voir le projet</a>
             </p>
         {% endif %}
+
         {% if estimate.id %}
             <div class="mt-6 pb-4">
                 <a href="{{ path('app_sales_document_new', {'estimateId': estimate.id}) }}"
@@ -61,10 +67,9 @@
             {% include 'components/_list_for_estimate.html.twig' with { estimate: estimate } %}
         {% endif %}
 
-
         <div class="mt-6 flex space-x-4">
-            <a href="{{ path('app_estimate_index') }}" class="text-sm text-gray-600 hover:underline">← Retour à la liste</a>
-            <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="text-sm text-blue-600 hover:underline">Modifier</a>
+            <a href="{{ path('app_estimate_index') }}" class="text-sm text-gray-400 hover:underline">← Retour à la liste</a>
+            <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="text-sm text-blue-400 hover:underline">Modifier</a>
             {{ include('estimate/_delete_form.html.twig') }}
         </div>
     </div>

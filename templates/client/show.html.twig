@@ -3,32 +3,42 @@
 {% block title %}Client{% endblock %}
 
 {% block body %}
-    <h1>Client</h1>
+    <div class="max-w-6xl mx-auto py-8">
+        <h1 class="text-3xl font-bold mb-6 text-white">Détails du client</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ client.id }}</td>
-            </tr>
-            <tr>
-                <th>Name</th>
-                <td>{{ client.name }}</td>
-            </tr>
-            <tr>
-                <th>Email</th>
-                <td>{{ client.email }}</td>
-            </tr>
-            <tr>
-                <th>Country</th>
-                <td>{{ client.country }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="bg-gray-800 text-white rounded-lg shadow-lg p-6 mb-6">
+            <dl class="grid grid-cols-2 gap-4">
+                <div>
+                    <dt class="text-sm font-medium text-gray-300">ID</dt>
+                    <dd class="text-lg text-white">{{ client.id }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-300">Nom</dt>
+                    <dd class="text-lg text-white">{{ client.name }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-300">Email</dt>
+                    <dd class="text-lg text-white">{{ client.email }}</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-300">Pays</dt>
+                    <dd class="text-lg text-white">{{ client.country }}</dd>
+                </div>
+                <div class="col-span-2">
+                    <dt class="text-sm font-medium text-gray-300">Notes</dt>
+                    <dd class="text-white whitespace-pre-line">{{ client.notes ?: '–' }}</dd>
+                </div>
+            </dl>
+        </div>
 
-    <a href="{{ path('app_client_index') }}">back to list</a>
+        <div class="flex space-x-4">
+            <a href="{{ path('app_client_index') }}"
+               class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
 
-    <a href="{{ path('app_client_edit', {'id': client.id}) }}">edit</a>
+            <a href="{{ path('app_client_edit', {'id': client.id}) }}"
+               class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white">Modifier</a>
 
-    {{ include('client/_delete_form.html.twig') }}
+            {{ include('client/_delete_form.html.twig') }}
+        </div>
+    </div>
 {% endblock %}
