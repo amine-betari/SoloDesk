@@ -21,6 +21,11 @@
             </div>
         {% endif %}
 
+        <div class="space-y-2">
+            {{ form_label(form.name, 'Name', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+            {{ form_errors(form.name) }}
+        </div>
 
         <div class="space-y-2">
             {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium'}}) }}

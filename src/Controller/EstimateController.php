@@ -6,6 +6,7 @@ use App\Constants\ProjectStatuses;
 use App\Constants\ProjectTypes;
 use App\Entity\Document;
 use App\Entity\Estimate;
+use App\Repository\PaginationService;
 use App\Entity\Project;
 use App\Services\DocumentManager;
 use App\Form\EstimateForm;
@@ -21,10 +22,24 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class EstimateController extends AbstractController
 {
     #[Route(name: 'app_estimate_index', methods: ['GET'])]
-    public function index(EstimateRepository $estimateRepository): Response
+    public function index(
+        EstimateRepository $estimateRepository,
+        Request $request,
+        PaginationService $paginator
+    ): Response
     {
+
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 2;
+
+        $qb = $estimateRepository->createQueryBuilder('c')
+        //    ->orderBy('c.name', 'ASC')
+        ;
+
+        $pagination = $paginator->paginate($qb, $page, $limit);
+
         return $this->render('estimate/index.html.twig', [
-            'estimates' => $estimateRepository->findAll(),
+            'pagination' => $pagination
         ]);
     }
 

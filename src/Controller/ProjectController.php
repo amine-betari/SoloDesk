@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Project;
 use App\Form\ProjectForm;
 use App\Repository\ProjectRepository;
+use App\Repository\PaginationService;
 use App\Services\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,10 +18,22 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 final class ProjectController extends AbstractController
 {
     #[Route(name: 'app_project_index', methods: ['GET'])]
-    public function index(ProjectRepository $projectRepository): Response
+    public function index(
+        ProjectRepository $projectRepository,
+        Request $request,
+        PaginationService $paginator
+    ): Response
     {
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 10;
+
+        $qb = $projectRepository->createQueryBuilder('p')
+            ->orderBy('p.name', 'ASC');
+
+        $pagination = $paginator->paginate($qb, $page, $limit);
+
         return $this->render('project/index.html.twig', [
-            'projects' => $projectRepository->findAll(),
+            'pagination' => $pagination
         ]);
     }
 

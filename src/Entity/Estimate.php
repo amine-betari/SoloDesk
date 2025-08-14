@@ -19,6 +19,9 @@ class Estimate
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(type: 'string', length: 255)]
+    private ?string $name = null;
+
     #[ORM\ManyToOne(inversedBy: 'estimates')]
     private ?Client $client = null;
 
@@ -83,6 +86,18 @@ class Estimate
     {
         return $this->id;
     }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+        return $this;
+    }
+
 
     public function getClient(): ?Client
     {

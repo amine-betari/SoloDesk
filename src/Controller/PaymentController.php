@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Payment;
 use App\Entity\Project;
 use App\Form\PaymentForm;
+use App\Repository\PaginationService;
 use App\Repository\PaymentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,10 +17,22 @@ use Symfony\Component\Routing\Attribute\Route;
 final class PaymentController extends AbstractController
 {
     #[Route(name: 'app_payment_index', methods: ['GET'])]
-    public function index(PaymentRepository $paymentRepository): Response
+    public function index(
+        PaymentRepository $paymentRepository,
+        Request $request,
+        PaginationService $paginator
+    ): Response
     {
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 10;
+
+        $qb = $paymentRepository->createQueryBuilder('p')
+            ->orderBy('p.date', 'ASC');
+
+        $pagination = $paginator->paginate($qb, $page, $limit);
+
         return $this->render('payment/index.html.twig', [
-            'payments' => $paymentRepository->findAll(),
+            'pagination' => $pagination
         ]);
     }
 

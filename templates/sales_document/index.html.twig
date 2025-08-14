@@ -7,54 +7,72 @@
 
         <h1 class="text-4xl font-bold text-white mb-6">Liste des documents</h1>
 
-        <div class="overflow-x-auto bg-gray-800 rounded-xl shadow-lg">
-            <table class="min-w-full divide-y divide-gray-700">
-                <thead class="bg-gray-900">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Référence</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Client</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Créé le</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Modifié le</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Statut</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
-                </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-700">
-                {% for sales_document in sales_documents %}
-                    <tr class="hover:bg-gray-700">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{{ sales_document.id }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-200">{{ sales_document.type }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{{ sales_document.reference }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
-                            {{ sales_document.getResolvedClient() ? sales_document.getResolvedClient().getName() : '—' }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
-                            {{ sales_document.createdAt ? sales_document.createdAt|date('d/m/Y') : '—' }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
-                            {{ sales_document.modifiedAt ? sales_document.modifiedAt|date('d/m/Y') : '—' }}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{{ sales_document.status ?: '—' }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">
-                            <a href="{{ path('app_sales_document_show', {'id': sales_document.id}) }}" class="text-blue-400 hover:text-blue-200 mr-4">Voir</a>
-                            <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}" class="text-indigo-400 hover:text-indigo-200">Modifier</a>
-                        </td>
-                    </tr>
-                {% else %}
+        {% if pagination.items is not empty %}
+            <div class="overflow-x-auto bg-gray-800 rounded-xl shadow-lg">
+                <table class="min-w-full divide-y divide-gray-700">
+                    <thead class="bg-gray-900">
                     <tr>
-                        <td colspan="8" class="px-6 py-4 text-center text-gray-400">Aucun document trouvé</td>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Référence</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Créé le</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Modifié le</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-700">
+                    {% for document in pagination.items %}
+                        <tr class="hover:bg-gray-700">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{{ document.id }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200 font-semibold">{{ document.type }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{{ document.reference }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                                {{ document.getResolvedClient() ? document.getResolvedClient().getName() : '—' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                                {{ document.createdAt ? document.createdAt|date('d/m/Y') : '—' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                                {{ document.modifiedAt ? document.modifiedAt|date('d/m/Y') : '—' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{{ document.status ?: '—' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm flex space-x-2">
+                                <a href="{{ path('app_sales_document_show', {'id': document.id}) }}" class="text-blue-400 hover:text-blue-200">Voir</a>
+                                <a href="{{ path('app_sales_document_edit', {'id': document.id}) }}" class="text-indigo-400 hover:text-indigo-200">Modifier</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-400">Aucun document trouvé</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {# Pagination #}
+            <div class="mt-4 flex justify-center space-x-2">
+                {% for i in 1..pagination.pages %}
+                    <a href="?page={{ i }}"
+                       class="px-3 py-1 rounded {{ i == pagination.page ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600' }}">
+                        {{ i }}
+                    </a>
                 {% endfor %}
-                </tbody>
-            </table>
-        </div>
+            </div>
+            <p class="mt-2 text-center text-gray-300 text-sm">
+                Affichage de {{ pagination.items|length }} sur {{ pagination.total }} documents
+            </p>
+        {% else %}
+            <p class="text-gray-300">Aucun document trouvé.</p>
+        {% endif %}
 
         <div class="mt-6 flex justify-end">
             <a href="{{ path('app_sales_document_new') }}" class="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-white font-medium transition-colors">
                 Ajouter un document
             </a>
         </div>
+
     </div>
 {% endblock %}

@@ -22,6 +22,10 @@ class EstimateForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+            ->add('name', TextType::class, [
+                'label' => 'Nom de l’estimate',
+                'required' => true,
+            ])
             ->add('amount')
             ->add('estimateNumber', TextType::class, [
                 'required' => true,

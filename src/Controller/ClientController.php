@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Client;
 use App\Form\ClientForm;
 use App\Repository\ClientRepository;
+use App\Repository\PaginationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +16,22 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ClientController extends AbstractController
 {
     #[Route(name: 'app_client_index', methods: ['GET'])]
-    public function index(ClientRepository $clientRepository): Response
+    public function index(
+        ClientRepository $clientRepository,
+        Request $request,
+        PaginationService $paginator
+    ): Response
     {
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 10;
+
+        $qb = $clientRepository->createQueryBuilder('c')
+            ->orderBy('c.name', 'ASC');
+
+        $pagination = $paginator->paginate($qb, $page, $limit);
+
         return $this->render('client/index.html.twig', [
-            'clients' => $clientRepository->findAll(),
+            'pagination' => $pagination
         ]);
     }
 

@@ -6,6 +6,7 @@ use App\Entity\Estimate;
 use App\Entity\Project;
 use App\Entity\SalesDocument;
 use App\Form\SalesDocumentForm;
+use App\Repository\PaginationService;
 use App\Helper\ToolsHelper;
 use App\Repository\SalesDocumentRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -33,10 +34,22 @@ final class SalesDocumentController extends AbstractController
 
     }
     #[Route(name: 'app_sales_document_index', methods: ['GET'])]
-    public function index(SalesDocumentRepository $salesDocumentRepository): Response
+    public function index(
+        SalesDocumentRepository $salesDocumentRepository,
+        Request $request,
+        PaginationService $paginator
+    ): Response
     {
+        $page = max(1, $request->query->getInt('page', 1));
+        $limit = 10;
+
+        $qb = $salesDocumentRepository->createQueryBuilder('s')
+            ->orderBy('s.createdAt', 'ASC');
+
+        $pagination = $paginator->paginate($qb, $page, $limit);
+
         return $this->render('sales_document/index.html.twig', [
-            'sales_documents' => $salesDocumentRepository->findAll(),
+            'pagination' => $pagination
         ]);
     }
 
