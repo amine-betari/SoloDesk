@@ -12,6 +12,10 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 #[ORM\Entity(repositoryClass: SalesDocumentRepository::class)]
 class SalesDocument
 {
+    public const TYPE_ESTIMATE = 'estimate';
+    public const TYPE_INVOICE = 'invoice';
+
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]

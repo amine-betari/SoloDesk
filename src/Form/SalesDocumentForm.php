@@ -7,6 +7,7 @@ use App\Entity\Estimate;
 use App\Entity\Project;
 use App\Entity\SalesDocument;
 use App\Constants\InvoiceStatus;
+use App\Constants\EstimateStatuses;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -21,6 +22,20 @@ class SalesDocumentForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        /** @var SalesDocument|null $data */
+        $data = $options['data'] ?? null;
+
+        // Déterminer les statuts selon le type
+        $statusChoices = [];
+        if ($data instanceof SalesDocument) {
+            if ($data->getType() === SalesDocument::TYPE_ESTIMATE) {
+                $statusChoices = EstimateStatuses::CHOICES;
+            } else {
+                $statusChoices = InvoiceStatus::CHOICES;
+            }
+        }
+
+
         $builder
             ->add('reference')
             ->add('salesDocumentItems', CollectionType::class, [
@@ -48,7 +63,7 @@ class SalesDocumentForm extends AbstractType
 
             ->add('status', ChoiceType::class, [
                 'label' => 'Statut',
-                'choices' => InvoiceStatus::CHOICES
+                'choices' => $statusChoices
             ]);
     }
 
