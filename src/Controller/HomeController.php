@@ -135,6 +135,7 @@ class HomeController extends AbstractController
 
         // Graph réellement paies
         $payments = $paymentRepository->findPaymentsForFinishedProjects();
+     //   $payments = $paymentRepository->findPaymentsForReports();
         $revenuesFromPayments = [];
         foreach ($payments as $payment) {
             $project = $payment->getProject();

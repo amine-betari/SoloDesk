@@ -16,8 +16,12 @@
     {% endblock %}
 </head>
 <body class="bg-[#16202A] text-white" style="font-family: DM Sans, sans-serif;">
-<div class="min-h-screen">
-    {% block body %}{% endblock %}
+<div class="flex min-h-screen">
+    {% include 'partials/sidebar.html.twig' %}
+
+    <main class="flex-1 p-6">
+        {% block body %}{% endblock %}
+    </main>
 </div>
 <div class="mt-32 text-sm p-4 bg-[#1F2732]">
     <footer class="max-w-screen-xl mx-auto">

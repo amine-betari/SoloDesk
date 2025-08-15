@@ -7,8 +7,11 @@ use App\Entity\Project;
 use App\Form\PaymentForm;
 use App\Repository\PaginationService;
 use App\Repository\PaymentRepository;
+use App\Repository\ProjectRepository;
+use App\Repository\SalesDocumentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -37,7 +40,10 @@ final class PaymentController extends AbstractController
     }
 
     #[Route('/new', name: 'app_payment_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(
+        Request $request,
+        ?int $projectId = null,
+        EntityManagerInterface $entityManager): Response
     {
         $payment = new Payment();
 
@@ -47,6 +53,7 @@ final class PaymentController extends AbstractController
             $project = $entityManager->getRepository(Project::class)->find($projectId);
             if ($project) {
                 $payment->setProject($project);
+                $payment->setInitialProject($project); // verrouillage
             }
         }
 
@@ -101,4 +108,5 @@ final class PaymentController extends AbstractController
 
         return $this->redirectToRoute('app_payment_index', [], Response::HTTP_SEE_OTHER);
     }
+
 }

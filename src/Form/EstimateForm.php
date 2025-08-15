@@ -59,11 +59,9 @@ class EstimateForm extends AbstractType
                 'required' => false,
             ])
             ->add('description')
-            ->add('client', EntityType::class, [
-                'class' => Client::class,
+            ->add('client', ClientAutocompleteField::class, [
+                'required' => true,
                 'choice_label' => 'name',
-                'placeholder' => 'Choisissez un client',
-                'label' => 'Client',
             ])
             ->add('documents', CollectionType::class, [
                 'entry_type' => FileType::class,

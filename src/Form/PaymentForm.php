@@ -2,14 +2,19 @@
 
 namespace App\Form;
 
+use App\Entity\Project;
+use App\Entity\SalesDocument;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
+
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Payment;
+use Symfony\Component\Validator\Constraints as Assert;
 
 class PaymentForm extends AbstractType
 {
@@ -43,14 +48,37 @@ class PaymentForm extends AbstractType
             ])
             ->add('invoiceReference', TextType::class, [
             'required' => false,
-            'label' => 'Libellé'
-        ]);
+            'label' => 'Référence facultative si pas de facture liée'
+            ]);
+
+        $builder
+              ->add('project', ProjectAutocompleteField::class, [
+                  'required' => false,
+              ])
+              ->add('salesDocument', InvoiceAutocompleteField::class, [
+                  'required' => false,
+              ])
+          ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
             'data_class' => Payment::class,
+            // Validation personnalisée au niveau du formulaire
+            'constraints' => [
+                new Assert\Callback([$this, 'validateProjectOrSalesDocument']),
+            ],
         ]);
+    }
+
+    public function validateProjectOrSalesDocument(Payment $payment, $context)
+    {
+        if (!$payment->getProject() && !$payment->getSalesDocument()) {
+            $context
+                ->buildViolation('Vous devez sélectionner soit un projet soit une facture.')
+                ->atPath('project') // ou 'salesDocument', juste pour pointer sur un champ
+                ->addViolation();
+        }
     }
 }

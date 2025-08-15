@@ -238,4 +238,9 @@ class Client
     {
         $this->currency = $currency;
     } // ex: 'MAD', 'EUR', 'USD'
+
+    public function __toString(): string
+    {
+        return (string) $this->name; // retourne le champ que tu veux afficher
+    }
 }

@@ -72,12 +72,10 @@ class ProjectForm extends AbstractType
                 'label' => 'Pas de TVA',
                 'required' => false,
             ])
-            ->add('client', EntityType::class, [
-                'class' => Client::class,
-                'choice_label' => 'name',
-                'placeholder' => 'Choisissez un client',
-                'label' => 'Client',
-            ])
+            ->add('client', ClientAutocompleteField::class, [
+                  'required' => true,
+                  'choice_label' => 'name',
+              ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
                 'attr' => [

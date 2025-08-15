@@ -12,4 +12,5 @@ return [
     Symfonycasts\TailwindBundle\SymfonycastsTailwindBundle::class => ['all' => true],
     Symfony\UX\Chartjs\ChartjsBundle::class => ['all' => true],
     Symfony\Bundle\WebProfilerBundle\WebProfilerBundle::class => ['dev' => true, 'test' => true],
+    Symfony\UX\Autocomplete\AutocompleteBundle::class => ['all' => true],
 ];

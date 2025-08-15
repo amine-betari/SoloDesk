@@ -42,6 +42,10 @@ class SalesDocument
     #[ORM\ManyToOne(inversedBy: 'salesDocuments')]
     private ?Client $client = null;
 
+    #[ORM\OneToMany(mappedBy: 'salesDocument', targetEntity: Payment::class)]
+    private Collection $payments;
+
+
     #[ORM\Column(length: 20)]
     private string $status = 'draft'; // Valeur par défaut
 
@@ -261,6 +265,11 @@ class SalesDocument
     {
         $this->notes = $notes;
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->reference; // retourne le champ que tu veux afficher
     }
 
 }
