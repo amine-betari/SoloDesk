@@ -16,14 +16,14 @@ class ProjectTypes
 
     // Tableau associatif clé-label (utile pour les formulaires)
     public const TYPES = [
-        'Régie' => self::REGIE,
-        'Forfait' => self::FORFAIT,
-        'Formation' => self::FORMATION,
-        'Hébergement' => self::HEBERGEMENT,
-        'TMA' => self::TMA,
-        'Audit' => self::AUDIT,
-        'Consulting' => self::CONSULTING,
-        'Autre' => self::AUTRE,
+        self::REGIE => self::REGIE,
+        self::FORFAIT => self::FORFAIT,
+        self::FORMATION => self::FORMATION,
+        self::HEBERGEMENT => self::HEBERGEMENT,
+        self::TMA => self::TMA,
+        self::AUDIT => self::AUDIT,
+        self::CONSULTING => self::CONSULTING,
+        self::AUTRE => self::AUTRE,
     ];
 
     // Exemple d’autres constantes (pour demain)

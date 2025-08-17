@@ -2,6 +2,9 @@
 
 namespace App\Constants;
 
+use Symfony\Contracts\Translation\TranslatorInterface;
+
+
 class EstimateStatuses
 {
     public const DRAFT = 'draft';
@@ -11,10 +14,12 @@ class EstimateStatuses
     public const EXPIRED = 'expired';
 
     public const CHOICES = [
-        'Brouillon' => self::DRAFT,
-        'Envoyé' => self::SENT,
-        'Accepté' => self::ACCEPTED,
-        'Refusé' => self::REJECTED,
-        'Expiré' => self::EXPIRED,
+        self::DRAFT => self::DRAFT,
+        self::SENT => self::SENT,
+        self::ACCEPTED => self::ACCEPTED,
+        self::REJECTED  => self::REJECTED,
+        self::EXPIRED => self::EXPIRED,
     ];
+
+
 }

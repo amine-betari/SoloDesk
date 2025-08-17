@@ -38,8 +38,8 @@
                 {% endif %}
                 <div>
                     <dt class="text-sm font-medium text-gray-400">Statut</dt>
-                    {% set status_class = sales_document.status == 'payé' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white' %}
-                    <span class="px-3 py-1 rounded-full font-semibold {{ status_class }}">{{ sales_document.status|capitalize }}</span>
+                    {% set status_class = sales_document.status == 'paid' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white' %}
+                    <span class="px-3 py-1 rounded-full font-semibold {{ status_class }}">{{ sales_document.status|trans }}</span>
                 </div>
             </div>
 

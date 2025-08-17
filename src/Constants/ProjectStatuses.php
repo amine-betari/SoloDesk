@@ -11,10 +11,10 @@ class ProjectStatuses
     public const CANCELLED = 'cancelled';
 
     public const CHOICES = [
-        'En attente' => self::STAND_BY,
-        'En cours' => self::IN_PROGRESS,
-        'En retard' => self::LATE,
-        'Terminé' => self::COMPLETED,
-        'Annulé' => self::CANCELLED,
+        self::STAND_BY => self::STAND_BY,
+        self::IN_PROGRESS => self::IN_PROGRESS,
+        self::LATE => self::LATE,
+        self::COMPLETED => self::COMPLETED,
+        self::CANCELLED => self::CANCELLED,
     ];
 }

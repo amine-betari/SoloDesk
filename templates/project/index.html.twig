@@ -37,7 +37,7 @@
                                     'Annulé': 'bg-red-600 text-white'
                                 } %}
                                 <span class="px-2 py-1 rounded-full text-xs font-semibold {{ statusColors[project.status]|default('bg-gray-500 text-white') }}">
-                                {{ project.status }}
+                                {{ project.status|trans }}
                             </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-300">

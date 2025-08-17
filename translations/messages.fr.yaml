@@ -1,0 +1,29 @@
+# translations/messages.fr.yaml
+
+# --- Devis ---
+draft: "Brouillon"
+sent: "Envoyé"
+accepted: "Accepté"
+rejected: "Refusé"
+expired: "Expiré"
+
+# --- Factures ---
+partially_paid: "Partiellement payé"
+paid: "Payé"
+cancelled: "Annulé"
+
+# --- Projets ---
+stand_by: "En attente"
+in_progress: "En cours"
+late: "En retard"
+completed: "Terminé"
+
+# --- Types de projets ---
+regie: "Régie"
+forfait: "Forfait"
+formation: "Formation"
+hebergement: "Hébergement"
+tma: "TMA"
+audit: "Audit"
+consulting: "Consulting"
+other: "Autre"

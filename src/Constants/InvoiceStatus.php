@@ -12,10 +12,10 @@ class InvoiceStatus
     public const CANCELLED = 'cancelled';
 
     public const CHOICES = [
-        'Brouillon' => self::DRAFT,
-        'Envoyé' => self::SENT,
-        'Partiellement payé' => self::PARTIALLY_PAID,
-        'Payé' => self::PAID,
-        'Annulé' => self::CANCELLED,
+        self::DRAFT => self::DRAFT,
+        self::SENT => self::SENT,
+        self::PARTIALLY_PAID => self::PARTIALLY_PAID,
+        self::PAID => self::PAID,
+        self::CANCELLED => self::CANCELLED,
     ];
 }

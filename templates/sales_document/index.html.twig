@@ -37,7 +37,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
                                 {{ document.modifiedAt ? document.modifiedAt|date('d/m/Y') : '—' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">{{ document.status ?: '—' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-200">
+                                {{ document.status ?  (document.status)|trans : '—' }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm flex space-x-2">
                                 <a href="{{ path('app_sales_document_show', {'id': document.id}) }}" class="text-blue-400 hover:text-blue-200">Voir</a>
                                 <a href="{{ path('app_sales_document_edit', {'id': document.id}) }}" class="text-indigo-400 hover:text-indigo-200">Modifier</a>

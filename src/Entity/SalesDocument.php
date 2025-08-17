@@ -13,6 +13,7 @@ use App\Constants\InvoiceStatus;
 #[ORM\Entity(repositoryClass: SalesDocumentRepository::class)]
 class SalesDocument
 {
+
     public const TYPE_ESTIMATE = 'estimate';
     public const TYPE_INVOICE = 'invoice';
 
@@ -208,7 +209,7 @@ class SalesDocument
     {
         // On peut éventuellement vérifier que le status est valide
         $validStatuses = ['draft', 'sent', 'partially_paid', 'paid', 'cancelled'];
-        if (!in_array($status, $validStatuses, true)) {
+        if (!in_array($status, $validStatuses, true) && $this->getType() !== 'estimate') {
             throw new \InvalidArgumentException("Statut invalide pour le SalesDocument : $status");
         }
 

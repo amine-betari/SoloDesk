@@ -38,7 +38,7 @@
                                     estimate.status == 'Accepté' ? 'green' :
                                     estimate.status == 'Refusé' ? 'red' : 'gray'
                                 %}
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">{{ estimate.status }}</span>
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">{{ estimate.status|trans }}</span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.startDate ? estimate.startDate|date('d/m/Y') : '-' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.project ? estimate.project.name : '-' }}</td>
