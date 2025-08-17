@@ -9,10 +9,6 @@
         <div class="bg-gray-800 text-white rounded-lg shadow-lg p-6 mb-6">
             <dl class="grid grid-cols-2 gap-4">
                 <div>
-                    <dt class="text-sm font-medium text-gray-300">ID</dt>
-                    <dd class="text-lg text-white">{{ client.id }}</dd>
-                </div>
-                <div>
                     <dt class="text-sm font-medium text-gray-300">Nom</dt>
                     <dd class="text-lg text-white">{{ client.name }}</dd>
                 </div>
@@ -24,12 +20,18 @@
                     <dt class="text-sm font-medium text-gray-300">Pays</dt>
                     <dd class="text-lg text-white">{{ client.country }}</dd>
                 </div>
+                <div>
+                    <dt class="text-sm font-medium text-gray-300">Nombre de projets</dt>
+                    {# <dd class="text-lg text-white">{{ client.projects|length }}</dd> #}
+                    <dd class="text-lg text-white">{{ projectsCount }}</dd>
+                </div>
                 <div class="col-span-2">
                     <dt class="text-sm font-medium text-gray-300">Notes</dt>
                     <dd class="text-white whitespace-pre-line">{{ client.notes ?: '–' }}</dd>
                 </div>
             </dl>
         </div>
+
 
         <div class="flex space-x-4">
             <a href="{{ path('app_client_index') }}"

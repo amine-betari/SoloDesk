@@ -7,8 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\UX\Autocomplete\AsEntityAutocompleteField;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use App\EventListener\PaymentListener;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
+#[ORM\EntityListeners([PaymentListener::class])]
 class Payment
 {
     #[ORM\Id]
@@ -28,13 +30,6 @@ class Payment
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $label = null; // ex : "Acompte LOT 1", "Solde", etc.
 
-    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'payments')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Project $project = null;
-
-    // pour savoir si on vient du show projet
-    private ?Project $initialProject = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $invoiceReference = null; // ex: "FAC-2024-0034"
 
@@ -43,26 +38,12 @@ class Payment
     private ?SalesDocument $salesDocument = null;
 
     // --- Getters & Setters ---
-
-    public function setInitialProject(?Project $project): self
-    {
-        $this->initialProject = $project;
-        return $this;
-    }
-
     #[Assert\Callback]
     public function validateContext(ExecutionContextInterface $context): void
     {
-        // verrouillage du projet si on vient du show projet
-        if ($this->initialProject && $this->project && $this->project !== $this->initialProject) {
-            $context->buildViolation('Vous ne pouvez pas changer le projet pour ce paiement.')
-                ->atPath('project')
-                ->addViolation();
-        }
-
-        // Si aucun projet n'est choisi, alors la facture est obligatoire
-        if (!$this->project && !$this->salesDocument) {
-            $context->buildViolation('Veuillez sélectionner une facture ou lier un projet.')
+       // Si aucun projet n'est choisi, alors la facture est obligatoire
+        if (!$this->salesDocument) {
+            $context->buildViolation('Veuillez sélectionner une facture')
                 ->atPath('salesDocument') // ça pointe sur le champ facture
                 ->addViolation();
         }
@@ -129,16 +110,16 @@ class Payment
         return $this;
     }
 
-    public function getProject(): ?Project
+   /* public function getProject(): ?Project
     {
         return $this->project;
-    }
+    }*/
 
-    public function setProject(?Project $project): static
+   /* public function setProject(?Project $project): static
     {
         $this->project = $project;
         return $this;
-    }
+    }*/
 
     public function getInvoiceReference(): ?string
     {

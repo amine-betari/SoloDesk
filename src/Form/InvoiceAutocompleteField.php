@@ -19,8 +19,10 @@ class InvoiceAutocompleteField extends AbstractType
             'placeholder' => 'Veilluez choisir une facture ',
             'query_builder' => function (EntityRepository $er) {
                 return $er->createQueryBuilder('s')
-                    ->where('s.type = :type')
-                    ->setParameter('type', 'invoice')
+                    ->where('s.type = :type1')
+                    ->orWhere('s.type = :type2')
+                    ->setParameter('type1', 'invoice')
+                    ->setParameter('type2', 'project')
                     ->orderBy('s.reference', 'ASC');
             },
         ]);

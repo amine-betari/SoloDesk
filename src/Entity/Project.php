@@ -70,8 +70,6 @@ class Project
     #[ORM\Column(type: 'string', length: 3)]
     private $currency;
 
-    #[ORM\OneToMany(targetEntity: Payment::class, mappedBy: 'project', cascade: ['persist', 'remove'])]
-    private Collection $payments;
 
     /**
      * @var Collection<int, Document>

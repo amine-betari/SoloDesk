@@ -6,6 +6,7 @@ use App\Entity\Client;
 use App\Form\ClientForm;
 use App\Repository\ClientRepository;
 use App\Repository\PaginationService;
+use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,10 +57,13 @@ final class ClientController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_client_show', methods: ['GET'])]
-    public function show(Client $client): Response
+    public function show(Client $client, ProjectRepository $projectRepo): Response
     {
+        $projectsCount = $projectRepo->count(['client' => $client]);
+
         return $this->render('client/show.html.twig', [
             'client' => $client,
+            'projectsCount' => $projectsCount,
         ]);
     }
 

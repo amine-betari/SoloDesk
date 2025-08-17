@@ -12,4 +12,7 @@
     <a href="{{ path('app_sales_document_index') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'app_sales_document' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
         Sales Documents
     </a>
+    <a href="{{ path('app_client_index') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'app_client_index' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
+        Clients
+    </a>
 </aside>

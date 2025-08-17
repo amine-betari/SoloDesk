@@ -47,16 +47,6 @@ final class PaymentController extends AbstractController
     {
         $payment = new Payment();
 
-        // Récupérer l'ID du projet depuis l'URL (ex: /payment/new?project=5)
-        $projectId = $request->query->get('project');
-        if ($projectId) {
-            $project = $entityManager->getRepository(Project::class)->find($projectId);
-            if ($project) {
-                $payment->setProject($project);
-                $payment->setInitialProject($project); // verrouillage
-            }
-        }
-
         $form = $this->createForm(PaymentForm::class, $payment);
         $form->handleRequest($request);
 
@@ -64,7 +54,9 @@ final class PaymentController extends AbstractController
             $entityManager->persist($payment);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_project_show', ['id' => $payment->getProject()->getId()]);
+            return $this->redirectToRoute('app_payment_show',
+                ['id' => $payment->getId()]
+            );
         }
 
         return $this->render('payment/new.html.twig', [

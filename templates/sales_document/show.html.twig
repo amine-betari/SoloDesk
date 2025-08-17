@@ -19,18 +19,27 @@
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-400">Créé le</dt>
-                    <dd class="text-lg text-gray-200">{{ sales_document.createdAt ? sales_document.createdAt|date('Y-m-d H:i') : 'N/A' }}</dd>
+                    <dd class="text-lg text-gray-200">{{ sales_document.createdAt ? sales_document.createdAt|date('d/m/Y') : 'N/A' }}</dd>
                 </div>
                 <div>
                     <dt class="text-sm font-medium text-gray-400">Modifié le</dt>
-                    <dd class="text-lg text-gray-200">{{ sales_document.modifiedAt ? sales_document.modifiedAt|date('Y-m-d H:i') : 'N/A' }}</dd>
+                    <dd class="text-lg text-gray-200">{{ sales_document.modifiedAt ? sales_document.modifiedAt|date('d/m/Y') : 'N/A' }}</dd>
                 </div>
+                {% if sales_document.project %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-400">Project Concerné</dt>
+                        <dd class="text-lg text-gray-200">{{ sales_document.project }}</dd>
+                    </div>
+                {% elseif sales_document.estimate %}
+                    <div>
+                        <dt class="text-sm font-medium text-gray-400">Devis Concerné</dt>
+                        <dd class="text-lg text-gray-200">{{ sales_document.estimate.estimateNumber }}</dd>
+                    </div>
+                {% endif %}
                 <div>
                     <dt class="text-sm font-medium text-gray-400">Statut</dt>
                     {% set status_class = sales_document.status == 'payé' ? 'bg-green-600 text-white' : 'bg-yellow-600 text-white' %}
-                    <span class="px-3 py-1 rounded-full font-semibold {{ status_class }}">
-                    {{ sales_document.status|capitalize }}
-                </span>
+                    <span class="px-3 py-1 rounded-full font-semibold {{ status_class }}">{{ sales_document.status|capitalize }}</span>
                 </div>
             </div>
 

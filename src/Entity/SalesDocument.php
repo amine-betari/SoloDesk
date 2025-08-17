@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
+use App\Constants\InvoiceStatus;
 
 #[ORM\Entity(repositoryClass: SalesDocumentRepository::class)]
 class SalesDocument
@@ -267,9 +268,31 @@ class SalesDocument
         return $this;
     }
 
+    // src/Entity/SalesDocument.php
+
+    public function updateStatusBasedOnPayments(): void
+    {
+        $totalPaid = 0;
+
+        foreach ($this->payments as $payment) {
+            $totalPaid += $payment->getAmount();
+        }
+
+        if ($totalPaid >= $this->getAmount()) {
+            $this->setStatus(InvoiceStatus::PAID);
+        } elseif ($totalPaid > 0) {
+            $this->setStatus(InvoiceStatus::PARTIALLY_PAID);
+        } else {
+            $this->setStatus(InvoiceStatus::SENT);
+        }
+    }
+
+
     public function __toString(): string
     {
         return (string) $this->reference; // retourne le champ que tu veux afficher
     }
+
+
 
 }

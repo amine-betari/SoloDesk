@@ -92,6 +92,7 @@ final class ProjectController extends AbstractController
     #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
     public function show(Project $project): Response
     {
+
         return $this->render('project/show.html.twig', [
             'project' => $project,
         ]);

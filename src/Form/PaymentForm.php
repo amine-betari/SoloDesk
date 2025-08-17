@@ -52,9 +52,9 @@ class PaymentForm extends AbstractType
             ]);
 
         $builder
-              ->add('project', ProjectAutocompleteField::class, [
+             /* ->add('project', ProjectAutocompleteField::class, [
                   'required' => false,
-              ])
+              ])*/
               ->add('salesDocument', InvoiceAutocompleteField::class, [
                   'required' => false,
               ])
@@ -74,7 +74,7 @@ class PaymentForm extends AbstractType
 
     public function validateProjectOrSalesDocument(Payment $payment, $context)
     {
-        if (!$payment->getProject() && !$payment->getSalesDocument()) {
+        if (!$payment->getSalesDocument()) {
             $context
                 ->buildViolation('Vous devez sélectionner soit un projet soit une facture.')
                 ->atPath('project') // ou 'salesDocument', juste pour pointer sur un champ
