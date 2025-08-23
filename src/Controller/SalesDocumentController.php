@@ -136,6 +136,8 @@ final class SalesDocumentController extends AbstractController
                 $salesDocument->setType("project");
                 $salesDocument->setReference($project->getProjectNumber());
             }
+        } else {
+            $salesDocument->setType("invoice");
         }
 
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);

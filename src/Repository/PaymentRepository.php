@@ -30,21 +30,17 @@ class PaymentRepository extends ServiceEntityRepository
     public function findPaymentsForReports(): array
     {
         $qb = $this->createQueryBuilder('pay')
-          //  ->leftJoin('pay.project', 'p')
             ->leftJoin('pay.salesDocument', 'sd')
-           // ->leftJoin('p.client', 'pc')
-           // ->leftJoin('sd.client', 'sdc')
-           // ->addSelect('p', 'sd', 'pc', 'sdc')
             ->addSelect('sd')
-            //->where('p.status = :projectStatus OR sd IS NOT NULL')
-            ->Where('(sd IS NOT NULL AND sd.status IN (:allowedStatuses))') // paiements liés à des sales documents valides
-            //->setParameter('projectStatus', ProjectStatuses::COMPLETED)
-            ->setParameter('allowedStatuses', ['paid']) // à adapter selon ton InvoiceStatus
+            ->where('sd IS NOT NULL')
+            ->andWhere('sd.status = :paidStatus')
+            ->setParameter('paidStatus', 'paid')
             ->orderBy('pay.date', 'ASC');
 
-
         return $qb->getQuery()->getResult();
+
     }
+
 
 
 }

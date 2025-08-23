@@ -46,6 +46,7 @@ final class PaymentController extends AbstractController
         EntityManagerInterface $entityManager): Response
     {
         $payment = new Payment();
+        $payment->setDate(new \DateTimeImmutable());
 
         $form = $this->createForm(PaymentForm::class, $payment);
         $form->handleRequest($request);

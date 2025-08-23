@@ -61,8 +61,8 @@ class HomeController extends AbstractController
 
 
         $projectData = $projectRepository->countProjectsActiveByYear(
-        //    new \DateTime('2017-01-01'),
-        //    new \DateTime('2025-12-31')
+            new \DateTime('2017-01-01'),
+            new \DateTime('2025-12-31')
         );
         $projectChart = $chartBuilder->createChart(Chart::TYPE_BAR);
         $projectChart->setData([
@@ -134,27 +134,26 @@ class HomeController extends AbstractController
         ]);
 
         // Graph réellement paies
-        $payments = $paymentRepository->findPaymentsForFinishedProjects();
-     //   $payments = $paymentRepository->findPaymentsForReports();
+        // $payments = $paymentRepository->findPaymentsForFinishedProjects();
+        $payments = $paymentRepository->findPaymentsForReports();
         $revenuesFromPayments = [];
+
         foreach ($payments as $payment) {
-            $project = $payment->getProject();
-            $client = $project->getClient();
-            if (!$client) {
-                continue;
-            }
-            $clientName = $client->getName();
-            $devise = $project->getCurrency();
-            $amount = (float) $payment->getAmount();
+            $salesDocument = $payment->getSalesDocument();
+            $project = $payment->getSalesDocument()->getProject();
 
-            $key = $clientName . ' (' . $devise . ')';
+            // On tente de récupérer le client depuis la facture, sinon depuis le projet
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue; // on skip si aucun client n'existe
 
-            if (!isset($revenuesFromPayments[$key])) {
-                $revenuesFromPayments[$key] = 0;
-            }
-            $revenuesFromPayments[$key] += $amount;
+            $devise = $client?->getCurrency() ?? $project?->getCurrency() ?? 'EUR'; // fallback devise si besoin
+            $key = $client->getName() . ' (' . $devise . ')';
+
+            $revenuesFromPayments[$key] = ($revenuesFromPayments[$key] ?? 0) + $payment->getAmount();
         }
 
+
+// Préparer les labels et données pour le chart
         $clientsPayments = array_keys($revenuesFromPayments);
         $revenuesPayments = array_values($revenuesFromPayments);
 
@@ -163,7 +162,7 @@ class HomeController extends AbstractController
             'labels' => $clientsPayments,
             'datasets' => [[
                 'label' => 'Revenus réels par paiements',
-                'backgroundColor' => ['#4ade80', '#60a5fa', '#facc15', '#f87171'],
+                'backgroundColor' => ['#4ade80', '#60a5fa', '#facc15', '#f87171', '#f472b6', '#a78bfa'],
                 'data' => $revenuesPayments,
             ]],
         ]);
@@ -174,6 +173,7 @@ class HomeController extends AbstractController
                 ],
             ],
         ]);
+
 
         return $this->render('home/index.html.twig', [
           //  'charts' => $charts,

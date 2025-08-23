@@ -1,17 +1,16 @@
 {# templates/partials/_stats.html.twig #}
 
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">Clients</h3>
+        <p class="text-4xl font-bold text-primary">{{ clientCount }}</p>
+        <a href="{{ path('app_client_index') }}" class="text-blue-600 hover:underline mt-2 inline-block">Voir les clients</a>
+    </div>
 
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold text-gray-700 mb-2">Projets</h3>
         <p class="text-4xl font-bold text-primary">{{ projectCount }}</p>
         <a href="{{ path('app_project_index') }}" class="text-blue-600 hover:underline mt-2 inline-block">Voir les projets</a>
-    </div>
-
-    <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-700 mb-2">Clients</h3>
-        <p class="text-4xl font-bold text-primary">{{ clientCount }}</p>
-        <a href="{{ path('app_client_index') }}" class="text-blue-600 hover:underline mt-2 inline-block">Voir les clients</a>
     </div>
 
     <div class="bg-white rounded-lg shadow p-6">
@@ -21,7 +20,7 @@
     </div>
 
     <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-700 mb-2">Tâches en retard</h3>
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">Factures</h3>
         <p class="text-4xl font-bold text-red-600">3</p> {# valeur fictive pour le moment #}
         <a href="{{ path('app_invoice_new') }}" class="text-blue-600 hover:underline mt-2 inline-block">Créer une facture directement </a>
     </div>

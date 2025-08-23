@@ -48,13 +48,10 @@ class SalesDocumentForm extends AbstractType
             ])
         ;
         // Champ client pour facture “directe”
-        $builder->add('client', EntityType::class, [
-            'class' => Client::class,
-            'choice_label' => 'name',
-            'required' => false,
-            'placeholder' => '— Sélectionner un client —',
-        ])
-
+           $builder->add('client', ClientAutocompleteField::class, [
+                'required' => true,
+                'choice_label' => 'name',
+            ])
             ->add('notes', TextareaType::class, [
                 'label' => 'Notes / Informations complémentaires',
                 'required' => false,
