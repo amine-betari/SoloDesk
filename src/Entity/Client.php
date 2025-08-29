@@ -23,6 +23,12 @@ class Client
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    private ?string $phone = null;
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $address = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $country = null;
 
     /**
@@ -243,4 +249,11 @@ class Client
     {
         return (string) $this->name; // retourne le champ que tu veux afficher
     }
+
+    public function getPhone(): ?string { return $this->phone; }
+    public function setPhone(?string $phone): static { $this->phone = $phone; return $this; }
+
+    public function getAddress(): ?string { return $this->address; }
+    public function setAddress(?string $address): static { $this->address = $address; return $this; }
+
 }
