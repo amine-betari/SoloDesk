@@ -1,0 +1,27 @@
+{# src/templates/project/_filter_form.html.twig #}
+<div class="bg-gray-800 p-4 rounded-xl mb-6 shadow-md">
+    {{ form_start(form, {
+        'action': path('app_project_index')
+    }) }}
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+            {{ form_label(form.client, 'Client') }}
+            {{ form_widget(form.client, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
+        </div>
+        <div>
+            {{ form_label(form.startDate, 'Date de début') }}
+            {{ form_widget(form.startDate, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
+        </div>
+        <div>
+            {{ form_label(form.endDate, 'Date de fin') }}
+            {{ form_widget(form.endDate, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
+        </div>
+        <div class="flex items-end space-x-2">
+            {{ form_widget(form.search, {'attr': {'class': 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition'}}) }}
+            {{ form_widget(form.reset, {'attr': {'class': 'px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition'}}) }}
+        </div>
+
+    </div>
+         {{ form_end(form) }}
+</div>

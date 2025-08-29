@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Project;
 use App\Form\ProjectForm;
+use App\Form\Search\ProjectFilterForm;
 use App\Repository\ProjectRepository;
 use App\Repository\PaginationService;
 use App\Services\DocumentManager;
@@ -17,7 +18,7 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/project')]
 final class ProjectController extends AbstractController
 {
-    #[Route(name: 'app_project_index', methods: ['GET'])]
+    #[Route(name: 'app_project_index')]
     public function index(
         ProjectRepository $projectRepository,
         Request $request,
@@ -26,14 +27,78 @@ final class ProjectController extends AbstractController
     {
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
+        $session = $request->getSession();
+
+
+        // Search
+        // Création du formulaire de filtre
+        $filterForm = $this->createForm(ProjectFilterForm::class);
+        $filterForm->handleRequest($request);
+        // Search
 
         $qb = $projectRepository->createQueryBuilder('p')
             ->orderBy('p.name', 'ASC');
 
+
+        // Si le formulaire est soumis et valide, on applique les filtres
+        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
+
+            if ($filterForm->get('reset')->isClicked()) {
+                $session->remove('project_filter');
+
+                return $this->redirectToRoute('app_project_index');
+            }
+
+            $data = $filterForm->getData();
+
+            // Set Session
+            $session->set('project_filter', $data);
+            // Set Session
+
+            // Search classic
+            if (!empty($data['client'])) {
+                $qb->andWhere('p.client = :client')
+                    ->setParameter('client', $data['client']);
+            }
+
+            if (!empty($data['startDate'])) {
+                $qb->andWhere('p.startDate >= :startDate')
+                    ->setParameter('startDate', $data['startDate']);
+            }
+
+            if (!empty($data['endDate'])) {
+                $qb->andWhere('p.startDate <= :endDate')
+                    ->setParameter('endDate', $data['endDate']);
+            }
+            // Search classic
+        }
+
+        // Search By Session
+        $searchParams = $session->has('project_filter') ? $session->get('project_filter', []) : [];
+        if (count($searchParams) > 0) {
+            if (!empty($searchParams['client'])) {
+                $qb->andWhere('p.client = :client')
+                    ->setParameter('client', $searchParams['client']);
+            }
+
+            if (!empty($searchParams['startDate'])) {
+                $qb->andWhere('p.startDate >= :startDate')
+                    ->setParameter('startDate', $searchParams['startDate']);
+            }
+
+            if (!empty($searchParams['endDate'])) {
+                $qb->andWhere('p.startDate <= :endDate')
+                    ->setParameter('endDate', $searchParams['endDate']);
+            }
+        }
+
+
+
         $pagination = $paginator->paginate($qb, $page, $limit);
 
         return $this->render('project/index.html.twig', [
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'filterForm' => $filterForm->createView(), // on envoie le form à la vu
         ]);
     }
 
