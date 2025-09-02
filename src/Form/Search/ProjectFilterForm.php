@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Entity\Client;
-use App\Form\ClientAutocompleteField;
+use App\Form\AutoComplete\ClientAutocompleteField;
 
 class ProjectFilterForm extends AbstractType
 {

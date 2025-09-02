@@ -15,7 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Entity\Payment;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use App\Form\AutoComplete\InvoiceAutocompleteField;
 class PaymentForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

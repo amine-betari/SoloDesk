@@ -9,7 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Entity\SalesDocument;
-use App\Form\InvoiceAutocompleteField;
+use App\Form\AutoComplete\InvoiceAutocompleteField;
 class PaymentFilterForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
