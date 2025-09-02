@@ -9,6 +9,7 @@ use App\Repository\ProjectRepository;
 use App\Repository\PaginationService;
 use App\Services\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Services\FilterService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,77 +23,34 @@ final class ProjectController extends AbstractController
     public function index(
         ProjectRepository $projectRepository,
         Request $request,
-        PaginationService $paginator
+        PaginationService $paginator,
+        FilterService $filterService
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
         $session = $request->getSession();
 
-
-        // Search
-        // Création du formulaire de filtre
+        // Search Form
         $filterForm = $this->createForm(ProjectFilterForm::class);
-        $filterForm->handleRequest($request);
-        // Search
+        // Search Form
+        
+        $qb = $projectRepository->createQueryBuilder('p')->orderBy('p.name', 'ASC');
 
-        $qb = $projectRepository->createQueryBuilder('p')
-            ->orderBy('p.name', 'ASC');
+        // Handle Generic
+        $filterForm = $filterService->handle(
+            $request,
+            $qb,
+            $filterForm,
+            $session,
+            'project_filter',
+            'app_project_index'
+        );
 
-
-        // Si le formulaire est soumis et valide, on applique les filtres
-        if ($filterForm->isSubmitted() && $filterForm->isValid()) {
-
-            if ($filterForm->get('reset')->isClicked()) {
-                $session->remove('project_filter');
-
-                return $this->redirectToRoute('app_project_index');
-            }
-
-            $data = $filterForm->getData();
-
-            // Set Session
-            $session->set('project_filter', $data);
-            // Set Session
-
-            // Search classic
-            if (!empty($data['client'])) {
-                $qb->andWhere('p.client = :client')
-                    ->setParameter('client', $data['client']);
-            }
-
-            if (!empty($data['startDate'])) {
-                $qb->andWhere('p.startDate >= :startDate')
-                    ->setParameter('startDate', $data['startDate']);
-            }
-
-            if (!empty($data['endDate'])) {
-                $qb->andWhere('p.startDate <= :endDate')
-                    ->setParameter('endDate', $data['endDate']);
-            }
-            // Search classic
+        // Redirection si reset
+        if ($filterForm->isSubmitted() && $filterForm->get('reset')->isClicked()) {
+            return $this->redirectToRoute('app_project_index');
         }
-
-        // Search By Session
-        $searchParams = $session->has('project_filter') ? $session->get('project_filter', []) : [];
-        if (count($searchParams) > 0) {
-            if (!empty($searchParams['client'])) {
-                $qb->andWhere('p.client = :client')
-                    ->setParameter('client', $searchParams['client']);
-            }
-
-            if (!empty($searchParams['startDate'])) {
-                $qb->andWhere('p.startDate >= :startDate')
-                    ->setParameter('startDate', $searchParams['startDate']);
-            }
-
-            if (!empty($searchParams['endDate'])) {
-                $qb->andWhere('p.startDate <= :endDate')
-                    ->setParameter('endDate', $searchParams['endDate']);
-            }
-        }
-
-
 
         $pagination = $paginator->paginate($qb, $page, $limit);
 

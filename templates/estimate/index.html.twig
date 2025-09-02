@@ -7,6 +7,9 @@
 
         <h1 class="text-3xl font-bold mb-6 text-white">Liste des estimates</h1>
 
+        {% include 'project/_filter_form.html.twig' with {'form': filterForm, 'action': path('app_estimate_index') } %}
+
+
         {% if pagination.items is not empty %}
             <div class="overflow-x-auto">
                 <table class="min-w-full bg-gray-800 rounded-lg shadow border-gray-700">

@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\Constants\ProjectStatuses;
 use App\Constants\ProjectTypes;
 use App\Entity\Document;
+use App\Form\Search\ProjectFilterForm;
 use App\Entity\Estimate;
 use App\Repository\PaginationService;
 use App\Entity\Project;
 use App\Services\DocumentManager;
 use App\Form\EstimateForm;
+use App\Services\FilterService;
 use App\Repository\EstimateRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,25 +23,45 @@ use Symfony\Component\String\Slugger\SluggerInterface;
 #[Route('/estimate')]
 final class EstimateController extends AbstractController
 {
-    #[Route(name: 'app_estimate_index', methods: ['GET'])]
+    #[Route(name: 'app_estimate_index')]
     public function index(
         EstimateRepository $estimateRepository,
         Request $request,
-        PaginationService $paginator
+        PaginationService $paginator,
+        FilterService $filterService
     ): Response
     {
 
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 2;
+        $session = $request->getSession();
 
-        $qb = $estimateRepository->createQueryBuilder('c')
-        //    ->orderBy('c.name', 'ASC')
-        ;
+        // Search Form
+        $filterForm = $this->createForm(ProjectFilterForm::class);
+       // $filterForm->handleRequest($request);
+        // QueryBuilder
+        $qb = $estimateRepository->createQueryBuilder('e');
+
+        // Handle Generic
+        $filterForm = $filterService->handle(
+            $request,
+            $qb,
+            $filterForm,
+            $session,
+            'estimate_filter',
+            'app_estimate_index'
+        );
+
+        // Redirection si reset
+        if ($filterForm->isSubmitted() && $filterForm->get('reset')->isClicked()) {
+            return $this->redirectToRoute('app_estimate_index');
+        }
 
         $pagination = $paginator->paginate($qb, $page, $limit);
 
         return $this->render('estimate/index.html.twig', [
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'filterForm' => $filterForm->createView(), // on envoie le form à la vu
         ]);
     }
 
