@@ -34,7 +34,7 @@ final class ProjectController extends AbstractController
         // Search Form
         $filterForm = $this->createForm(ProjectFilterForm::class);
         // Search Form
-        
+
         $qb = $projectRepository->createQueryBuilder('p')->orderBy('p.name', 'ASC');
 
         // Handle Generic

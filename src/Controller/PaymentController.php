@@ -15,27 +15,44 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Services\FilterService;
+use App\Form\Search\PaymentFilterForm;
 
 #[Route('/payment')]
 final class PaymentController extends AbstractController
 {
-    #[Route(name: 'app_payment_index', methods: ['GET'])]
+    #[Route(name: 'app_payment_index')]
     public function index(
         PaymentRepository $paymentRepository,
         Request $request,
-        PaginationService $paginator
+        PaginationService $paginator,
+        FilterService $filterService
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
+        $session = $request->getSession();
 
-        $qb = $paymentRepository->createQueryBuilder('p')
-            ->orderBy('p.date', 'ASC');
+        // Search Form
+        $filterForm = $this->createForm(PaymentFilterForm::class);
+        // Search Form
+        $qb = $paymentRepository->createQueryBuilder('p')->orderBy('p.date', 'ASC');
+
+        // Handle Generic
+        $filterForm = $filterService->handle(
+            $request,
+            $qb,
+            $filterForm,
+            $session,
+            'payment_filter',
+            'app_payment_index'
+        );
 
         $pagination = $paginator->paginate($qb, $page, $limit);
 
         return $this->render('payment/index.html.twig', [
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'filterForm' => $filterForm->createView(), // on envoie le form à la vu
         ]);
     }
 
