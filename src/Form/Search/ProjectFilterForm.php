@@ -17,7 +17,7 @@ class ProjectFilterForm extends AbstractType
     {
         $builder
       //      ->add('client', ClientAutocompleteField::class, [
-            ->add('client', EntityType  ::class, [
+            ->add('client', EntityType::class, [
                 'class' => Client::class,
                 'choice_label' => 'name',
                 'required' => false,
