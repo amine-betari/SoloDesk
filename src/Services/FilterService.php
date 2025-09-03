@@ -53,7 +53,7 @@ class FilterService
                     $qb->andWhere("$alias.startDate <= :endDate")->setParameter('endDate', $value);
                     break;
                 case 'date':
-                    $qb->andWhere("$alias.date <= :date")->setParameter('date', $value);
+                    $qb->andWhere("$alias.date >= :date")->setParameter('date', $value);
                     break;
                 case 'salesDocument':
                     $qb->andWhere("$alias.salesDocument = :salesDocument")->setParameter('salesDocument', $value);
