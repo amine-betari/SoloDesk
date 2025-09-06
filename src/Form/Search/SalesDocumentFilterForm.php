@@ -2,7 +2,9 @@
 
 namespace App\Form\Search;
 
+use App\Constants\EstimateStatuses;
 use App\Constants\InvoiceStatus;
+use App\Form\EstimateForm;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -16,7 +18,8 @@ class SalesDocumentFilterForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $statusChoices = InvoiceStatus::CHOICES;
+        $statusChoicesInvoice  = InvoiceStatus::CHOICES;
+        $statusChoicesEstimate = EstimateStatuses::CHOICES;
         $builder
            /* ->add('client', EntityType::class, [
                 'class' => Client::class,
@@ -26,16 +29,16 @@ class SalesDocumentFilterForm extends AbstractType
             ])*/
             ->add('status', ChoiceType::class, [
                'label' => 'Status',
-               'choices' => $statusChoices,
-                'required' => false,
-                'placeholder' => 'Tous les status',
+               'choices' => array_merge($statusChoicesEstimate,$statusChoicesInvoice),
+               'required' => false,
+               'placeholder' => 'Tous les status',
             ])
             ->add('type', ChoiceType::class, [
                 'label' => 'Type',
                 'choices' => [
                     'Devis' => 'estimate',
                     'Facture' => 'invoice',
-                    'Facture depuis un projet' => 'project',
+                    'Facture - Projet' => 'project',
                 ],
                 'required' => false,
                 'placeholder' => 'Tous les types',

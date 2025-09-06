@@ -3,32 +3,38 @@
         'action': action
     }) }}
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {# <div>
-            {{ form_label(form.client, 'Client') }}
-            {{ form_widget(form.client, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
-        </div> #}
-        <div>
-            {{ form_label(form.type, 'Type') }}
-            {{ form_widget(form.type, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+
+        <!-- Type + Status -->
+        <div data-controller="status-filter" class="flex gap-4 col-span-2">
+            <div class="flex-1">
+                {{ form_label(form.type, 'Type') }}
+                {{ form_widget(form.type, {
+                    'attr': {
+                        'class': 'w-full rounded bg-gray-700 text-white p-3',
+                        'data-status-filter-target': 'type'
+                    }
+                }) }}
+            </div>
+
+            <div class="flex-1">
+                {{ form_label(form.status, 'Status') }}
+                {{ form_widget(form.status, {
+                    'attr': {
+                        'class': 'w-full rounded bg-gray-700 text-white p-3',
+                        'data-status-filter-target': 'status'
+                    }
+                }) }}
+            </div>
         </div>
-        <div>
-            {{ form_label(form.status, 'Status') }}
-            {{ form_widget(form.status, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
-        </div>
-        {# <div>
-            {{ form_label(form.startDate, 'Date de début') }}
-            {{ form_widget(form.startDate, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
-        </div>
-        <div>
-            {{ form_label(form.endDate, 'Date de fin') }}
-            {{ form_widget(form.endDate, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
-        </div> #}
-        <div class="flex items-end space-x-2">
-            {{ form_widget(form.search, {'attr': {'class': 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition'}}) }}
-            {{ form_widget(form.reset, {'attr': {'class': 'px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition'}}) }}
+
+        <!-- Boutons à droite -->
+        <div class="flex justify-end space-x-2">
+            {{ form_widget(form.search, {'attr': {'class': 'px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition'}}) }}
+            {{ form_widget(form.reset, {'attr': {'class': 'px-6 py-3 bg-gray-600 text-white rounded hover:bg-gray-700 transition'}}) }}
         </div>
 
     </div>
+
     {{ form_end(form) }}
 </div>

@@ -13,6 +13,11 @@
 
     {% block javascripts %}
         {% block importmap %}{{ importmap('app') }}{% endblock %}
+        <script>
+            window.EstimateStatuses = {{ constant("App\\Constants\\EstimateStatuses::CHOICES")|json_encode|raw }};
+            window.InvoiceStatuses = {{ constant("App\\Constants\\InvoiceStatus::CHOICES")|json_encode|raw }};
+        </script>
+
     {% endblock %}
 </head>
 <body class="bg-[#16202A] text-white" style="font-family: DM Sans, sans-serif;">

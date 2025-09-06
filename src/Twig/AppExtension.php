@@ -22,7 +22,7 @@ class AppExtension extends AbstractExtension
         return match($type) {
             'estimate' => $this->translator->trans('Devis'),
             'invoice'  => $this->translator->trans('Facture'),
-            'project'  => $this->translator->trans('Facture tirée du projet'),
+            'project'  => $this->translator->trans('Facture - Projet'),
             default    => $type,
         };
     }
