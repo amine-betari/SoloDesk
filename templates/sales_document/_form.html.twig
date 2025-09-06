@@ -1,7 +1,7 @@
 <div class="w-full min-h-screen bg-gray-900 p-6">
     <div class="mx-auto max-w-6xl">
         <h1 class="text-3xl font-bold mb-8 text-white">
-            {% if form.vars.value.id is defined %}Modifier{% else %}Créer{% endif %} un document commercial
+            {% if button_label is defined %}Modifier le document {% else %}Nouveau document{% endif %}
         </h1>
 
         {{ form_start(form, {

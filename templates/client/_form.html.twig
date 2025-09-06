@@ -1,5 +1,11 @@
 <div class="max-w-6xl mx-auto mt-10 bg-gray-900 p-8 rounded-xl shadow-xl text-white">
-    <h1 class="text-3xl font-bold mb-6">Créer un client</h1>
+
+    {% if button_label is defined  %}
+        <h1 class="text-3xl font-bold mb-6">Modifier le client</h1>
+    {% else %}
+        <h1 class="text-3xl font-bold mb-6">Nouveau client</h1>
+
+    {% endif %}
 
     {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 

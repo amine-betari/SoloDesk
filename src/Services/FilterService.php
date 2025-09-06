@@ -41,7 +41,6 @@ class FilterService
             if (empty($value)) continue;
 
             $alias = $qb->getRootAliases()[0];
-
             switch ($field) {
                 case 'client':
                     $qb->andWhere("$alias.client = :client")->setParameter('client', $value);
@@ -57,6 +56,12 @@ class FilterService
                     break;
                 case 'salesDocument':
                     $qb->andWhere("$alias.salesDocument = :salesDocument")->setParameter('salesDocument', $value);
+                    break;
+                case 'type':
+                    $qb->andWhere("$alias.type = :type")->setParameter('type', $value);
+                    break;
+                case 'status':
+                    $qb->andWhere("$alias.status = :status")->setParameter('status', $value);
                     break;
                 // Ajouter d'autres champs dynamiquement si besoin
             }

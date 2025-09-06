@@ -17,12 +17,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 
+use App\Form\Search\SalesDocumentFilterForm;
 use PhpOffice\PhpWord\PhpWord;
 use PhpOffice\PhpWord\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use App\Services\FilterService;
 use PhpOffice\PhpWord\TemplateProcessor;
 
 #[Route('/sales/document')]
@@ -33,23 +35,39 @@ final class SalesDocumentController extends AbstractController
     ) {
 
     }
-    #[Route(name: 'app_sales_document_index', methods: ['GET'])]
+    #[Route(name: 'app_sales_document_index')]
     public function index(
         SalesDocumentRepository $salesDocumentRepository,
         Request $request,
-        PaginationService $paginator
+        PaginationService $paginator,
+        FilterService $filterService
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
+        $session = $request->getSession();
 
-        $qb = $salesDocumentRepository->createQueryBuilder('s')
-            ->orderBy('s.createdAt', 'ASC');
+        // Search Form
+        $filterForm = $this->createForm(SalesDocumentFilterForm::class);
+        // Search Form
+
+        $qb = $salesDocumentRepository->createQueryBuilder('s')->orderBy('s.createdAt', 'ASC');
+
+        // Handle Generic
+        $filterForm = $filterService->handle(
+            $request,
+            $qb,
+            $filterForm,
+            $session,
+            'document_sales_filter',
+            'app_sales_document_index'
+        );
 
         $pagination = $paginator->paginate($qb, $page, $limit);
 
         return $this->render('sales_document/index.html.twig', [
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'filterForm' => $filterForm->createView(), // on envoie le form à la vu
         ]);
     }
 
