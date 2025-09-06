@@ -156,6 +156,7 @@ final class SalesDocumentController extends AbstractController
             }
         } else {
             $salesDocument->setType("invoice");
+            $salesDocument->setReference('INV-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(3))));
         }
 
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);

@@ -17,7 +17,7 @@
                 <div>
                     <dt class="text-sm font-medium text-gray-400">Date</dt>
                     <dd class="text-lg text-gray-200">
-                        {{ payment.date ? payment.date|date('d/m/Y H:i') : 'Non renseignée' }}
+                        {{ payment.date ? payment.date|date('d/m/Y') : 'Non renseignée' }}
                     </dd>
                 </div>
                 <div>
@@ -34,6 +34,12 @@
                     <dt class="text-sm font-medium text-gray-400">Libellé</dt>
                     <dd class="text-lg text-gray-200">{{ payment.label ?: '—' }}</dd>
                 </div>
+                {% if payment.salesDocument %}
+                    <div class="col-span-2">
+                        <dt class="text-sm font-medium text-gray-400">Référence facture</dt>
+                        <dd class="text-lg text-gray-200">{{ payment.salesDocument }}</dd>
+                    </div>
+                {% endif %}
                 {% if payment.invoiceReference %}
                     <div class="col-span-2">
                         <dt class="text-sm font-medium text-gray-400">Référence facture</dt>

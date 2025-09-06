@@ -195,7 +195,7 @@ class SalesDocument
         $total = 0.0;
 
         foreach ($this->salesDocumentItems as $item) {
-            $total += $item->getQuantity() * $item->getUnitPrice();
+            $total += (float)$item->getQuantity() * (float)$item->getUnitPrice();
         }
 
         return $total;
@@ -279,7 +279,7 @@ class SalesDocument
             $totalPaid += $payment->getAmount();
         }
 
-        if ($totalPaid >= $this->getAmount()) {
+        if ($totalPaid >= $this->getTotal()) {
             $this->setStatus(InvoiceStatus::PAID);
         } elseif ($totalPaid > 0) {
             $this->setStatus(InvoiceStatus::PARTIALLY_PAID);
@@ -293,7 +293,5 @@ class SalesDocument
     {
         return (string) $this->reference; // retourne le champ que tu veux afficher
     }
-
-
 
 }

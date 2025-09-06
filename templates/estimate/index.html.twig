@@ -44,7 +44,11 @@
                                 <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">{{ estimate.status|trans }}</span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.startDate ? estimate.startDate|date('d/m/Y') : '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.project ? estimate.project.name : '-' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-200">
+                                {% if estimate.project %}
+                                    <a href="{{ path('app_project_show', {'id': estimate.project.id}) }}" class="text-blue-400 hover:text-blue-200">{{ estimate.project ?: '—' }}</a>
+                                {% endif %}
+                            </td>
                             <td class="px-6 py-4 text-sm flex space-x-2">
                                 <a href="{{ path('app_estimate_show', {'id': estimate.id}) }}" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Voir</a>
                                 <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Modifier</a>

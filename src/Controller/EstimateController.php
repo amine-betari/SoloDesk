@@ -33,7 +33,7 @@ final class EstimateController extends AbstractController
     {
 
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 2;
+        $limit = 10;
         $session = $request->getSession();
 
         // Search Form

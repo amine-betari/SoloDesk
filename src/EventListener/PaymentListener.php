@@ -18,7 +18,9 @@ class PaymentListener
         $invoice = $payment->getSalesDocument();
 
         if ($invoice) {
-            $invoice->setStatus('paid');
+          //  $invoice->setStatus('paid');
+            $invoice->updateStatusBasedOnPayments();
+
             $em = $args->getObjectManager();
             $em->persist($invoice);
             $em->flush();
@@ -39,7 +41,9 @@ class PaymentListener
         $invoice = $payment->getSalesDocument();
 
         if ($invoice) {
-            $invoice->setStatus('paid');
+          //  $invoice->setStatus('paid');
+            $invoice->updateStatusBasedOnPayments();
+
             $em = $args->getObjectManager();
             $em->persist($invoice);
             $em->flush();
