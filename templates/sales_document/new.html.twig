@@ -3,5 +3,5 @@
 {% block title %}New SalesDocument{% endblock %}
 
 {% block body %}
-    {{ include('sales_document/_form.html.twig') }}
+    {% include 'sales_document/_form.html.twig' with {'salesDocument': salesDocument } %}
 {% endblock %}

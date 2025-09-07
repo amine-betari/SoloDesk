@@ -16,7 +16,7 @@
                 <tr class="hover:bg-gray-600">
                     <td class="px-4 py-2">{{ doc.reference }}</td>
                     <td class="px-4 py-2">{{ doc.type }}</td>
-                    <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('Y-m-d') : '—' }}</td>
+                    <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : '—' }}</td>
                     <td class="px-4 py-2">
                         <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
                            class="text-blue-400 hover:text-blue-500">🔍 Voir</a>

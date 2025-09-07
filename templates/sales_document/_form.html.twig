@@ -40,6 +40,37 @@
                         {{ form_errors(form.client) }}
                     </div>
                 </div>
+
+                {# TVA fields #}
+                <div>
+                    {{ form_label(form.taxApplied, 'TVA appliquée', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
+
+                    {% if salesDocument.type == 'invoice' %}
+                        {{ form_widget(form.taxApplied, {
+                            'attr': {'class': 'text-sm'}
+                        }) }}
+                    {% else %}
+                        {{ form_widget(form.taxApplied, {
+                            'attr': {'class': 'text-sm', 'disabled': true}
+                        }) }}
+                    {% endif %}
+                    {{ form_errors(form.taxApplied) }}
+                </div>
+
+                <div>
+                    {{ form_label(form.vatRate, 'Taux TVA (%)', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
+
+                    {% if salesDocument.type == 'invoice' %}
+                        {{ form_widget(form.vatRate, {
+                            'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}
+                        }) }}
+                    {% else %}
+                        {{ form_widget(form.vatRate, {
+                            'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white', 'readonly': 'readonly'}
+                        }) }}
+                    {% endif %}
+                    {{ form_errors(form.vatRate) }}
+                </div>
             </div>
         </fieldset>
 

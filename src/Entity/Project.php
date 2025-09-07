@@ -333,7 +333,7 @@ class Project
     /**
      * @throws \Exception
      */
-    public function getCalculatedAmount(): float
+    public function getCalculatedAmount(): ?float
     {
         if (!$this->isRecurring) {
             return $this->amount;

@@ -31,13 +31,6 @@ class PaymentListener
 
     public function postUpdate(Payment $payment, PostUpdateEventArgs $args): void
     {
-        /* $invoice = $payment->getSalesDocument();
-         if ($invoice) {
-             $invoice->updateStatusBasedOnPayments();
-             $args->getEntityManager()->persist($invoice);
-             $args->getEntityManager()->flush();
-         }*/
-
         $invoice = $payment->getSalesDocument();
 
         if ($invoice) {

@@ -79,6 +79,13 @@ final class SalesDocumentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            if ($salesDocument->getVatRate() > 0) {
+                $salesDocument->setTaxApplied(true);
+            } else {
+                $salesDocument->setTaxApplied(false);
+            }
+
             $entityManager->persist($salesDocument);
             $entityManager->flush();
 
@@ -108,6 +115,11 @@ final class SalesDocumentController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Mettre à jour la date de modification
             $salesDocument->setModifiedAt(new \DateTimeImmutable());
+            if ($salesDocument->getVatRate() > 0) {
+                $salesDocument->setTaxApplied(true);
+            } else {
+                $salesDocument->setTaxApplied(false);
+            }
 
             $entityManager->flush();
 
@@ -116,6 +128,7 @@ final class SalesDocumentController extends AbstractController
 
         return $this->render('sales_document/edit.html.twig', [
             'sales_document' => $salesDocument,
+            'salesDocument' => $salesDocument,
             'form' => $form,
         ]);
     }
@@ -146,6 +159,9 @@ final class SalesDocumentController extends AbstractController
                 $salesDocument->setEstimate($estimate);
                 $salesDocument->setType("estimate");
                 $salesDocument->setReference($estimate->getEstimateNumber());
+                $salesDocument->setTaxApplied($estimate->getVatRate() > 0); // <--- ici
+                $salesDocument->setVatRate($estimate->getVatRate()); // <--- ici
+
             }
         } elseif ($projectId) {
             $project = $em->getRepository(Project::class)->find($projectId);
@@ -153,10 +169,15 @@ final class SalesDocumentController extends AbstractController
                 $salesDocument->setProject($project);
                 $salesDocument->setType("project");
                 $salesDocument->setReference($project->getProjectNumber());
+                $salesDocument->setTaxApplied($project->getVatRate() > 0); // <--- ici
+                $salesDocument->setVatRate($project->getVatRate()); // <--- ici
             }
         } else {
             $salesDocument->setType("invoice");
             $salesDocument->setReference('INV-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(3))));
+            // Display les deux champs dans le formulaire (TVA ou non and Taux TVA) car tu dépend plus de projets mais il s'agit d'une facture directe
+            $salesDocument->setTaxApplied(false);
+            $salesDocument->setVatRate(0.0);
         }
 
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);
@@ -174,6 +195,7 @@ final class SalesDocumentController extends AbstractController
 
         return $this->render('sales_document/new.html.twig', [
             'form' => $form,
+            'salesDocument' => $salesDocument
         ]);
     }
 
@@ -217,7 +239,7 @@ final class SalesDocumentController extends AbstractController
         }
 
         $section->addTextBreak(1);
-        $section->addText("Total : " . number_format($salesDocument->getTotal(), 2, ',', ' ') . ' €', ['bold' => true]);
+        $section->addText("Total : " . number_format($salesDocument->getTotalTTC(), 2, ',', ' ') . ' €', ['bold' => true]);
 
         $fileName = 'devis-' . $salesDocument->getReference() . '.docx';
 
@@ -256,7 +278,7 @@ final class SalesDocumentController extends AbstractController
         }
 
         $sheet->setCellValue("C$row", "TOTAL");
-        $sheet->setCellValue("D$row", $salesDocument->getTotal());
+        $sheet->setCellValue("D$row", $salesDocument->getTotalTTC());
 
         $writer = new Xlsx($spreadsheet);
         $tempFile = tempnam(sys_get_temp_dir(), 'excel');

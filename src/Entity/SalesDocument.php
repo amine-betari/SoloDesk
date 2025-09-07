@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SalesDocumentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
@@ -59,6 +60,14 @@ class SalesDocument
      */
     #[ORM\OneToMany(targetEntity: SalesDocumentItem::class, mappedBy: 'salesDocument', cascade: ['persist'], orphanRemoval: true)]
     private Collection $salesDocumentItems;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $taxApplied = false;
+
+    #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2, nullable: true)]
+
+    private float $vatRate = 0.0;
+
 
     public function __construct()
     {
@@ -190,7 +199,7 @@ class SalesDocument
     /**
      * Calcule le total HT du document en sommant toutes les lignes.
      */
-    public function getTotal(): float
+    public function getTotalHT(): float
     {
         $total = 0.0;
 
@@ -199,6 +208,27 @@ class SalesDocument
         }
 
         return $total;
+    }
+
+    public function getTotalTTC(): float
+    {
+        $totalHT = $this->getTotalHT();
+        $tvaRate = 0.0;
+
+        // Priorité : valeur du document lui-même
+        if ($this->taxApplied) {
+            $tvaRate = $this->vatRate;
+        }
+        // Sinon projet
+        elseif ($this->project) {
+            $tvaRate = $this->project->getVatRate() ?? 0.0;
+        }
+        // Sinon estimate
+        elseif ($this->estimate) {
+            $tvaRate = $this->estimate->getVatRate() ?? 0.0;
+        }
+
+        return $totalHT * (1 + $tvaRate / 100);
     }
 
     public function getStatus(): string
@@ -269,8 +299,6 @@ class SalesDocument
         return $this;
     }
 
-    // src/Entity/SalesDocument.php
-
     public function updateStatusBasedOnPayments(): void
     {
         $totalPaid = 0;
@@ -279,7 +307,7 @@ class SalesDocument
             $totalPaid += $payment->getAmount();
         }
 
-        if ($totalPaid >= $this->getTotal()) {
+        if ($totalPaid >= $this->getTotalTTC()) {
             $this->setStatus(InvoiceStatus::PAID);
         } elseif ($totalPaid > 0) {
             $this->setStatus(InvoiceStatus::PARTIALLY_PAID);
@@ -292,6 +320,28 @@ class SalesDocument
     public function __toString(): string
     {
         return (string) $this->reference; // retourne le champ que tu veux afficher
+    }
+
+    public function isTaxApplied(): bool
+    {
+        return $this->taxApplied;
+    }
+
+    public function setTaxApplied(bool $taxApplied): self
+    {
+        $this->taxApplied = $taxApplied;
+        return $this;
+    }
+
+    public function getVatRate(): float
+    {
+        return $this->vatRate;
+    }
+
+    public function setVatRate(float $vatRate): self
+    {
+        $this->vatRate = $vatRate;
+        return $this;
     }
 
 }

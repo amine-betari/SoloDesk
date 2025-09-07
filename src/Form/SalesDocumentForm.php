@@ -10,6 +10,7 @@ use App\Constants\InvoiceStatus;
 use App\Constants\EstimateStatuses;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -17,6 +18,7 @@ use App\Form\AutoComplete\ClientAutocompleteField;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 
 class SalesDocumentForm extends AbstractType
 {
@@ -38,6 +40,16 @@ class SalesDocumentForm extends AbstractType
 
         $builder
             ->add('reference')
+            // Champs TVA
+            ->add('taxApplied', CheckboxType::class, [
+                'label'    => 'TVA appliquée',
+                'required' => false,
+            ])
+            ->add('vatRate', NumberType::class, [
+                'label'    => 'TVA (%)',
+                'required' => false,
+                'scale'    => 2,
+            ])
             ->add('salesDocumentItems', CollectionType::class, [
                 'entry_type' => SalesDocumentItemForm::class,
                 'allow_add' => true,
