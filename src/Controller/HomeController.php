@@ -5,6 +5,7 @@ use App\Repository\ClientRepository;
 use App\Repository\EstimateRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\SalesDocumentRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,15 +21,22 @@ class HomeController extends AbstractController
         ProjectRepository $projectRepository,
         EstimateRepository $estimateRepository,
         PaymentRepository $paymentRepository,
+        SalesDocumentRepository $salesDocumentRepository,
         ChartBuilderInterface $chartBuilder
     ): Response {
         $clients   = $clientRepository->findAll();
         $projects  = $projectRepository->findAll();
         $estimates = $estimateRepository->findAll();
+        $invoices  = $salesDocumentRepository->findBy(['type' => 'invoice']);
 
         $totalClients   = $clientRepository->count([]);
         $totalProjects  = $projectRepository->count([]);
         $totalEstimates = $estimateRepository->count([]);
+        $invoicesFromProject = $salesDocumentRepository->count(['type' => 'project']);
+        $invoicesManual      = $salesDocumentRepository->count(['type' => 'invoice']);
+        $totalInvoices       = $invoicesFromProject + $invoicesManual;
+
+
 
 
         $data = $clientRepository->countClientsGroupedByYear(
@@ -140,7 +148,7 @@ class HomeController extends AbstractController
 
         foreach ($payments as $payment) {
             $salesDocument = $payment->getSalesDocument();
-            $project = $payment->getSalesDocument()->getProject();
+            $project       = $payment->getSalesDocument()->getProject();
 
             // On tente de récupérer le client depuis la facture, sinon depuis le projet
             $client = $salesDocument?->getClient() ?? $project?->getClient();
@@ -153,7 +161,7 @@ class HomeController extends AbstractController
         }
 
 
-// Préparer les labels et données pour le chart
+        // Préparer les labels et données pour le chart
         $clientsPayments = array_keys($revenuesFromPayments);
         $revenuesPayments = array_values($revenuesFromPayments);
 
@@ -187,6 +195,7 @@ class HomeController extends AbstractController
             'totalClients' => $totalClients,
             'totalProjects' => $totalProjects,
             'totalEstimates' => $totalEstimates,
+            'totalInvoices' => $totalInvoices,
         ]);
     }
 

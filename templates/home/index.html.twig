@@ -26,13 +26,11 @@
     </div>
 
     <!-- Stat cards -->
-    {% include 'partials/_stats.html.twig' with { projectCount: totalProjects, clientCount: totalClients, estimateCount: totalEstimates } %}
-
-    <!-- Liste projets -->
-   {#  {% include 'partials/_project_list.html.twig' with { projects: projects } %}
-
-    <!-- Liste clients -->
-    {% include 'partials/_client_list.html.twig' with { clients: clients } %}
-   #}
+    {% include 'partials/_stats.html.twig' with {
+        projectCount: totalProjects,
+        clientCount: totalClients,
+        estimateCount: totalEstimates,
+        invoiceCount: totalInvoices
+    } %}
 
 {% endblock %}

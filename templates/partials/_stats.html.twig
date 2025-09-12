@@ -21,8 +21,10 @@
 
     <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-semibold text-gray-700 mb-2">Factures</h3>
-        <p class="text-4xl font-bold text-red-600">3</p> {# valeur fictive pour le moment #}
+        <p class="text-4xl font-bold text-red-600">{{ invoiceCount }}</p> {# valeur fictive pour le moment #}
         <a href="{{ path('app_invoice_new') }}" class="text-blue-600 hover:underline mt-2 inline-block">Créer une facture directement </a>
+        <a href="{{ path('app_sales_document_index') }}" class="text-blue-600 hover:underline mt-1 inline-block">Voir toutes les factures</a>
     </div>
+
 
 </div>

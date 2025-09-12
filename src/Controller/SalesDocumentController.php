@@ -346,6 +346,7 @@ final class SalesDocumentController extends AbstractController
 
         return $this->render('sales_document/new.html.twig', [
             'form' => $form,
+            'salesDocument' => $invoice,
         ]);
     }
 
