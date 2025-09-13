@@ -3,39 +3,43 @@
 {% block title %}Liste des documents{% endblock %}
 
 {% block body %}
-    <div class="max-w-7xl mx-auto py-10 space-y-8">
+    <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
 
-        <h1 class="text-4xl font-bold text-white mb-6">Devis et Factures</h1>
+        <h1 class="text-4xl font-bold text-gray-900 mb-6">Devis et Factures</h1>
 
-        {% include 'components/_filter_sales_document_form.html.twig' with {'form': filterForm, 'action': path('app_sales_document_index') } %}
+        {# Formulaire de filtre clair #}
+        {% include 'components/_filter_sales_document_form.html.twig' with {
+            'form': filterForm,
+            'action': path('app_sales_document_index')
+        } %}
 
         {% if pagination.items is not empty %}
-            <div class="overflow-x-auto bg-gray-900 rounded-xl shadow-lg">
-                <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-gray-800">
+            <div class="overflow-x-auto bg-white rounded-xl shadow-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Type</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Référence</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Créé le</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Modifié le</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modifié le</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-700">
+                    <tbody class="divide-y divide-gray-200">
                     {% for document in pagination.items %}
-                        <tr class="hover:bg-gray-800 transition-colors">
-                            <td class="px-6 py-4 text-sm text-gray-200">{{ document.id }}</td>
-                            <td class="px-6 py-4 text-sm font-semibold text-white">{{ document.type|document_type_label }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-200">{{ document.reference }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-200">
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.id }}</td>
+                            <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ document.type|document_type_label }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.reference }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">
                                 {{ document.getResolvedClient() ? document.getResolvedClient().getName() : '–' }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-200">{{ document.createdAt ? document.createdAt|date('d/m/Y') : '–' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-200">{{ document.modifiedAt ? document.modifiedAt|date('d/m/Y') : '–' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-200">{{ document.status ? document.status|trans : '–' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.createdAt ? document.createdAt|date('d/m/Y') : '–' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.modifiedAt ? document.modifiedAt|date('d/m/Y') : '–' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.status ? document.status|trans : '–' }}</td>
                             <td class="px-6 py-4 text-sm flex space-x-2">
                                 <a href="{{ path('app_sales_document_show', {'id': document.id}) }}"
                                    class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs">Voir</a>
@@ -56,17 +60,17 @@
             <div class="mt-4 flex justify-center space-x-2">
                 {% for i in 1..pagination.pages %}
                     <a href="?page={{ i }}"
-                       class="px-3 py-1 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600' }}">
+                       class="px-3 py-1 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
                         {{ i }}
                     </a>
                 {% endfor %}
             </div>
 
-            <p class="mt-2 text-center text-gray-400 text-sm">
+            <p class="mt-2 text-center text-gray-500 text-sm">
                 Affichage de {{ pagination.items|length }} sur {{ pagination.total }} documents
             </p>
         {% else %}
-            <p class="text-gray-400">Aucun document trouvé.</p>
+            <p class="text-gray-500">Aucun document trouvé.</p>
         {% endif %}
 
         <div class="mt-6 text-right">

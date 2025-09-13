@@ -1,18 +1,18 @@
-<div class="bg-gray-800 p-4 rounded-xl mb-6 shadow-md w-full">
+<div class="bg-white p-4 rounded-xl mb-6 shadow-xl w-full">
     {{ form_start(form, {'action': action}) }}
 
     <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
         <div class="md:col-span-2">
-            {{ form_label(form.salesDocument, 'Référence') }}
-            {{ form_widget(form.salesDocument, {'attr': {'class': 'w-full rounded bg-gray-700 text-white px-3 py-2 h-10'}}) }}
+            {{ form_label(form.salesDocument, 'Référence', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_widget(form.salesDocument, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div class="md:col-span-2">
-            {{ form_label(form.date, 'Date') }}
-            {{ form_widget(form.date, {'attr': {'class': 'w-full rounded bg-gray-700 text-white px-3 py-2 h-10'}}) }}
+            {{ form_label(form.date, 'Date', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_widget(form.date, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div class="md:col-span-2 flex justify-end space-x-2 items-end">
             {{ form_widget(form.search, {'attr': {'class': 'px-4 py-2 h-10 bg-blue-600 text-white rounded hover:bg-blue-700 transition'}}) }}
-            {{ form_widget(form.reset, {'attr': {'class': 'px-4 py-2 h-10 bg-gray-600 text-white rounded hover:bg-gray-700 transition'}}) }}
+            {{ form_widget(form.reset, {'attr': {'class': 'px-4 py-2 h-10 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition'}}) }}
         </div>
     </div>
 

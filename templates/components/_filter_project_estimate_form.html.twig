@@ -1,27 +1,25 @@
 {# src/templates/project/_filter_form.html.twig #}
-<div class="bg-gray-800 p-4 rounded-xl mb-6 shadow-md">
-    {{ form_start(form, {
-        'action': action
-    }) }}
+<div class="w-full p-6 bg-white rounded-xl shadow-xl mb-6">
+    {{ form_start(form, {'action': action}) }}
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-            {{ form_label(form.client, 'Client') }}
-            {{ form_widget(form.client, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
+            {{ form_label(form.client, 'Client', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_widget(form.client, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div>
-            {{ form_label(form.startDate, 'Date de début') }}
-            {{ form_widget(form.startDate, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
+            {{ form_label(form.startDate, 'Date de début', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_widget(form.startDate, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div>
-            {{ form_label(form.endDate, 'Date de fin') }}
-            {{ form_widget(form.endDate, {'attr': {'class': 'w-full rounded bg-gray-700 text-white p-2'}}) }}
+            {{ form_label(form.endDate, 'Date de fin', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_widget(form.endDate, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div class="flex items-end space-x-2">
             {{ form_widget(form.search, {'attr': {'class': 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition'}}) }}
-            {{ form_widget(form.reset, {'attr': {'class': 'px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition'}}) }}
+            {{ form_widget(form.reset, {'attr': {'class': 'px-4 py-2 bg-gray-400 text-gray-900 rounded hover:bg-gray-300 transition'}}) }}
         </div>
-
     </div>
-         {{ form_end(form) }}
+
+    {{ form_end(form) }}
 </div>

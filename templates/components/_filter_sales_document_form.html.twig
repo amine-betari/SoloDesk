@@ -1,4 +1,4 @@
-<div class="bg-gray-800 p-4 rounded-xl mb-6 shadow-md">
+<div class="bg-white p-4 rounded-xl mb-6 shadow-md">
     {{ form_start(form, {
         'action': action
     }) }}
@@ -8,20 +8,20 @@
         <!-- Type + Status -->
         <div data-controller="status-filter" class="flex gap-4 col-span-2">
             <div class="flex-1">
-                {{ form_label(form.type, 'Type') }}
+                {{ form_label(form.type, 'Type', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
                 {{ form_widget(form.type, {
                     'attr': {
-                        'class': 'w-full rounded bg-gray-700 text-white p-3',
+                        'class': 'w-full rounded border border-gray-300 p-2 text-gray-900',
                         'data-status-filter-target': 'type'
                     }
                 }) }}
             </div>
 
             <div class="flex-1">
-                {{ form_label(form.status, 'Status') }}
+                {{ form_label(form.status, 'Statut', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
                 {{ form_widget(form.status, {
                     'attr': {
-                        'class': 'w-full rounded bg-gray-700 text-white p-3',
+                        'class': 'w-full rounded border border-gray-300 p-2 text-gray-900',
                         'data-status-filter-target': 'status'
                     }
                 }) }}
@@ -30,8 +30,16 @@
 
         <!-- Boutons à droite -->
         <div class="flex justify-end space-x-2">
-            {{ form_widget(form.search, {'attr': {'class': 'px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 transition'}}) }}
-            {{ form_widget(form.reset, {'attr': {'class': 'px-6 py-3 bg-gray-600 text-white rounded hover:bg-gray-700 transition'}}) }}
+            {{ form_widget(form.search, {
+                'attr': {
+                    'class': 'px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition'
+                }
+            }) }}
+            {{ form_widget(form.reset, {
+                'attr': {
+                    'class': 'px-4 py-2 bg-gray-400 text-gray-900 rounded hover:bg-gray-300 transition'
+                }
+            }) }}
         </div>
 
     </div>
