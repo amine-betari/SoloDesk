@@ -1,6 +1,6 @@
-<div class="max-w-6xl mx-auto mt-12 bg-gray-900 p-8 rounded-xl shadow-xl text-white">
+<div class="mt-12 p-8 bg-white text-gray-900 rounded-xl">
 
-    {% if button_label is defined  %}
+{% if button_label is defined %}
         <h1 class="text-4xl font-extrabold mb-8">Modifier le projet</h1>
     {% else %}
         <h1 class="text-4xl font-extrabold mb-8">Nouveau projet</h1>
@@ -9,68 +9,68 @@
     {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
 
     <!-- Informations générales -->
-    <fieldset class="bg-gray-800 p-6 rounded-lg space-y-6">
-        <legend class="text-2xl font-semibold">Informations générales</legend>
+    <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6 border border-gray-200">
+        <legend class="text-2xl font-semibold text-gray-700">Informations générales</legend>
 
         <div class="space-y-2">
-            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-            {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
             {{ form_errors(form.name) }}
         </div>
 
         {% if form.projectNumber is defined %}
             <div class="space-y-2">
-                {{ form_label(form.projectNumber, 'Référence', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.projectNumber, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                {{ form_label(form.projectNumber, 'Référence', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.projectNumber, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.projectNumber) }}
             </div>
         {% endif %}
 
         <div data-controller="client-modal" class="space-y-2">
-            {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
-            <a href="{{ path('app_client_new') }}" class="text-blue-400 text-sm inline-block mt-1">+ Ajouter un nouveau client</a>
+            {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+            <a href="{{ path('app_client_new') }}" class="text-blue-600 text-sm inline-block mt-1">+ Ajouter un nouveau client</a>
         </div>
 
         <div class="space-y-2">
-            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-            {{ form_widget(form.description, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}, 'type': 'textarea'}) }}
+            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.description, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}, 'type': 'textarea'}) }}
             {{ form_errors(form.description) }}
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                {{ form_label(form.status, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                {{ form_label(form.status, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.status) }}
             </div>
             <div>
-                {{ form_label(form.type, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.type, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                {{ form_label(form.type, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.type, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.type) }}
             </div>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
             <div>
-                {{ form_label(form.startDate, 'Date début', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.startDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                {{ form_label(form.startDate, 'Date début', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.startDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.startDate) }}
             </div>
             <div>
-                {{ form_label(form.endDate, 'Date fin', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.endDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                {{ form_label(form.endDate, 'Date fin', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.endDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.endDate) }}
             </div>
         </div>
     </fieldset>
 
     <!-- TVA -->
-    <fieldset class="bg-gray-800 p-6 rounded-lg space-y-4" data-controller="toggle-vat">
-        <legend class="text-2xl font-semibold">TVA</legend>
+    <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200" data-controller="toggle-vat">
+        <legend class="text-2xl font-semibold text-gray-700">TVA</legend>
 
         <div>
-            {{ form_label(form.amount, 'Montant HT', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-            {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+            {{ form_label(form.amount, 'Montant HT', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
             {{ form_errors(form.amount) }}
         </div>
 
@@ -81,19 +81,19 @@
                     'data-action': 'toggle-vat#toggle'
                 }
             }) }}
-            {{ form_label(form.noVat, 'Pas de TVA', {'label_attr': {'class': 'text-sm'}}) }}
+            {{ form_label(form.noVat, 'Pas de TVA', {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
         </div>
 
         <div data-toggle-vat-target="vat" class="mt-2">
-            {{ form_label(form.vatRate, 'TVA (%)', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-            {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white', 'step': '0.01'}}) }}
+            {{ form_label(form.vatRate, 'TVA (%)', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900', 'step': '0.01'}}) }}
             {{ form_errors(form.vatRate) }}
         </div>
     </fieldset>
 
     <!-- Récurrence -->
-    <fieldset class="bg-gray-800 p-6 rounded-lg space-y-4" data-controller="toggle-visibility">
-        <legend class="text-2xl font-semibold">Récurrence</legend>
+    <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200" data-controller="toggle-visibility">
+        <legend class="text-2xl font-semibold text-gray-700">Récurrence</legend>
 
         <div class="flex items-center space-x-3">
             {{ form_widget(form.isRecurring, {
@@ -102,27 +102,27 @@
                     'data-action': 'toggle-visibility#toggle'
                 }
             }) }}
-            {{ form_label(form.isRecurring, 'Projet récurrent', {'label_attr': {'class': 'text-sm'}}) }}
+            {{ form_label(form.isRecurring, 'Projet récurrent', {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
         </div>
 
         <div data-toggle-visibility-target="toggleField" class="space-y-4 hidden mt-2">
             <div>
-                {{ form_label(form.recurringAmount, 'Montant récurrent', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.recurringAmount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                {{ form_label(form.recurringAmount, 'Montant récurrent', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.recurringAmount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.recurringAmount) }}
             </div>
 
             <div>
-                {{ form_label(form.recurringPeriod, 'Périodicité', {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.recurringPeriod, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                {{ form_label(form.recurringPeriod, 'Périodicité', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.recurringPeriod, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.recurringPeriod) }}
             </div>
         </div>
     </fieldset>
 
     <!-- Documents -->
-    <fieldset class="bg-gray-800 p-6 rounded-lg space-y-4">
-        <legend class="text-2xl font-semibold">Documents</legend>
+    <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200">
+        <legend class="text-2xl font-semibold text-gray-700">Documents</legend>
         {% include 'partials/_documents_form.html.twig' with { form: form, relatedEntity: project } %}
     </fieldset>
 
@@ -133,16 +133,15 @@
 
     {{ form_end(form) }}
 
-
-    {% if button_label is defined  %}
-        <div class="flex space-x-4">
+    {% if button_label is defined %}
+        <div class="flex space-x-4 mt-4">
             <a href="{{ path('app_project_index') }}"
-               class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900">← Retour à la liste</a>
 
             {{ include('project/_delete_form.html.twig') }}
         </div>
     {% else %}
         <a href="{{ path('app_project_index') }}"
-           class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+           class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 mt-4 inline-block">← Retour à la liste</a>
     {% endif %}
 </div>

@@ -1,39 +1,40 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des estimates{% endblock %}
+{% block title %}Liste des pré-estimations{% endblock %}
 
 {% block body %}
-    <div class="max-w-6xl mx-auto py-10 space-y-8">
+    <div class="max-w-7xl mx-auto py-10 space-y-8">
 
         <h1 class="text-3xl font-bold mb-6 text-white">Pré-Estimations</h1>
 
         {% include 'components/_filter_project_estimate_form.html.twig' with {'form': filterForm, 'action': path('app_estimate_index') } %}
 
-
         {% if pagination.items is not empty %}
-            <div class="overflow-x-auto bg-gray-800 rounded-xl shadow-lg">
+            <div class="overflow-x-auto bg-gray-900 rounded-xl shadow-lg">
                 <table class="min-w-full divide-y divide-gray-700">
-                    <thead class="bg-gray-900">
+                    <thead class="bg-gray-800">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Référence</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Nom</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Montant</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Début</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Projet</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Actions</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Référence</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nom</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Montant</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Statut</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Début</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Projet</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-700">
                     {% for estimate in pagination.items %}
-                        <tr class="hover:bg-gray-700">
+                        <tr class="hover:bg-gray-800 transition-colors cursor-pointer">
                             <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.id }}</td>
                             <td class="px-6 py-4 text-sm font-semibold text-white">{{ estimate.estimateNumber }}</td>
                             <td class="px-6 py-4 text-sm font-semibold text-white">{{ estimate.name }}</td>
                             <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.client ? estimate.client.name : '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.amount|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-200">
+                                {{ estimate.amount|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}
+                            </td>
                             <td class="px-6 py-4 text-sm">
                                 {% set color =
                                     estimate.status == 'Brouillon' ? 'gray' :
@@ -41,22 +42,28 @@
                                     estimate.status == 'Accepté' ? 'green' :
                                     estimate.status == 'Refusé' ? 'red' : 'gray'
                                 %}
-                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">{{ estimate.status|trans }}</span>
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">
+                                    {{ estimate.status|trans }}
+                                </span>
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-200">{{ estimate.startDate ? estimate.startDate|date('d/m/Y') : '-' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-200">
                                 {% if estimate.project %}
-                                    <a href="{{ path('app_project_show', {'id': estimate.project.id}) }}" class="text-blue-400 hover:text-blue-200">{{ estimate.project ?: '—' }}</a>
+                                    <a href="{{ path('app_project_show', {'id': estimate.project.id}) }}" class="text-blue-400 hover:text-blue-200">
+                                        {{ estimate.project }}
+                                    </a>
+                                {% else %}
+                                    —
                                 {% endif %}
                             </td>
                             <td class="px-6 py-4 text-sm flex space-x-2">
-                                <a href="{{ path('app_estimate_show', {'id': estimate.id}) }}" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Voir</a>
-                                <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Modifier</a>
+                                <a href="{{ path('app_estimate_show', {'id': estimate.id}) }}" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs">Voir</a>
+                                <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition text-xs">Modifier</a>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="8" class="px-6 py-4 text-center text-gray-400">Aucune estimate trouvée</td>
+                            <td colspan="9" class="px-6 py-4 text-center text-gray-400">Aucune pré-estimation trouvée</td>
                         </tr>
                     {% endfor %}
                     </tbody>
@@ -67,21 +74,22 @@
             <div class="mt-4 flex justify-center space-x-2">
                 {% for i in 1..pagination.pages %}
                     <a href="?page={{ i }}"
-                       class="px-3 py-1 rounded {{ i == pagination.page ? 'bg-blue-600' : 'bg-gray-700 hover:bg-gray-600' }}">
+                       class="px-3 py-1 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600' }}">
                         {{ i }}
                     </a>
                 {% endfor %}
             </div>
-            <p class="mt-2 text-center text-gray-300 text-sm">
-                Affichage de {{ pagination.items|length }} sur {{ pagination.total }} estimates
+
+            <p class="mt-2 text-center text-gray-400 text-sm">
+                Affichage de {{ pagination.items|length }} sur {{ pagination.total }} pré-estimations
             </p>
         {% else %}
-            <p class="text-gray-300">Aucune estimate trouvée.</p>
+            <p class="text-gray-400">Aucune pré-estimation trouvée.</p>
         {% endif %}
 
         <div class="mt-6 text-right">
             <a href="{{ path('app_estimate_new') }}"
-               class="inline-block px-6 py-2 bg-green-600 text-white rounded hover:bg-blue-700 transition">
+               class="inline-block px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg text-white font-medium transition-colors">
                 Nouvelle Pré-Estimation
             </a>
         </div>

@@ -1,21 +1,42 @@
 {# templates/partials/sidebar.html.twig #}
-<aside class="w-64 bg-[#1F2732] min-h-screen p-6 flex flex-col gap-4">
-    <a href="{{ path('home') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'home' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
-        Dashboard
-    </a>
-    <a href="{{ path('app_project_index') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'app_project' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
-        Projects
-    </a>
-    <a href="{{ path('app_estimate_index') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'app_estimate' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
-        Pré-Estimations
-    </a>
-    <a href="{{ path('app_payment_index') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'app_payment' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
-        Paiements
-    </a>
-    <a href="{{ path('app_sales_document_index') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'app_sales_document' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
-        Documents de Vente
-    </a>
-    <a href="{{ path('app_client_index') }}" class="px-4 py-2 rounded hover:bg-[#2A3747] {{ app.request.attributes.get('_route') starts with 'app_client_index' ? 'bg-[#2A3747] text-white font-semibold' : '' }}">
-        Clients
-    </a>
+<aside class="w-64 bg-[#1F2732] min-h-screen flex flex-col">
+    <div class="px-6 py-4 text-white text-2xl font-bold">
+        SoloDesk
+    </div>
+
+    <nav class="flex-1 px-2 space-y-2">
+        {% set menuItems = [
+            {'route':'home', 'label':'Dashboard', 'icon':'home'},
+            {'route':'app_project_index', 'label':'Projects', 'icon':'folder'},
+            {'route':'app_estimate_index', 'label':'Pré-Estimations', 'icon':'file-text'},
+            {'route':'app_payment_index', 'label':'Paiements', 'icon':'credit-card'},
+            {'route':'app_sales_document_index', 'label':'Documents de Vente', 'icon':'file'},
+            {'route':'app_client_index', 'label':'Clients', 'icon':'users'}
+        ] %}
+
+        {% for item in menuItems %}
+            <a href="{{ path(item.route) }}"
+               class="group flex items-center px-4 py-3 rounded-md transition-colors
+               {% if app.request.attributes.get('_route') starts with item.route %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
+                {# Icône simple avec Heroicons #}
+                <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    {% if item.icon == 'home' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4H9v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9z"/>
+                    {% elseif item.icon == 'folder' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 7v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7M3 7l2-4h14l2 4"/>
+                    {% elseif item.icon == 'file-text' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6"/>
+                    {% elseif item.icon == 'credit-card' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2 6h20v12H2zM2 10h20"/>
+                    {% elseif item.icon == 'file' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    {% elseif item.icon == 'users' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 0 0-4-4h-1M9 20h5v-2a4 4 0 0 0-4-4H9M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/>
+                    {% endif %}
+                </svg>
+
+                {{ item.label }}
+            </a>
+        {% endfor %}
+    </nav>
 </aside>

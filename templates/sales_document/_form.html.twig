@@ -1,87 +1,78 @@
-<div class="w-full min-h-screen bg-gray-900 p-6">
-    <div class="mx-auto max-w-6xl">
-        <h1 class="text-3xl font-bold mb-8 text-white">
-            {% if button_label is defined %}Modifier le document {% else %}Nouveau document{% endif %}
+<div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
+        <h1 class="text-3xl font-bold mb-8 text-gray-900">
+            {% if button_label is defined %}Modifier le document{% else %}Nouveau document{% endif %}
         </h1>
 
         {{ form_start(form, {
             'attr': {'class': 'space-y-8', 'enctype': 'multipart/form-data'}
         }) }}
 
-        <fieldset class="bg-gray-800 shadow rounded-lg p-8 space-y-6">
-            <legend class="text-xl font-semibold text-white mb-4">Informations générales</legend>
+        <!-- Informations générales -->
+        <fieldset class="bg-gray-50 shadow rounded-lg p-8 space-y-6">
+            <legend class="text-xl font-semibold text-gray-900 mb-4">Informations générales</legend>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    {{ form_label(form.reference, 'Référence', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
-                    {{ form_widget(form.reference, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                    {{ form_label(form.reference, 'Référence', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_widget(form.reference, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                     {{ form_errors(form.reference) }}
                 </div>
 
                 <div>
-                    {{ form_label(form.status, 'Statut', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
-                    {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                    {{ form_label(form.status, 'Statut', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                     {{ form_errors(form.status) }}
                 </div>
 
                 <div class="md:col-span-2">
-                    {{ form_label(form.notes, 'Notes', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
-                    {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                    {{ form_label(form.notes, 'Notes', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                     {{ form_errors(form.notes) }}
                 </div>
 
+                <!-- Client -->
                 <div class="md:col-span-2" data-controller="sales-document"
                      data-action="change->sales-document#toggleClient"
                      data-has-project-select="false"
                      data-has-estimate-select="false">
                     <div data-sales-document-target="clientField">
-                        {{ form_label(form.client, 'Client', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
-                        {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}}) }}
+                        {{ form_label(form.client, 'Client', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                        {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                         {{ form_errors(form.client) }}
                     </div>
                 </div>
 
-                {# TVA fields #}
+                <!-- TVA fields -->
                 <div>
-                    {{ form_label(form.taxApplied, 'TVA appliquée', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
-
+                    {{ form_label(form.taxApplied, 'TVA appliquée', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                     {% if salesDocument.type == 'invoice' %}
-                        {{ form_widget(form.taxApplied, {
-                            'attr': {'class': 'text-sm'}
-                        }) }}
+                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                     {% else %}
-                        {{ form_widget(form.taxApplied, {
-                            'attr': {'class': 'text-sm', 'disabled': true}
-                        }) }}
+                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2', 'disabled': true}}) }}
                     {% endif %}
                     {{ form_errors(form.taxApplied) }}
                 </div>
 
                 <div>
-                    {{ form_label(form.vatRate, 'Taux TVA (%)', {'label_attr': {'class': 'block text-sm font-medium text-white'}}) }}
-
+                    {{ form_label(form.vatRate, 'Taux TVA (%)', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                     {% if salesDocument.type == 'invoice' %}
-                        {{ form_widget(form.vatRate, {
-                            'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white'}
-                        }) }}
+                        {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                     {% else %}
-                        {{ form_widget(form.vatRate, {
-                            'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white', 'readonly': 'readonly'}
-                        }) }}
+                        {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2', 'readonly': 'readonly'}}) }}
                     {% endif %}
                     {{ form_errors(form.vatRate) }}
                 </div>
             </div>
         </fieldset>
 
-        {# Lignes d'articles #}
+        <!-- Lignes d'articles -->
         <div data-controller="sales-document-items" data-sales-document-items-items-container-target="itemsContainer" class="mt-8">
-            <h2 class="text-2xl font-semibold mb-4 text-white">Lignes d'articles</h2>
+            <h2 class="text-2xl font-semibold mb-4 text-gray-900">Lignes d'articles</h2>
 
             <div data-sales-document-items-target="itemsContainer"
                  data-prototype="{{ include('sales_document_item/_form.html.twig', { form: form.salesDocumentItems.vars.prototype })|e('html_attr') }}">
                 {% for itemForm in form.salesDocumentItems %}
-                    <div class="mb-4 p-4 border rounded-lg bg-gray-700 relative shadow-sm">
+                    <div class="mb-4 p-4 border rounded-lg bg-gray-50 relative shadow-sm">
                         {% include 'sales_document_item/_form.html.twig' with { 'form': itemForm } %}
 
                         <button type="button"
@@ -100,6 +91,7 @@
             </button>
         </div>
 
+        <!-- Bouton Enregistrer -->
         <div class="flex justify-end mt-8">
             <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
                 Enregistrer
@@ -108,16 +100,16 @@
 
         {{ form_end(form) }}
 
-        {% if button_label is defined  %}
-            <div class="flex space-x-4">
+        <!-- Retour / suppression -->
+        {% if button_label is defined %}
+            <div class="flex space-x-4 mt-4">
                 <a href="{{ path('app_sales_document_index') }}"
-                   class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+                   class="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded text-gray-900">← Retour à la liste</a>
 
                 {{ include('sales_document/_delete_form.html.twig') }}
             </div>
         {% else %}
             <a href="{{ path('app_sales_document_index') }}"
-               class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+               class="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded text-gray-900 mt-4 inline-block">← Retour à la liste</a>
         {% endif %}
-    </div>
 </div>

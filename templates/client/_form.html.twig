@@ -1,63 +1,64 @@
-<div class="max-w-6xl mx-auto mt-10 bg-gray-900 p-8 rounded-xl shadow-xl text-white">
+<div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
 
     {% if button_label is defined  %}
         <h1 class="text-3xl font-bold mb-6">Modifier le client</h1>
     {% else %}
         <h1 class="text-3xl font-bold mb-6">Nouveau client</h1>
-
     {% endif %}
 
     {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
-    <fieldset class="space-y-4 p-6 bg-gray-800 rounded-lg shadow-inner border border-gray-700">
-        <legend class="text-xl font-semibold mb-4 text-gray-200">Informations du client</legend>
+    <fieldset class="space-y-4 p-6 bg-white rounded-lg shadow-inner border border-gray-200">
+        <legend class="text-xl font-semibold mb-4 text-gray-900">Informations du client</legend>
 
         <div>
-            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-            {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-            {{ form_errors(form.name) }}
+            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {{ form_errors(form.name, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
 
         <div>
-            {{ form_label(form.email, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-            {{ form_widget(form.email, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-            {{ form_errors(form.email) }}
+            {{ form_label(form.email, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.email, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {{ form_errors(form.email, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
+
         <div>
-            {{ form_label(form.phone, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-            {{ form_widget(form.phone, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-            {{ form_errors(form.phone) }}
+            {{ form_label(form.phone, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.phone, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {{ form_errors(form.phone, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
+
         <div>
-            {{ form_label(form.address, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-            {{ form_widget(form.address, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-            {{ form_errors(form.address) }}
+            {{ form_label(form.address, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.address, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {{ form_errors(form.address, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                {{ form_label(form.country, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-                {{ form_widget(form.country, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-                {{ form_errors(form.country) }}
+                {{ form_label(form.country, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.country, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+                {{ form_errors(form.country, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
             </div>
 
             <div>
-                {{ form_label(form.currency, 'Devise', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-                {{ form_widget(form.currency, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-                {{ form_errors(form.currency) }}
+                {{ form_label(form.currency, 'Devise', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.currency, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+                {{ form_errors(form.currency, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
             </div>
         </div>
 
         <div>
-            {{ form_label(form.firstContactAt, 'Premier Contact', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-            {{ form_widget(form.firstContactAt, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-            {{ form_errors(form.firstContactAt) }}
+            {{ form_label(form.firstContactAt, 'Premier Contact', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.firstContactAt, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {{ form_errors(form.firstContactAt, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
 
         <div>
-            {{ form_label(form.notes, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-200'}}) }}
-            {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-600 bg-gray-700 text-white placeholder-gray-400'}}) }}
-            {{ form_errors(form.notes) }}
+            {{ form_label(form.notes, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {{ form_errors(form.notes, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
     </fieldset>
 
@@ -70,14 +71,14 @@
     {{ form_end(form) }}
 
     {% if button_label is defined  %}
-    <div class="flex space-x-4">
-        <a href="{{ path('app_client_index') }}"
-        class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+        <div class="flex space-x-4 mt-4">
+            <a href="{{ path('app_client_index') }}"
+               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900">← Retour à la liste</a>
 
-        {{ include('client/_delete_form.html.twig') }}
-    </div>
+            {{ include('client/_delete_form.html.twig') }}
+        </div>
     {% else %}
         <a href="{{ path('app_client_index') }}"
-           class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
+           class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 mt-4 inline-block">← Retour à la liste</a>
     {% endif %}
 </div>
