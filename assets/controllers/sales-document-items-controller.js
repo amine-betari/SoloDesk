@@ -18,7 +18,7 @@ export default class extends Controller {
         // Crée un div pour contenir la nouvelle ligne
         const div = document.createElement("div");
         div.innerHTML = newForm;
-        div.classList.add("mb-4", "p-4", "border", "rounded", "bg-gray-700");
+        div.classList.add("mb-4", "p-4", "border", "rounded", "bg-gray-100");
 
         // Ajoute un bouton supprimer
         const removeButton = document.createElement("button");

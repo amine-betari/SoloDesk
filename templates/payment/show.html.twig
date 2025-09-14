@@ -3,60 +3,54 @@
 {% block title %}Paiement n°{{ payment.id }}{% endblock %}
 
 {% block body %}
-    <div class="max-w-6xl mx-auto mt-12 bg-gray-900 p-8 rounded-xl shadow-xl text-white">
-        <h1 class="text-4xl font-extrabold mb-8">Détails du paiement</h1>
+    <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
 
-        <fieldset class="bg-gray-800 p-6 rounded-lg space-y-6">
-            <legend class="text-2xl font-semibold">Informations générales</legend>
-
-            <div class="grid grid-cols-2 gap-6">
-                <div>
-                    <dt class="text-sm font-medium text-gray-400">ID</dt>
-                    <dd class="text-lg text-gray-200">{{ payment.id }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-400">Date</dt>
-                    <dd class="text-lg text-gray-200">
-                        {{ payment.date ? payment.date|date('d/m/Y') : 'Non renseignée' }}
-                    </dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-400">Montant</dt>
-                    <dd class="text-lg text-gray-200">
-                        {{ payment.amount|number_format(2, ',', ' ') }} €
-                    </dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-400">Méthode</dt>
-                    <dd class="text-lg text-gray-200">{{ payment.method }}</dd>
-                </div>
-                <div class="col-span-2">
-                    <dt class="text-sm font-medium text-gray-400">Libellé</dt>
-                    <dd class="text-lg text-gray-200">{{ payment.label ?: '—' }}</dd>
-                </div>
-                {% if payment.salesDocument %}
-                    <div class="col-span-2">
-                        <dt class="text-sm font-medium text-gray-400">Référence facture</dt>
-                        <dd class="text-lg text-gray-200">{{ payment.salesDocument }}</dd>
-                    </div>
-                {% endif %}
-                {% if payment.invoiceReference %}
-                    <div class="col-span-2">
-                        <dt class="text-sm font-medium text-gray-400">Référence facture</dt>
-                        <dd class="text-lg text-gray-200">{{ payment.invoiceReference }}</dd>
-                    </div>
-                {% endif %}
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-4xl font-extrabold">Paiement n°{{ payment.id }}</h1>
+            <div class="flex space-x-3">
+                <a href="{{ path('app_payment_index') }}"
+                   class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 text-sm transition-colors">← Retour</a>
+                <a href="{{ path('app_payment_edit', {'id': payment.id}) }}"
+                   class="px-5 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm transition-colors">Modifier</a>
+                {{ include('payment/_delete_form.html.twig') }}
             </div>
-        </fieldset>
-
-        <div class="flex space-x-4 mt-6">
-            <a href="{{ path('app_payment_index') }}"
-               class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white text-sm transition-colors">← Retour à la liste</a>
-
-            <a href="{{ path('app_payment_edit', {'id': payment.id}) }}"
-               class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm transition-colors">Modifier</a>
-
-            {{ include('payment/_delete_form.html.twig') }}
         </div>
+
+        {# Informations générales #}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">ID</h2>
+                <p class="text-gray-900 text-xl">{{ payment.id }}</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Date</h2>
+                <p class="text-gray-900 text-xl">{{ payment.date ? payment.date|date('d/m/Y') : 'Non renseignée' }}</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Montant</h2>
+                <p class="text-gray-900 text-xl">{{ payment.amount|number_format(2, ',', ' ') }} €</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Méthode</h2>
+                <p class="text-gray-900 text-xl">{{ payment.method }}</p>
+            </div>
+            <div class="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Libellé</h2>
+                <p class="text-gray-900 text-xl">{{ payment.label ?: '—' }}</p>
+            </div>
+            {% if payment.salesDocument %}
+                <div class="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-500 mb-2">Référence facture</h2>
+                    <p class="text-gray-900 text-xl">{{ payment.salesDocument }}</p>
+                </div>
+            {% endif %}
+            {% if payment.invoiceReference %}
+                <div class="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-500 mb-2">Référence facture</h2>
+                    <p class="text-gray-900 text-xl">{{ payment.invoiceReference }}</p>
+                </div>
+            {% endif %}
+        </div>
+
     </div>
 {% endblock %}

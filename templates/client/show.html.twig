@@ -1,46 +1,89 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Client{% endblock %}
+{% block title %}Détails du client{% endblock %}
 
 {% block body %}
-    <div class="max-w-6xl mx-auto py-8">
-        <h1 class="text-3xl font-bold mb-6 text-white">Détails du client</h1>
+    <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
 
-        <div class="bg-gray-800 text-white rounded-lg shadow-lg p-6 mb-6">
-            <dl class="grid grid-cols-2 gap-4">
-                <div>
-                    <dt class="text-sm font-medium text-gray-300">Nom</dt>
-                    <dd class="text-lg text-white">{{ client.name }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-300">Email</dt>
-                    <dd class="text-lg text-white">{{ client.email }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-300">Pays</dt>
-                    <dd class="text-lg text-white">{{ client.country }}</dd>
-                </div>
-                <div>
-                    <dt class="text-sm font-medium text-gray-300">Nombre de projets</dt>
-                    {# <dd class="text-lg text-white">{{ client.projects|length }}</dd> #}
-                    <dd class="text-lg text-white">{{ projectsCount }}</dd>
-                </div>
-                <div class="col-span-2">
-                    <dt class="text-sm font-medium text-gray-300">Notes</dt>
-                    <dd class="text-white whitespace-pre-line">{{ client.notes ?: '–' }}</dd>
-                </div>
-            </dl>
+        <div class="flex justify-between items-center">
+            <h1 class="text-4xl font-bold text-gray-900">Client : {{ client.name }}</h1>
+            <div class="flex space-x-3">
+                <a href="{{ path('app_client_index') }}"
+                   class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900">← Retour</a>
+                <a href="{{ path('app_client_edit', {'id': client.id}) }}"
+                   class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white">Modifier</a>
+                {{ include('client/_delete_form.html.twig') }}
+            </div>
         </div>
 
-
-        <div class="flex space-x-4">
-            <a href="{{ path('app_client_index') }}"
-               class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded text-white">← Retour à la liste</a>
-
-            <a href="{{ path('app_client_edit', {'id': client.id}) }}"
-               class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white">Modifier</a>
-
-            {{ include('client/_delete_form.html.twig') }}
+        {# Section résumé cartes #}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Email</h2>
+                <p class="text-gray-900 text-xl">{{ client.email }}</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Pays</h2>
+                <p class="text-gray-900 text-xl">{{ client.country ?: '–' }}</p>
+            </div>
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-lg font-semibold text-gray-500 mb-2">Nombre de projets</h2>
+                <p class="text-gray-900 text-xl">{{ projectsCount }}</p>
+            </div>
         </div>
+
+        {# Section détails supplémentaires #}
+        <div class="bg-white rounded-xl p-6 shadow-md">
+            <h2 class="text-2xl font-bold text-gray-900 mb-4">Notes</h2>
+            <p class="text-gray-700 whitespace-pre-line">{{ client.notes ?: 'Aucune note disponible.' }}</p>
+        </div>
+
+        {# Section projets liés #}
+        {% if projectsCount > 0 %}
+            <div class="bg-white rounded-xl p-6 shadow-md">
+                <h2 class="text-2xl font-bold text-gray-900 mb-4">Projets du client</h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Début</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fin</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                        {% for project in client.projects %}
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer">
+                                <td class="px-6 py-4 text-sm text-gray-900">{{ project.id }}</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ project.name }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">{{ project.startDate ? project.startDate|date('d/m/Y') : '–' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">{{ project.endDate ? project.endDate|date('d/m/Y') : '–' }}</td>
+                                <td class="px-6 py-4">
+                                    {% set statusColors = {
+                                        'En cours': 'bg-yellow-100 text-yellow-800',
+                                        'Terminé': 'bg-green-100 text-green-800',
+                                        'Annulé': 'bg-red-100 text-red-800'
+                                    } %}
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold {{ statusColors[project.status]|default('bg-gray-100 text-gray-800') }}">
+                                        {{ project.status|trans }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 flex space-x-2">
+                                    <a href="{{ path('app_project_show', {'id': project.id}) }}"
+                                       class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs">Voir</a>
+                                    <a href="{{ path('app_project_edit', {'id': project.id}) }}"
+                                       class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition text-xs">Modifier</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
     </div>
 {% endblock %}

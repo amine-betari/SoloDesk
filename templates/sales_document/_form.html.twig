@@ -72,7 +72,7 @@
             <div data-sales-document-items-target="itemsContainer"
                  data-prototype="{{ include('sales_document_item/_form.html.twig', { form: form.salesDocumentItems.vars.prototype })|e('html_attr') }}">
                 {% for itemForm in form.salesDocumentItems %}
-                    <div class="mb-4 p-4 border rounded-lg bg-gray-50 relative shadow-sm">
+                    <div class="mb-4 p-4 border rounded-lg bg-gray-100 relative shadow-sm">
                         {% include 'sales_document_item/_form.html.twig' with { 'form': itemForm } %}
 
                         <button type="button"
