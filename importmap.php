@@ -56,4 +56,7 @@ return [
         'version' => '2.4.3',
         'type' => 'css',
     ],
+    '@ckeditor/ckeditor5-build-classic' => [
+        'version' => '44.3.0',
+    ],
 ];

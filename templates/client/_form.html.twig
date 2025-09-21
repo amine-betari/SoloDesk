@@ -31,7 +31,16 @@
 
         <div>
             {{ form_label(form.address, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-            {{ form_widget(form.address, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {# {{ form_widget(form.address, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }} #}
+            <div
+                data-controller="ckeditor"
+                data-ckeditor-toolbar-value='["bold","italic","bulletedList","numberedList","undo","redo"]'
+                data-ckeditor-license-key-value="GPL"  {# optionnel, par défaut déjà GPL #}
+            >
+                {{ form_widget(form.address, {
+                    attr: { 'data-ckeditor-target':'textarea', rows:10, class:'mt-1 w-full rounded-md border-gray-300 bg-white' }
+                }) }}
+            </div>
             {{ form_errors(form.address, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
 
@@ -57,7 +66,16 @@
 
         <div>
             {{ form_label(form.notes, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-            {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+            {#  { form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }} #}
+            <div
+                data-controller="ckeditor"
+                data-ckeditor-toolbar-value='["bold","italic","bulletedList","numberedList","undo","redo"]'
+                data-ckeditor-license-key-value="GPL"  {# optionnel, par défaut déjà GPL #}
+            >
+                {{ form_widget(form.notes, {
+                    attr: { 'data-ckeditor-target':'textarea', rows:10, class:'mt-1 w-full rounded-md border-gray-300 bg-white' }
+                }) }}
+            </div>
             {{ form_errors(form.notes, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
         </div>
     </fieldset>

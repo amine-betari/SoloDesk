@@ -30,13 +30,18 @@
                 <h2 class="text-lg font-semibold text-gray-500 mb-2">Nombre de projets</h2>
                 <p class="text-gray-900 text-xl">{{ projectsCount }}</p>
             </div>
+
+            {# Section détails supplémentaires #}
+            {% if client.notes is not null %}
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">Notes</h2>
+                    {# <p class="text-gray-700 whitespace-pre-line ck-content prose max-w-none">{{ client.notes|raw ?: 'Aucune note disponible.' }}</p> #}
+                    <p class="">{{ client.notes|sanitize_html ?: 'Aucune note disponible.' }}</p>
+                </div>
+            {% endif %}
         </div>
 
-        {# Section détails supplémentaires #}
-        <div class="bg-white rounded-xl p-6 shadow-md">
-            <h2 class="text-2xl font-bold text-gray-900 mb-4">Notes</h2>
-            <p class="text-gray-700 whitespace-pre-line">{{ client.notes ?: 'Aucune note disponible.' }}</p>
-        </div>
+
 
         {# Section projets liés #}
         {% if projectsCount > 0 %}

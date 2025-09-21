@@ -34,7 +34,7 @@
                 {% set status_class = estimate.status == 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %}
                 <span class="px-3 py-1 rounded-full text-xs font-semibold {{ status_class }}">
                 {{ estimate.status|trans }}
-            </span>
+                </span>
             </div>
         </div>
 
@@ -48,7 +48,7 @@
                 </div>
                 <div class="col-span-2">
                     <dt class="text-sm font-medium text-gray-500">Description</dt>
-                    <dd class="text-gray-700 whitespace-pre-line">{{ estimate.description ?: '–' }}</dd>
+                    <dd class="text-gray-700 whitespace-pre-line">{{ estimate.description ?  estimate.description|sanitize_html ?: '–' }}</dd>
                 </div>
             </dl>
         </div>

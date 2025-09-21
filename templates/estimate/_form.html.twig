@@ -33,8 +33,16 @@
         </div>
 
         <div class="space-y-2">
-            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-            {{ form_widget(form.description, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+            {{ form_label(form.description, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            <div
+                data-controller="ckeditor"
+                data-ckeditor-toolbar-value='["bold","italic","bulletedList","numberedList","undo","redo"]'
+                data-ckeditor-license-key-value="GPL"
+            >
+                {{ form_widget(form.description, {
+                    attr: { 'data-ckeditor-target':'textarea', rows:10, class:'mt-1 w-full rounded-md border-gray-300 bg-white' }
+                }) }}
+            </div>
             {{ form_errors(form.description) }}
         </div>
 

@@ -55,6 +55,13 @@
                 {{ project.status|trans }}
             </span>
             </div>
+            {# Section détails supplémentaires #}
+            {% if project.description is not null %}
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <h2 class="text-lg font-semibold text-gray-500 mb-2">Description</h2>
+                    <p class="">{{ project.description|sanitize_html ?: 'Aucune description disponible.' }}</p>
+                </div>
+            {% endif %}
         </div>
 
         {# Documents et actions #}

@@ -26,7 +26,16 @@
 
                 <div class="md:col-span-2">
                     {{ form_label(form.notes, 'Notes', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                    {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
+                    {# {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}  #}
+                    <div
+                        data-controller="ckeditor"
+                        data-ckeditor-toolbar-value='["bold","italic","bulletedList","numberedList","undo","redo"]'
+                        data-ckeditor-license-key-value="GPL"
+                    >
+                        {{ form_widget(form.notes, {
+                            attr: { 'data-ckeditor-target':'textarea', rows:5, class:'mt-1 w-full rounded-md border-gray-300 bg-white' }
+                        }) }}
+                    </div>
                     {{ form_errors(form.notes) }}
                 </div>
 

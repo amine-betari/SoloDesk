@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+
+/* Zone d’édition CKEditor (et aussi le rendu, car CK ajoute .ck-content) */
+.ck-content { min-height: 180px; }
+
+.ck-content ul {
+    list-style: disc !important;
+    margin: .5rem 0;
+    padding-left: 1.5rem;      /* <- l’indentation qui manque */
+}
+.ck-content ol {
+    list-style: decimal !important;
+    margin: .5rem 0;
+    padding-left: 1.5rem;      /* <- l’indentation qui manque */
+}
+.ck-content li { margin: .125rem 0; }
