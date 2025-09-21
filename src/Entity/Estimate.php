@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\EventListener\EstimateListener;
 use App\Repository\EstimateRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -11,6 +12,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 
 #[ORM\Entity(repositoryClass: EstimateRepository::class)]
+#[ORM\EntityListeners([EstimateListener::class])]
 #[UniqueEntity('estimateNumber')]
 class Estimate
 {

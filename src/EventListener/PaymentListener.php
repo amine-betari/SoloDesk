@@ -12,7 +12,6 @@ use Doctrine\ORM\Event\PostUpdateEventArgs;
 
 class PaymentListener
 {
-
     public function postPersist(Payment $payment, PostPersistEventArgs $args): void
     {
         $invoice = $payment->getSalesDocument();
