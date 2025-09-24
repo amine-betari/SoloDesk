@@ -55,7 +55,7 @@ class Project
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2, nullable: true)]
     private ?string $amount = null;
 
-    #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(mappedBy: 'project', cascade: ['persist'])]
     private ?Estimate $estimate = null;
 
     #[ORM\Column(type: 'boolean')]

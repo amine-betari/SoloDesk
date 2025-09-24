@@ -36,6 +36,9 @@ class SalesDocument
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $modifiedAt = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $invoiceDate = null;
+
     #[ORM\ManyToOne(inversedBy: 'salesDocuments')]
     private ?Project $project = null;
 
@@ -72,6 +75,7 @@ class SalesDocument
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->invoiceDate = new \DateTimeImmutable();
         $this->salesDocumentItems = new ArrayCollection();
        // $this->reference = $this->projectNumber ?? $this->generateProjectNumber();
 
@@ -115,6 +119,18 @@ class SalesDocument
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getInvoiceDate(): ?\DateTimeImmutable
+    {
+        return $this->invoiceDate;
+    }
+
+    public function setInvoiceDate(\DateTimeImmutable $invoiceDate): static
+    {
+        $this->invoiceDate = $invoiceDate;
 
         return $this;
     }

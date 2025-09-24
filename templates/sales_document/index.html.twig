@@ -22,8 +22,9 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Modifié le</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date d'émission</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -37,8 +38,9 @@
                             <td class="px-6 py-4 text-sm text-gray-700">
                                 {{ document.getResolvedClient() ? document.getResolvedClient().getName() : '–' }}
                             </td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.estimate ? document.estimate.amount|format_currency(document.estimate.currency, app.request.locale ?: 'fr_FR') }} </td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.createdAt ? document.createdAt|date('d/m/Y') : '–' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.modifiedAt ? document.modifiedAt|date('d/m/Y') : '–' }}</td>
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.invoiceDate ? document.invoiceDate|date('d/m/Y') : '–' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.status ? document.status|trans : '–' }}</td>
                             <td class="px-6 py-4 text-sm flex space-x-2">
                                 <a href="{{ path('app_sales_document_show', {'id': document.id}) }}"

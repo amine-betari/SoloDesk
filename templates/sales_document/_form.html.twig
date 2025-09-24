@@ -4,7 +4,7 @@
         </h1>
 
         {{ form_start(form, {
-            'attr': {'class': 'space-y-8', 'enctype': 'multipart/form-data'}
+            'attr': {'class': 'space-y-8', 'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}
         }) }}
 
         <!-- Informations générales -->
@@ -22,6 +22,12 @@
                     {{ form_label(form.status, 'Statut', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                     {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                     {{ form_errors(form.status) }}
+                </div
+
+                ><div>
+                    {{ form_label(form.invoiceDate, "Date d'emission", {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_widget(form.invoiceDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
+                    {{ form_errors(form.invoiceDate) }}
                 </div>
 
                 <div class="md:col-span-2">

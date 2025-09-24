@@ -40,8 +40,8 @@ class HomeController extends AbstractController
 
 
         $data = $clientRepository->countClientsGroupedByYear(
-        //    new \DateTime('2019-01-01'),
-        //    new \DateTime('2023-12-31')
+            new \DateTime('2017-01-01'),
+            new \DateTime('2025-12-31')
         );
 
         $clientData = $chartBuilder->createChart(Chart::TYPE_BAR);

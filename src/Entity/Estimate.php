@@ -54,7 +54,7 @@ class Estimate
     #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2, nullable: true)]
     private ?string $vatRate = null;
 
-    #[ORM\OneToOne(inversedBy: 'estimate', cascade: ['persist', 'remove'])]
+    #[ORM\OneToOne(inversedBy: 'estimate', cascade: ['persist'])]
     private ?Project $project = null;
 
     #[ORM\Column(type: 'string', length: 3)]

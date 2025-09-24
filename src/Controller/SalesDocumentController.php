@@ -161,6 +161,8 @@ final class SalesDocumentController extends AbstractController
                 $salesDocument->setReference($estimate->getEstimateNumber());
                 $salesDocument->setTaxApplied($estimate->getVatRate() > 0); // <--- ici
                 $salesDocument->setVatRate($estimate->getVatRate()); // <--- ici
+                $salesDocument->setStatus($estimate->getStatus());
+                $salesDocument->setInvoiceDate($estimate->getStartDate());
 
             }
         } elseif ($projectId) {

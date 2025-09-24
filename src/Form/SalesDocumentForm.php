@@ -73,7 +73,14 @@ class SalesDocumentForm extends AbstractType
             ->add('status', ChoiceType::class, [
                 'label' => 'Statut',
                 'choices' => $statusChoices
-            ]);
+            ])
+               ->add('invoiceDate', DateType::class, [
+                   'required' => false,
+                   'widget' => 'single_text',
+                   'label' => "Date d'émission",
+                   'html5' => true, // active le datepicker natif
+               ])
+           ;
     }
 
     public function configureOptions(OptionsResolver $resolver): void
