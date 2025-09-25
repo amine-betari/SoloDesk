@@ -40,7 +40,7 @@
                 data-ckeditor-license-key-value="GPL"
             >
                 {{ form_widget(form.description, {
-                    attr: { 'data-ckeditor-target':'textarea', rows:10, class:'mt-1 w-full rounded-md border-gray-300 bg-white' }
+                    attr: { 'data-ckeditor-target':'textarea', rows:10, class:'mt-1 w-full rounded-md border-gray-300 bg-white', 'required': false }
                 }) }}
             </div>
             {{ form_errors(form.description) }}

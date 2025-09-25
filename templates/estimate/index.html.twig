@@ -37,10 +37,10 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     {% set color =
-                                        estimate.status == 'Brouillon' ? 'gray' :
-                                        estimate.status == 'Envoyé' ? 'blue' :
-                                        estimate.status == 'Accepté' ? 'green' :
-                                        estimate.status == 'Refusé' ? 'red' : 'gray'
+                                        estimate.status == 'draf' ? 'gray' :
+                                        estimate.status == 'sent' ? 'indigo' :
+                                        estimate.status == 'accepted' ? 'green' :
+                                        estimate.status == 'rejected' ? 'red' : 'gray'
                                     %}
                                     <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">
                                         {{ estimate.status|trans }}

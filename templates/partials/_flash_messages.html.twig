@@ -1,0 +1,42 @@
+{% set fb = app.session.getFlashBag().peekAll() %} {# lit sans consommer #}
+{% set total = 0 %}
+{% for _, msgs in fb %}{% set total = total + msgs|length %}{% endfor %}
+
+{% if total > 0 %}
+    <div id="flash-container" class="px-4 py-3">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                {# map types to couleurs (adaptable) #}
+                {% set bg =
+                    type == 'error' ? 'bg-red-600' :
+                    type == 'warning' ? 'bg-yellow-500' :
+                    type == 'info' ? 'bg-blue-600' :
+                    'bg-green-600'
+                %}
+                <div class="mx-auto my-3 max-w-4xl rounded-md shadow-sm text-white p-3 flex justify-between items-center {{ bg }}" data-flash>
+                    <div class="text-sm leading-tight">
+                        {{ message }} {# utilise l'échappement par défaut pour la sécurité #}
+                    </div>
+                    <button type="button" class="ml-4 text-white text-xl leading-none close-flash" aria-label="Fermer">&times;</button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <script>
+        // close button
+        document.addEventListener('click', function(e){
+            if(e.target.matches('.close-flash')){
+                const el = e.target.closest('[data-flash]');
+                if(el) el.remove();
+            }
+        });
+
+        // autohide au bout de 5s
+        document.addEventListener('DOMContentLoaded', function(){
+            document.querySelectorAll('[data-flash]').forEach(function(el){
+                setTimeout(function(){ el.remove(); }, 5000);
+            });
+        });
+    </script>
+{% endif %}

@@ -48,7 +48,7 @@ class SalesDocument
     #[ORM\ManyToOne(inversedBy: 'salesDocuments')]
     private ?Client $client = null;
 
-    #[ORM\OneToMany(mappedBy: 'salesDocument', targetEntity: Payment::class)]
+    #[ORM\OneToMany(targetEntity: Payment::class, mappedBy: 'salesDocument')]
     private Collection $payments;
 
 
@@ -358,6 +358,14 @@ class SalesDocument
     {
         $this->vatRate = $vatRate;
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Payment>
+     */
+    public function getPayments(): Collection
+    {
+        return $this->payments;
     }
 
 }

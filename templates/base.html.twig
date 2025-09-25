@@ -23,9 +23,10 @@
 <body class="bg-[#16202A] text-white" style="font-family: DM Sans, sans-serif;">
 <div class="flex min-h-screen">
     {% include 'partials/sidebar.html.twig' %}
-
     <main class="flex-1 p-0">
-        {% block body %}{% endblock %}
+        {% include 'partials/_flash_messages.html.twig' %}
+        {% block body %}
+        {% endblock %}
     </main>
 </div>
 <div class="mt-32 text-sm p-4 bg-[#1F2732]">

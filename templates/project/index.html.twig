@@ -34,9 +34,9 @@
                             <td class="px-6 py-4 text-sm text-gray-700">{{ project.endDate ? project.endDate|date('d/m/Y') : '-' }}</td>
                             <td class="px-6 py-4">
                                 {% set statusColors = {
-                                    'En cours': 'bg-yellow-500 text-black',
-                                    'Terminé': 'bg-green-600 text-white',
-                                    'Annulé': 'bg-red-600 text-white'
+                                    'in_progress': 'bg-yellow-500 text-black',
+                                    'completed': 'bg-green-600 text-white',
+                                    'cancelled': 'bg-red-600 text-white'
                                 } %}
                                 <span class="px-3 py-1 rounded-full text-xs font-semibold {{ statusColors[project.status]|default('bg-gray-400 text-white') }}">
                                 {{ project.status|trans }}

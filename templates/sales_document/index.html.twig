@@ -41,7 +41,18 @@
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.estimate ? document.estimate.amount|format_currency(document.estimate.currency, app.request.locale ?: 'fr_FR') }} </td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.createdAt ? document.createdAt|date('d/m/Y') : '–' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.invoiceDate ? document.invoiceDate|date('d/m/Y') : '–' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.status ? document.status|trans : '–' }}</td>
+                            {% set color =
+                                document.status == 'draf' ? 'gray' :
+                                document.status == 'sent' ? 'indigo' :
+                                document.status == 'accepted' ? 'green' :
+                                document.status == 'paid' ? 'green' :
+                                document.status == 'rejected' ? 'red' : 'gray'
+                            %}
+                            <td class="px-6 py-4 text-sm text-gray-700">
+                                <span class="px-2 py-1 rounded-full text-xs font-semibold bg-{{ color }}-600 text-white">
+                                     {{ document.status ? document.status|trans : '–' }}
+                                </span>
+                            </td>
                             <td class="px-6 py-4 text-sm flex space-x-2">
                                 <a href="{{ path('app_sales_document_show', {'id': document.id}) }}"
                                    class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs">Voir</a>

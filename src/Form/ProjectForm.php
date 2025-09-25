@@ -78,6 +78,7 @@ class ProjectForm extends AbstractType
                   'choice_label' => 'name',
               ])
             ->add('description', TextareaType::class, [
+                'required' => false,
                 'label' => 'Description',
                 'attr' => [
                     'class' => 'mt-1 w-full rounded-md border-gray-300 text-black',

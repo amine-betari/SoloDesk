@@ -136,6 +136,11 @@ final class SalesDocumentController extends AbstractController
     #[Route('/{id}', name: 'app_sales_document_delete', methods: ['POST'])]
     public function delete(Request $request, SalesDocument $salesDocument, EntityManagerInterface $entityManager): Response
     {
+        if (!$salesDocument->getPayments()->isEmpty()) {
+            $this->addFlash('error', 'Impossible de supprimer : des paiements existent.');
+            return $this->redirectToRoute('app_sales_document_show', ['id' => $salesDocument->getId()]);
+        }
+
         if ($this->isCsrfTokenValid('delete'.$salesDocument->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($salesDocument);
             $entityManager->flush();

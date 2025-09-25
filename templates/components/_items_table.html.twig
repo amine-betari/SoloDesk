@@ -16,8 +16,7 @@
             <tbody class="divide-y">
             {% for item in items %}
 
-
-                {% set currency = item.salesDocument.estimate.currency ?? item.salesDocument.project.currency ?? 'EUR' %}
+                {% set currency = item.salesDocument.estimate.currency ?? item.salesDocument.project.currency ?? item.salesDocument.client.currency ?? 'EUR' %}
                 {{ item.unitPrice|format_currency(currency, app.request.locale ?: 'fr_FR') }}
 
                 <tr class="hover:bg-gray-50">

@@ -52,9 +52,6 @@ class PaymentForm extends AbstractType
             ]);
 
         $builder
-             /* ->add('project', ProjectAutocompleteField::class, [
-                  'required' => false,
-              ])*/
               ->add('salesDocument', InvoiceAutocompleteField::class, [
                   'required' => false,
               ])
