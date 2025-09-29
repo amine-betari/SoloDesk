@@ -43,7 +43,15 @@ class FilterService
             $alias = $qb->getRootAliases()[0];
             switch ($field) {
                 case 'client':
-                    $qb->andWhere("$alias.client = :client")->setParameter('client', $value);
+                    if ($alias === 's') { // ou selon l'alias passé depuis le controller
+                        $qb->leftJoin("$alias.project", "p")
+                            ->leftJoin("$alias.estimate", "e")
+                            ->andWhere("s.client = :client OR p.client = :client OR e.client = :client")
+                            ->setParameter('client', $value);
+                    } else {
+                        $qb->andWhere("$alias.client = :client")->setParameter('client', $value);
+                    }
+                   // $qb->andWhere("$alias.client = :client")->setParameter('client', $value);
                     break;
                 case 'startDate':
                     $qb->andWhere("$alias.startDate >= :startDate")->setParameter('startDate', $value);

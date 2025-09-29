@@ -26,6 +26,15 @@
                     }
                 }) }}
             </div>
+            <div class="flex-1">
+                {{ form_label(form.client, 'Client', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+                {{ form_widget(form.client, {
+                    'attr': {
+                        'class': 'w-full',
+                        'data-status-filter-target': 'client'
+                    }
+                }) }}
+            </div>
         </div>
 
         <!-- Boutons à droite -->
@@ -43,6 +52,27 @@
         </div>
 
     </div>
+    <style>
+
+        .ts-wrapper{ width:100% !important; }
+        .ts-wrapper .ts-control{
+            min-height:42px !important;
+            height:42px !important;
+            padding:8px 12px !important;     /* py-2 px-3 */
+            display:flex !important;
+            align-items:center !important;
+            border:1px solid #d1d5db !important; /* gray-300 */
+            border-radius:.375rem !important;    /* rounded-md */
+            box-shadow:none !important;
+        }
+        .ts-wrapper .ts-control > input{
+            height:1.25rem !important;
+            padding:0 !important;
+            margin:0 !important;
+        }
+    </style>
+
+
 
     {{ form_end(form) }}
 </div>

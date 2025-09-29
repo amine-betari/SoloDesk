@@ -55,16 +55,31 @@
                 <p class="text-gray-900">{{ sales_document.modifiedAt ? sales_document.modifiedAt|date('d/m/Y') : 'N/A' }}</p>
             </div>
             {% if sales_document.project %}
-                <div class="bg-gray-50 p-6 rounded-lg shadow col-span-2">
+                <div class="bg-gray-50 p-6 rounded-lg shadow">
                     <h2 class="text-gray-500 font-semibold mb-2">Projet Concerné</h2>
                     <p class="text-gray-900">{{ sales_document.project.name }}</p>
                 </div>
             {% elseif sales_document.estimate %}
-                <div class="bg-gray-50 p-6 rounded-lg shadow col-span-2">
+                <div class="bg-gray-50 p-6 rounded-lg shadow ">
                     <h2 class="text-gray-500 font-semibold mb-2">Devis Concerné</h2>
                     <p class="text-gray-900"> <a href="{{ path('app_estimate_show', {'id': sales_document.estimate.id}) }}"> {{ sales_document.estimate.estimateNumber }} </a></p>
                 </div>
             {% endif %}
+            <div class="bg-gray-50 p-6 rounded-lg shadow">
+                <h2 class="text-gray-500 font-semibold mb-2">Montant</h2>
+                <p class="text-gray-900"><span class="text-gray-500 font-semibold mb-2"> Montant (HT) : </span>
+                    {% if sales_document.project %}
+                        {# {{ sales_document.project ? sales_document.project.amount|format_currency(sales_document.project.currency, app.request.locale ?: 'fr_FR') }} #}
+                        {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
+                    {% elseif sales_document.estimate %}
+                        {# {{ sales_document.estimate ? sales_document.estimate.amount|format_currency(sales_document.estimate.currency, app.request.locale ?: 'fr_FR') }} #}
+                        {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
+                    {% else %}
+                        {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
+                    {% endif %}
+                </p>
+                <p class="text-gray-900"><span class="text-gray-500 font-semibold mb-2"> TVA Appliquée : </span> {{ sales_document.taxApplied ? sales_document.vatRate : '–' }}</p>
+            </div>
         </div>
 
         {# Client #}
@@ -84,6 +99,21 @@
                 </div>
             {% endif %}
         </div>
+
+        {# Après la section “Client / Adresse” ou juste après le header principal, par exemple #}
+        {% if sales_document.type == 'estimate' %}
+            {% if sales_document.estimate and sales_document.estimate.status == 'accepted' %}
+                {% set hasInvoice = sales_document.estimate.salesDocuments|filter(doc => doc.type == 'invoice')|length > 0 %}
+                    {% if not hasInvoice %}
+                        <div class="mt-4">
+                        <a href="{{ path('app_sales_document_from_estimate', {'salesDocument': sales_document.id}) }}"
+                           class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                            📄 Créer une facture depuis ce devis
+                        </a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        {% endif %}
 
         {% if sales_document.type == 'invoice' or sales_document.type == 'project' %}
             <div id="paiements" class="mt-6 p-4 bg-gray-50 rounded-lg shadow text-gray-900">
@@ -129,25 +159,5 @@
                 <div class="bg-gray-50 p-6 rounded-lg shadow text-gray-400 text-center">Aucune ligne d'article enregistrée.</div>
             {% endif %}
         </div>
-
-        {# Totaux #}
-        {% if sales_document.totalAmount is defined %}
-            <div class="bg-gray-50 shadow rounded-lg p-6 flex justify-end space-x-6 text-gray-900 mb-6">
-                <div>
-                    <h2 class="text-gray-500 font-semibold mb-1">Total HT</h2>
-                    <p class="text-lg">{{ sales_document.totalHT|number_format(2, ',', ' ') }} €</p>
-                </div>
-                <div>
-                    <h2 class="text-gray-500 font-semibold mb-1">TVA</h2>
-                    <p class="text-lg">{{ sales_document.totalTVA|number_format(2, ',', ' ') }} €</p>
-                </div>
-                <div>
-                    <h2 class="text-gray-500 font-semibold mb-1">Total TTC</h2>
-                    <p class="text-lg font-bold">{{ sales_document.totalAmount|number_format(2, ',', ' ') }} €</p>
-                </div>
-            </div>
-            {# Section paiements - s'affiche seulement pour les factures #}
-        {% endif %}
-
     </div>
 {% endblock %}

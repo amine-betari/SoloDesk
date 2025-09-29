@@ -41,7 +41,11 @@
             {% if payment.salesDocument %}
                 <div class="col-span-1 md:col-span-2 bg-white rounded-xl p-6 shadow-md">
                     <h2 class="text-lg font-semibold text-gray-500 mb-2">Référence facture</h2>
-                    <p class="text-gray-900 text-xl">{{ payment.salesDocument }}</p>
+                    <p class="text-gray-900 text-xl">
+                        <a href="{{ path('app_sales_document_show', { id: payment.salesDocument.id }) }}" class="flex-1 flex items-center gap-4 text-gray-900 no-underline hover:underline">
+                            {{ payment.salesDocument }}
+                        </a>
+                    </p>
                 </div>
             {% endif %}
             {% if payment.invoiceReference %}

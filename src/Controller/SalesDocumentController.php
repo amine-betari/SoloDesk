@@ -51,7 +51,7 @@ final class SalesDocumentController extends AbstractController
         $filterForm = $this->createForm(SalesDocumentFilterForm::class);
         // Search Form
 
-        $qb = $salesDocumentRepository->createQueryBuilder('s')->orderBy('s.createdAt', 'ASC');
+        $qb = $salesDocumentRepository->createQueryBuilder('s')->orderBy('s.invoiceDate', 'DESC');
 
         // Handle Generic
         $filterForm = $filterService->handle(
@@ -62,6 +62,11 @@ final class SalesDocumentController extends AbstractController
             'document_sales_filter',
             'app_sales_document_index'
         );
+
+        // Redirection si reset
+        if ($filterForm->isSubmitted() && $filterForm->get('reset')->isClicked()) {
+            return $this->redirectToRoute('app_sales_document_index');
+        }
 
         $pagination = $paginator->paginate($qb, $page, $limit);
 
@@ -174,9 +179,9 @@ final class SalesDocumentController extends AbstractController
             $project = $em->getRepository(Project::class)->find($projectId);
             if ($project) {
                 $salesDocument->setProject($project);
-                $salesDocument->setType("project");
+                $salesDocument->setType("invoice");
                 $salesDocument->setReference($project->getProjectNumber());
-                $salesDocument->setTaxApplied($project->getVatRate() > 0); // <--- ici
+                $salesDocument->setTaxApplied((bool)$project->getVatRate() > 0); // <--- ici
                 $salesDocument->setVatRate($project->getVatRate()); // <--- ici
             }
         } else {
@@ -191,7 +196,6 @@ final class SalesDocumentController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-           // dd($salesDocument);
             $em->persist($salesDocument);
             $em->flush();
 
@@ -336,9 +340,9 @@ final class SalesDocumentController extends AbstractController
     public function createInvoice(Request $request, EntityManagerInterface $em): Response
     {
         $invoice = new SalesDocument();
-        $invoice->setType('invoice');
+        $invoice->setType(SalesDocument::TYPE_INVOICE);
         $invoice->setCreatedAt(new \DateTimeImmutable());
-        $invoice->setReference('INV-' . date('Ymd-His')); // à remplacer par un générateur propre
+        $invoice->setReference('INV-' . date('Ymd-His'));
 
         $form = $this->createForm(SalesDocumentForm::class, $invoice);
         $form->handleRequest($request);
@@ -356,6 +360,44 @@ final class SalesDocumentController extends AbstractController
             'salesDocument' => $invoice,
         ]);
     }
+
+    #[Route('/sales-document/from-estimate/{salesDocument}', name: 'app_sales_document_from_estimate')]
+    public function createFromEstimate(
+        SalesDocument $salesDocument,
+        EntityManagerInterface $em
+    ): Response {
+
+        // Vérifier que le document est bien un devis
+        if (!in_array($salesDocument->getType(), [SalesDocument::TYPE_ESTIMATE, SalesDocument::TYPE_ESTIMATE])) {
+            throw $this->createNotFoundException('Ce document n’est pas un devis valide.');
+        }
+        // Nouveau SalesDocument
+        $estimateRelated = $em->getRepository(Estimate::class)->find($salesDocument->getEstimate()?->getId());
+       // dd($salesDocument);
+        $invoice = new SalesDocument();
+        $invoice->setType(SalesDocument::TYPE_INVOICE);
+        $invoice->setCreatedAt(new \DateTimeImmutable());
+        $invoice->setInvoiceDate($salesDocument->getInvoiceDate());
+        $invoice->setReference('INV-' . date('Ymd-His'));
+        $invoice->setClient($salesDocument->getResolvedClient());
+        $invoice->setEstimate($estimateRelated);
+        $invoice->setStatus('draft');
+        $invoice->setTaxApplied($estimateRelated->getVatRate() > 0);
+        $invoice->setVatRate($estimateRelated->getVatRate());
+
+        // Copier les items de l'estimate
+        foreach ($salesDocument->getSalesDocumentItems() as $item) {
+            $newItem = clone $item; // clone permet de copier les propriétés
+            $newItem->setSalesDocument($invoice);
+            $em->persist($newItem);
+        }
+
+        $em->persist($invoice);
+        $em->flush();
+
+        return $this->redirectToRoute('app_sales_document_show', ['id' => $invoice->getId()]);
+    }
+
 
 
 

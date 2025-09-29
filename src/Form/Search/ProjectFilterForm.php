@@ -2,6 +2,7 @@
 
 namespace App\Form\Search;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -10,11 +11,25 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Entity\Client;
 use App\Form\AutoComplete\ClientAutocompleteField;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class ProjectFilterForm extends AbstractType
 {
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected EntityManagerInterface $entityManager,
+    ) {
+    }
+
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $searchParams = $this->requestStack->getSession()->get('project_filter', []);
+        $client       = $searchParams['client'] ?? null;
+
+        if ($client instanceof Client) {
+            // Forcer Doctrine à travailler avec une entité managée
+            $client = $this->entityManager->getReference(Client::class, $client->getId());
+        }
         $builder
       //      ->add('client', ClientAutocompleteField::class, [
             ->add('client', EntityType::class, [
@@ -22,6 +37,7 @@ class ProjectFilterForm extends AbstractType
                 'choice_label' => 'name',
                 'required' => false,
                 'placeholder' => 'Tous les clients',
+                'data' => $client,
             ])
             ->add('startDate', DateType::class, [
                 'widget' => 'single_text',

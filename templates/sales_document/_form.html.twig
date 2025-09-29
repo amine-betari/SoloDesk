@@ -63,7 +63,7 @@
                     {% if salesDocument.type == 'invoice' %}
                         {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
                     {% else %}
-                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2', 'disabled': true}}) }}
+                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2', 'disabled': false }}) }}
                     {% endif %}
                     {{ form_errors(form.taxApplied) }}
                 </div>

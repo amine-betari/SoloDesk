@@ -23,7 +23,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Créé le</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">TVA</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date d'émission</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -38,8 +38,19 @@
                             <td class="px-6 py-4 text-sm text-gray-700">
                                 {{ document.getResolvedClient() ? document.getResolvedClient().getName() : '–' }}
                             </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.estimate ? document.estimate.amount|format_currency(document.estimate.currency, app.request.locale ?: 'fr_FR') }} </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.createdAt ? document.createdAt|date('d/m/Y') : '–' }}</td>
+                            {% if  document.estimate %}
+                                <td class="px-6 py-4 text-sm text-gray-700">{{ document.estimate ? document.estimate.amount|format_currency(document.estimate.currency, app.request.locale ?: 'fr_FR') }} </td>
+                            {% elseif document.project  %}
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                   {#  {{ document.project ? document.project.amount|format_currency(document.project.currency, app.request.locale ?: 'fr_FR') }} #}
+                                    {{ document.getTotalHT|format_currency(document.project.currency, app.request.locale ?: 'fr_FR') }}
+                                </td>
+                            {% else %}
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    {{ document.getTotalHT|format_currency(document.client.currency, app.request.locale ?: 'fr_FR') }}
+                                </td>
+                            {% endif %}
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ document.taxApplied ? document.vatRate : '–' }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.invoiceDate ? document.invoiceDate|date('d/m/Y') : '–' }}</td>
                             {% set color =
                                 document.status == 'draf' ? 'gray' :
