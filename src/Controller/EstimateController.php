@@ -39,7 +39,7 @@ final class EstimateController extends AbstractController
         // Search Form
         $filterForm = $this->createForm(ProjectFilterForm::class);
         // QueryBuilder
-        $qb = $estimateRepository->createQueryBuilder('e')->orderBy('e.estimateNumber', 'ASC');
+        $qb = $estimateRepository->createQueryBuilder('e')->orderBy('e.startDate', 'DESC');
 
         // Handle Generic
         $filterForm = $filterService->handle(

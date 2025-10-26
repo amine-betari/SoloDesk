@@ -26,15 +26,16 @@ class HomeController extends AbstractController
     ): Response {
         $clients   = $clientRepository->findAll();
         $projects  = $projectRepository->findAll();
-        $estimates = $estimateRepository->findAll();
-        $invoices  = $salesDocumentRepository->findBy(['type' => 'invoice']);
+
+        $estimates      = $salesDocumentRepository->findBy(['type' => 'estimate']);
+        $invoicesManual = $salesDocumentRepository->count(['type' => 'invoice']);
+        $invoices       = $salesDocumentRepository->findBy(['type' => 'invoice']);
 
         $totalClients   = $clientRepository->count([]);
         $totalProjects  = $projectRepository->count([]);
         $totalEstimates = $estimateRepository->count([]);
-        $invoicesFromProject = $salesDocumentRepository->count(['type' => 'project']);
-        $invoicesManual      = $salesDocumentRepository->count(['type' => 'invoice']);
-        $totalInvoices       = $invoicesFromProject + $invoicesManual;
+
+        $totalInvoices  = $invoicesManual;
 
 
 
@@ -96,53 +97,9 @@ class HomeController extends AbstractController
 
 
 
-        $projectFinishedData = $projectRepository->findFinishedProjects();
 
-        $revenuesPerClient = [];
-
-        foreach ($projectFinishedData as $project) {
-            $client = $project->getClient();
-            if (!$client) {
-                continue;
-            }
-
-            $clientName = $client->getName();
-            $devise = $project->getCurrency();
-            $amount = $project->getCalculatedAmount();
-
-            // Clé unique : Client + Devise
-            $key = $clientName . ' (' . $devise . ')';
-
-            if (!isset($revenuesPerClient[$key])) {
-                $revenuesPerClient[$key] = 0;
-            }
-
-            $revenuesPerClient[$key] += $amount;
-        }
-
-        $clientsGlobal = array_keys($revenuesPerClient);
-        $revenuesGlobal = array_values($revenuesPerClient);
-
-        $revenuesGlobalChart = $chartBuilder->createChart(Chart::TYPE_PIE);
-        $revenuesGlobalChart->setData([
-            'labels' => $clientsGlobal,
-            'datasets' => [[
-                'label' => 'Revenus par client',
-                'backgroundColor' => ['#4ade80', '#60a5fa', '#facc15', '#f87171'],
-                'data' => $revenuesGlobal,
-            ]],
-        ]);
-
-        $revenuesGlobalChart->setOptions([
-            'plugins' => [
-                'legend' => [
-                    'position' => 'right',
-                ],
-            ],
-        ]);
 
         // Graph réellement paies
-        // $payments = $paymentRepository->findPaymentsForFinishedProjects();
         $payments = $paymentRepository->findPaymentsForReports();
         $revenuesFromPayments = [];
 
@@ -183,9 +140,65 @@ class HomeController extends AbstractController
         ]);
 
 
+        // EstimateStats Graph
+        $estimateStats = [];
+        foreach ($estimates as $e) {
+            $status = $e->getStatus(); // ex: 'accepted', 'rejected', 'draft', 'sent'
+            // Traduction
+            switch ($status) {
+                case 'draft':    $label = 'Brouillon'; break;
+                case 'sent':     $label = 'Envoyé'; break;
+                case 'accepted': $label = 'Accepté'; break;
+                case 'rejected': $label = 'Refusé'; break;
+                default:         $label = $status; break;
+            }
+
+            // $estimateStats[$e->getStatus()] = ($estimateStats[$e->getStatus()] ?? 0) + 1;
+            $estimateStats[$label] = ($estimateStats[$label] ?? 0) + 1;
+
+        }
+        $estimateChart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
+        $estimateChart->setData([
+            'labels' => array_keys($estimateStats),
+            'datasets' => [[
+                'label' => 'Devis',
+                'backgroundColor' => ['#facc15','#60a5fa','#4ade80','#f87171'],
+                'data' => array_values($estimateStats),
+            ]],
+        ]);
+
+
+        $invoicesByYear = [];
+        foreach ($invoices as $invoice) {
+            $year = $invoice->getInvoiceDate() ? $invoice->getInvoiceDate()->format('Y') : 'N/A';
+            if (!isset($invoicesByYear[$year])) {
+                $invoicesByYear[$year] = 0;
+            }
+            $invoicesByYear[$year]++;
+        }
+
+        // Crée le chart
+        ksort($invoicesByYear); // Trie par année croissante
+
+        $invoiceChart = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $invoiceChart->setData([
+            'labels' => array_keys($invoicesByYear),
+            'datasets' => [[
+                'label' => 'Nombre de factures par année',
+                'backgroundColor' => 'rgba(255, 159, 64, 0.5)',
+                'borderColor' => 'rgb(255, 159, 64)',
+                'data' => array_values($invoicesByYear),
+            ]],
+        ]);
+        $invoiceChart->setOptions([
+            'scales' => [
+                'y' => ['beginAtZero' => true, 'ticks' => ['precision' => 0]],
+            ],
+        ]);
+
+
         return $this->render('home/index.html.twig', [
-          //  'charts' => $charts,
-            'revenuesGlobalChart' => $revenuesGlobalChart,
+         //   'revenuesGlobalChart' => $revenuesGlobalChart,
             'clientDataChart' => $clientData,
             'projectDataChart' => $projectChart,
             'paymentsChart' => $paymentsChart,
@@ -196,23 +209,22 @@ class HomeController extends AbstractController
             'totalProjects' => $totalProjects,
             'totalEstimates' => $totalEstimates,
             'totalInvoices' => $totalInvoices,
+            'estimateChart' => $estimateChart,
+            'invoiceChart' => $invoiceChart,
         ]);
     }
 
 
-    #[Route('/stats/clients/trimestriels', name: 'stats_clients_trimestriels')]
-    public function revenusParTrimestre(
-        ProjectRepository $projectRepository,
-        ChartBuilderInterface $chartBuilder,
-        Request $request
-    ): Response {
-        $annee = $request->query->get('annee', date('Y'));
+    #[Route('/stats/ca/trimestre', name: 'stats_ca_trimestre')]
+    public function caParTrimestre(PaymentRepository $paymentRepository, ChartBuilderInterface $chartBuilder, Request $request): Response
+    {
+        $anneeSelectionnee = $request->query->get('annee', date('Y')); // année par défaut
+        $anneeDebut = 2017;
+        $anneesDisponibles = range($anneeDebut, date('Y'));
 
-        $projects = $projectRepository->findFinishedProjects();
+        $payments = $paymentRepository->findPaymentsForReports(); // ✅ paiement réel
         $revenusParTrimestreEtClient = [];
-        $anneesDisponibles = [];
 
-        // 👇 Tableau pour rendre les trimestres lisibles
         $trimestrePeriodes = [
             'T1' => 'Janv - Mars',
             'T2' => 'Avril - Juin',
@@ -220,98 +232,57 @@ class HomeController extends AbstractController
             'T4' => 'Oct - Déc',
         ];
 
-        foreach ($projects as $project) {
-            $client = $project->getClient();
-            if (!$client) {
-                continue;
-            }
+        foreach ($payments as $payment) {
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
 
-            $clientName = $client->getName();
-            $devise = $project->getCurrency();
-            $amount = $project->getCalculatedAmount();
+            // Récupère le client via facture ou projet
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue;
 
-            $createdAt = $project->getStartDate();
-            $year = $createdAt->format('Y');
+            $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+            $key = $client->getName() . ' (' . $devise . ')';
 
-            if (!in_array($year, $anneesDisponibles)) {
-                $anneesDisponibles[] = $year;
-            }
+            $paymentDate = $payment->getDate();
+            if (!$paymentDate) continue;
 
-            if ($year !== $annee) {
-                continue;
-            }
+            $year = $paymentDate->format('Y');
+            if ($year != $anneeSelectionnee) continue;
 
-            $quarterNumber = (int) ceil($createdAt->format('m') / 3);
+            $quarterNumber = (int) ceil($paymentDate->format('m') / 3);
             $quarter = 'T' . $quarterNumber;
-
-            // 🟢 Ajoute une description lisible dans la clé "période"
             $periode = sprintf('%s-%s (%s)', $year, $quarter, $trimestrePeriodes[$quarter]);
-
-            $key = $clientName . ' (' . $devise . ')';
 
             if (!isset($revenusParTrimestreEtClient[$periode])) {
                 $revenusParTrimestreEtClient[$periode] = [];
             }
-
             if (!isset($revenusParTrimestreEtClient[$periode][$key])) {
                 $revenusParTrimestreEtClient[$periode][$key] = 0;
             }
 
-            $revenusParTrimestreEtClient[$periode][$key] += $amount;
+            $revenusParTrimestreEtClient[$periode][$key] += $payment->getAmount();
         }
 
-        sort($anneesDisponibles);
-
-        // 🔵 Création des charts
+        // Crée les charts
         $charts = [];
         foreach ($revenusParTrimestreEtClient as $periode => $clients) {
-            $labels = array_keys($clients);
-            $data = array_values($clients);
-
             $chart = $chartBuilder->createChart(Chart::TYPE_PIE);
             $chart->setData([
-                'labels' => $labels,
+                'labels' => array_keys($clients),
                 'datasets' => [[
-                    'label' => 'Revenus ' . $periode,
+                    'label' => 'CA ' . $periode,
                     'backgroundColor' => ['#4ade80', '#60a5fa', '#facc15', '#f87171'],
-                    'data' => $data,
+                    'data' => array_values($clients),
                 ]],
             ]);
-
-            $chart->setOptions([
-                'plugins' => [
-                    'legend' => [
-                        'position' => 'right',
-                    ],
-                ],
-            ]);
-
+            $chart->setOptions(['plugins' => ['legend' => ['position' => 'right']]]);
             $charts[$periode] = $chart;
         }
-
-        // 🔵 Trie les périodes dans l’ordre chrono
-        uksort($charts, function ($a, $b) {
-            // Extraire année et trimestre (ex: 2025-T1 (Janv - Mars)) → 2025, 1
-            [$partA] = explode(' ', $a); // "2025-T1"
-            [$partB] = explode(' ', $b);
-
-            [$yearA, $trimA] = explode('-T', $partA);
-            [$yearB, $trimB] = explode('-T', $partB);
-
-            $timestampA = strtotime($yearA . '-' . ((($trimA - 1) * 3) + 1) . '-01');
-            $timestampB = strtotime($yearB . '-' . ((($trimB - 1) * 3) + 1) . '-01');
-
-            return $timestampA <=> $timestampB;
-        });
 
         return $this->render('stats/trimestriels.html.twig', [
             'charts' => $charts,
             'annees' => $anneesDisponibles,
-            'anneeSelectionnee' => $annee,
+            'anneeSelectionnee' => $anneeSelectionnee,
         ]);
     }
-
-
-
-
 }

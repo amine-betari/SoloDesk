@@ -36,7 +36,7 @@ final class PaymentController extends AbstractController
         // Search Form
         $filterForm = $this->createForm(PaymentFilterForm::class);
         // Search Form
-        $qb = $paymentRepository->createQueryBuilder('p')->orderBy('p.date', 'ASC');
+        $qb = $paymentRepository->createQueryBuilder('p')->orderBy('p.date', 'DESC');
 
         // Handle Generic
         $filterForm = $filterService->handle(

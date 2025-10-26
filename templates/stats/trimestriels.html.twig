@@ -1,29 +1,30 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <h1>Revenus par client par trimestre</h1>
+    <h1 class="text-2xl font-bold mb-4">CA par trimestre - {{ anneeSelectionnee }}</h1>
 
-    <form method="get" action="{{ path('stats_clients_trimestriels') }}" id="anneeForm" class="mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-            <label for="annee" class="text-white text-lg font-semibold">Année :</label>
-            <select id="annee" name="annee"
-                    class="bg-gray-800 text-white border border-gray-600 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                    onchange="document.getElementById('anneeForm').submit()">
-                {% for annee in annees %}
-                    <option value="{{ annee }}" {% if annee == anneeSelectionnee %}selected{% endif %}>{{ annee }}</option>
-                {% endfor %}
-            </select>
-        </div>
+    <form method="get" class="mb-6">
+        <label for="annee" class="mr-2">Choisir une année :</label>
+        <select name="annee" id="annee" onchange="this.form.submit()" class="rounded border p-1">
+            {% for y in annees %}
+                <option value="{{ y }}" {% if y == anneeSelectionnee %}selected{% endif %}>{{ y }}</option>
+            {% endfor %}
+        </select>
     </form>
 
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        {% for periode, chart in charts %}
-            <div class="bg-white p-6 rounded shadow">
-                <h3 class="text-gray-900 mb-4">{{ periode }}</h3>
-                {{ render_chart(chart) }}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {% for quarter, chart in charts %}
+            <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow flex flex-col">
+                <h2 class="text-lg font-semibold mb-3">{{ quarter }}</h2>
+                <div class="flex-1">
+                    {{ render_chart(chart) }}
+                </div>
             </div>
         {% endfor %}
     </div>
+
+
 
 {% endblock %}
