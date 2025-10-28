@@ -31,14 +31,14 @@
 </div>
 <div class="mt-32 text-sm p-4 bg-[#1F2732]">
     <footer class="max-w-screen-xl mx-auto">
-        <p class="text-white opacity-60">Made with love by your friends at <a href="https://symfonycasts.com" class="underline">SymfonyCasts</a></p>
+        <p class="text-white opacity-60">Made with others <a href="https://symfonycasts.com" class="underline">SymfonyCasts</a></p>
         <div class="md:flex md:justify-between items-center">
             <div class="flex gap-4">
-                <a href="#" class="hover:text-[#6cc7cd]">Travel</a>
-                <div>|</div>
+                {% if app.user %}
+                    <a href="{{ path('app_profile') }}" class="hover:text-[#6cc7cd]">Profile</a>
+                    <div>|</div>
+                {% endif %}
                 <a href="#" class="hover:text-[#6cc7cd]">FAQ</a>
-                <div>|</div>
-                <a href="#" class="hover:text-[#6cc7cd]">Blog</a>
                 <div>|</div>
                 <a href="#" class="hover:text-[#6cc7cd]">Support</a>
             </div>

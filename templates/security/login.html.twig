@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <div class="w-full max-w-md mx-auto mt-20 p-8 bg-white rounded-xl shadow-xl">
+        <h1 class="text-3xl font-bold mb-6 text-gray-900 text-center">Connexion à SoloDesk</h1>
+
+        {% if error  %}
+            <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                {{ error.messageKey|trans(error.messageData, 'security') }}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{{ path('app_login') }}" class="space-y-4">
+
+            <div>
+                <label for="email" class="block text-sm font-medium text-gray-700">Adresse email</label>
+                <input type="email" name="_username" id="email" value="{{ last_username }}" required
+                       class="mt-1 w-full p-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Mot de passe</label>
+                <input type="password" name="_password" id="password" required
+                       class="mt-1 w-full p-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center gap-2 bg-gray-50 text-gray-900">
+                    <input type="checkbox" name="_remember_me" class="rounded border-gray-300 bg-gray-50 text-gray-900">
+                    Se souvenir de moi
+                </label>
+                <a href="#" class="text-blue-600 hover:underline">Mot de passe oublié ?</a>
+            </div>
+            <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+
+            <button type="submit"
+                    class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-md transition">
+                Connexion
+            </button>
+
+            {% if allow_register is defined %}
+                <p class="text-center text-sm mt-4">
+                    Pas encore de compte ?
+                    <a href="{{ path('app_register') }}" class="text-blue-600 hover:underline">Créer un compte</a>
+                </p>
+            {% endif %}
+
+        </form>
+    </div>
+{% endblock %}
