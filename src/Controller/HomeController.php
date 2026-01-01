@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use \NumberFormatter;
 
 class HomeController extends AbstractController
 {
@@ -42,7 +43,7 @@ class HomeController extends AbstractController
 
         $data = $clientRepository->countClientsGroupedByYear(
             new \DateTime('2017-01-01'),
-            new \DateTime('2025-12-31')
+            new \DateTime('2026-12-31')
         );
 
         $clientData = $chartBuilder->createChart(Chart::TYPE_BAR);
@@ -267,6 +268,7 @@ class HomeController extends AbstractController
         $charts = [];
         foreach ($revenusParTrimestreEtClient as $periode => $clients) {
             $chart = $chartBuilder->createChart(Chart::TYPE_PIE);
+
             $chart->setData([
                 'labels' => array_keys($clients),
                 'datasets' => [[
@@ -279,10 +281,80 @@ class HomeController extends AbstractController
             $charts[$periode] = $chart;
         }
 
+
+        // CA N Current
+
+        $totauxParDevise = [];
+
+        foreach ($payments as $payment) {
+            $paymentDate = $payment->getDate();
+            if (!$paymentDate) continue;
+
+            $year = $paymentDate->format('Y');
+            if ($year != $anneeSelectionnee) continue;
+
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
+
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue;
+
+            $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+
+            $totauxParDevise[$devise] = ($totauxParDevise[$devise] ?? 0) + $payment->getAmount();
+        }
+
+        // formatage propre "fr"
+        $fmt = new NumberFormatter('fr_FR', NumberFormatter::DECIMAL);
+        $fmt->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $caAnneeAffichage = [];
+        foreach ($totauxParDevise as $devise => $montant) {
+            $caAnneeAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+
+        $caAnneeTexte = $caAnneeAffichage ? implode(' • ', $caAnneeAffichage) : '0';
+        // CA N Current
+
+
+        // CA N-1
+        $anneePrecedente = (int) $anneeSelectionnee - 1;
+        $totauxParDeviseN1 = [];
+
+        foreach ($payments as $payment) {
+            $paymentDate = $payment->getDate();
+            if (!$paymentDate) continue;
+
+            $year = $paymentDate->format('Y');
+            if ($year != $anneePrecedente) continue;
+
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
+
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue;
+
+            $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+
+            $totauxParDeviseN1[$devise] =
+                ($totauxParDeviseN1[$devise] ?? 0) + $payment->getAmount();
+        }
+        $caAnneePrecedenteAffichage = [];
+        foreach ($totauxParDeviseN1 as $devise => $montant) {
+            $caAnneePrecedenteAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+
+        $caAnneePrecedenteTexte =
+            $caAnneePrecedenteAffichage ? implode(' • ', $caAnneePrecedenteAffichage) : '0';
+        // CA N-1
+
+
         return $this->render('stats/trimestriels.html.twig', [
             'charts' => $charts,
             'annees' => $anneesDisponibles,
             'anneeSelectionnee' => $anneeSelectionnee,
+            'caAnneeTexte' => $caAnneeTexte,
+            'caAnneePrecedenteTexte' => $caAnneePrecedenteTexte,
         ]);
     }
 }

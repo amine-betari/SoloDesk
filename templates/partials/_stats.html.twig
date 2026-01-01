@@ -1,4 +1,5 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
     {% set cardConfig = [
         {title: 'Clients', value: clientCount, color: 'blue', link: path('app_client_index')},
         {title: 'Projets', value: projectCount, color: 'green', link: path('app_project_index')},
@@ -6,16 +7,49 @@
         {title: 'Factures', value: invoiceCount, color: 'red', link1: path('app_sales_document_index'), link2: path('app_invoice_new')}
     ] %}
 
+    {% set colors = {
+        blue:  'text-blue-400',
+        green: 'text-green-400',
+        yellow:'text-yellow-400',
+        red:  'text-red-400'
+    } %}
+
+    {% set links = {
+        blue:  'text-blue-300',
+        green: 'text-green-300',
+        yellow:'text-yellow-300',
+        red:  'text-red-300'
+    } %}
+
     {% for card in cardConfig %}
-        <div class="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow">
-            <h3 class="text-lg font-semibold text-gray-700 mb-2">{{ card.title }}</h3>
-            <p class="text-4xl font-bold text-{{ card.color }}-600">{{ card.value }}</p>
-            {% if card.link is defined %}
-                <a href="{{ card.link }}" class="text-{{ card.color }}-500 hover:underline mt-2 inline-block">Voir {{ card.title|lower }}</a>
-            {% elseif card.link1 and card.link2 %}
-                <a href="{{ card.link2 }}" class="text-{{ card.color }}-500 hover:underline mt-2 inline-block">Créer {{ card.title|lower }}</a>
-                <a href="{{ card.link1 }}" class="text-{{ card.color }}-500 hover:underline mt-1 inline-block">Voir toutes les {{ card.title|lower }}</a>
-            {% endif %}
+        <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 shadow-sm hover:shadow-md transition flex flex-col justify-between">
+
+            <!-- Titre -->
+            <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wide">
+                {{ card.title }}
+            </h3>
+
+            <!-- Valeur -->
+            <p class="mt-2 text-4xl font-bold {{ colors[card.color] }}">
+                {{ card.value }}
+            </p>
+
+            <!-- Actions -->
+            <div class="mt-4 text-sm">
+                {% if card.link is defined %}
+                    <a href="{{ card.link }}" class="{{ links[card.color] }} hover:underline">
+                        Voir {{ card.title|lower }} →
+                    </a>
+                {% elseif card.link1 is defined and card.link2 is defined %}
+                    <a href="{{ card.link2 }}" class="{{ links[card.color] }} hover:underline block">
+                        Créer {{ card.title|lower }} →
+                    </a>
+                    <a href="{{ card.link1 }}" class="{{ links[card.color] }} hover:underline block mt-1">
+                        Voir toutes les {{ card.title|lower }} →
+                    </a>
+                {% endif %}
+            </div>
+
         </div>
     {% endfor %}
 </div>
