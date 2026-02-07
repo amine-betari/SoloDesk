@@ -34,7 +34,9 @@
                 Factures par année
             </h3>
             {{ render_chart(invoiceChart) }}
-            <p class="text-sm text-gray-500 mt-2">Nombre total de factures émises par année</p>
+            <p class="text-sm text-gray-500 mt-2">
+                Nombre total de factures émises par année — externes : {{ totalExternalInvoices }}
+            </p>
         </div>
 
         <!-- CA par client -->

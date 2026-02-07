@@ -81,6 +81,13 @@ class SalesDocumentForm extends AbstractType
                    'html5' => true, // active le datepicker natif
                ])
            ;
+
+        if ($data instanceof SalesDocument && $data->getType() === SalesDocument::TYPE_INVOICE) {
+            $builder->add('externalInvoice', CheckboxType::class, [
+                'label' => 'Facture externe (pour un ami)',
+                'required' => false,
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

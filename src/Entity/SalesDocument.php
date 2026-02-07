@@ -58,6 +58,9 @@ class SalesDocument
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $notes = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $externalInvoice = false;
+
     /**
      * @var Collection<int, SalesDocumentItem>
      */
@@ -312,6 +315,17 @@ class SalesDocument
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+        return $this;
+    }
+
+    public function isExternalInvoice(): bool
+    {
+        return $this->externalInvoice;
+    }
+
+    public function setExternalInvoice(bool $externalInvoice): self
+    {
+        $this->externalInvoice = $externalInvoice;
         return $this;
     }
 

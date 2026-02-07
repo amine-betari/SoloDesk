@@ -14,21 +14,37 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     {{ form_label(form.reference, 'Référence', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                    {{ form_widget(form.reference, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
-                    {{ form_errors(form.reference) }}
+                    {{ form_widget(form.reference, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.reference.vars.errors|length ? 'border-red-500' : 'border-gray-300')}}) }}
+                    <div class="text-sm text-red-600 mt-1">
+                        {{ form_errors(form.reference) }}
+                    </div>
                 </div>
 
                 <div>
                     {{ form_label(form.status, 'Statut', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                    {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
-                    {{ form_errors(form.status) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.status.vars.errors|length ? 'border-red-500' : 'border-gray-300')}}) }}
+                    <div class="text-sm text-red-600 mt-1">
+                        {{ form_errors(form.status) }}
+                    </div>
                 </div
 
                 ><div>
                     {{ form_label(form.invoiceDate, "Date d'emission", {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                    {{ form_widget(form.invoiceDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
-                    {{ form_errors(form.invoiceDate) }}
+                    {{ form_widget(form.invoiceDate, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.invoiceDate.vars.errors|length ? 'border-red-500' : 'border-gray-300')}}) }}
+                    <div class="text-sm text-red-600 mt-1">
+                        {{ form_errors(form.invoiceDate) }}
+                    </div>
                 </div>
+
+                {% if salesDocument.type == 'invoice' and form.externalInvoice is defined %}
+                    <div class="md:col-span-2">
+                        {{ form_label(form.externalInvoice, 'Facture externe (pour un ami)', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                        {{ form_widget(form.externalInvoice, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.externalInvoice.vars.errors|length ? 'border-red-500' : 'border-gray-300')}}) }}
+                        <div class="text-sm text-red-600 mt-1">
+                            {{ form_errors(form.externalInvoice) }}
+                        </div>
+                    </div>
+                {% endif %}
 
                 <div class="md:col-span-2">
                     {{ form_label(form.notes, 'Notes', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
@@ -39,10 +55,12 @@
                         data-ckeditor-license-key-value="GPL"
                     >
                         {{ form_widget(form.notes, {
-                            attr: { 'data-ckeditor-target':'textarea', rows:5, class:'mt-1 w-full rounded-md border-gray-300 bg-white' }
+                            attr: { 'data-ckeditor-target':'textarea', rows:5, class:'mt-1 w-full rounded-md bg-white ' ~ (form.notes.vars.errors|length ? 'border-red-500' : 'border-gray-300') }
                         }) }}
                     </div>
-                    {{ form_errors(form.notes) }}
+                    <div class="text-sm text-red-600 mt-1">
+                        {{ form_errors(form.notes) }}
+                    </div>
                 </div>
 
                 <!-- Client -->
@@ -52,8 +70,10 @@
                      data-has-estimate-select="false">
                     <div data-sales-document-target="clientField">
                         {{ form_label(form.client, 'Client', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                        {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
-                        {{ form_errors(form.client) }}
+                        {{ form_widget(form.client, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.client.vars.errors|length ? 'border-red-500' : 'border-gray-300')}}) }}
+                        <div class="text-sm text-red-600 mt-1">
+                            {{ form_errors(form.client) }}
+                        </div>
                     </div>
                 </div>
 
@@ -61,21 +81,25 @@
                 <div>
                     {{ form_label(form.taxApplied, 'TVA appliquée', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                     {% if salesDocument.type == 'invoice' %}
-                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
+                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.taxApplied.vars.errors|length ? 'border-red-500' : 'border-gray-300')}}) }}
                     {% else %}
-                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2', 'disabled': false }}) }}
+                        {{ form_widget(form.taxApplied, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.taxApplied.vars.errors|length ? 'border-red-500' : 'border-gray-300'), 'disabled': false }}) }}
                     {% endif %}
-                    {{ form_errors(form.taxApplied) }}
+                    <div class="text-sm text-red-600 mt-1">
+                        {{ form_errors(form.taxApplied) }}
+                    </div>
                 </div>
 
                 <div>
                     {{ form_label(form.vatRate, 'Taux TVA (%)', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                     {% if salesDocument.type == 'invoice' %}
-                        {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}
+                        {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.vatRate.vars.errors|length ? 'border-red-500' : 'border-gray-300')}}) }}
                     {% else %}
-                        {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2', 'readonly': 'readonly'}}) }}
+                        {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.vatRate.vars.errors|length ? 'border-red-500' : 'border-gray-300'), 'readonly': 'readonly'}}) }}
                     {% endif %}
-                    {{ form_errors(form.vatRate) }}
+                    <div class="text-sm text-red-600 mt-1">
+                        {{ form_errors(form.vatRate) }}
+                    </div>
                 </div>
             </div>
         </fieldset>

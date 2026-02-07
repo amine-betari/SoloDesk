@@ -38,7 +38,7 @@ class FilterService
 
         // Appliquer les filtres dynamiquement
         foreach ($searchParams as $field => $value) {
-            if (empty($value)) continue;
+            if ($value === null || $value === '') continue;
 
             $alias = $qb->getRootAliases()[0];
             switch ($field) {
@@ -70,6 +70,10 @@ class FilterService
                     break;
                 case 'status':
                     $qb->andWhere("$alias.status = :status")->setParameter('status', $value);
+                    break;
+                case 'externalInvoice':
+                    $qb->andWhere("$alias.externalInvoice = :externalInvoice")
+                        ->setParameter('externalInvoice', (int) $value);
                     break;
                 // Ajouter d'autres champs dynamiquement si besoin
             }

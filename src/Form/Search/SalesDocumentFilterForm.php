@@ -78,6 +78,16 @@ class SalesDocumentFilterForm extends AbstractType
                 'placeholder' => 'Tous les types',
                 'data' => $searchParams['type'] ?? null,
             ])
+            ->add('externalInvoice', ChoiceType::class, [
+                'label' => 'Facture externe',
+                'choices' => [
+                    'Oui' => '1',
+                    'Non' => '0',
+                ],
+                'required' => false,
+                'placeholder' => 'Toutes',
+                'data' => $searchParams['externalInvoice'] ?? null,
+            ])
         ;
         $builder->add('search', SubmitType::class, ['label' => 'Filtrer']);
         $builder->add('reset', SubmitType::class, ['label' => 'Reset']);

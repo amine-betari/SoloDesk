@@ -3,10 +3,10 @@
         'action': action
     }) }}
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
 
         <!-- Type + Status -->
-        <div data-controller="status-filter" class="flex gap-4 col-span-2">
+        <div data-controller="status-filter" class="flex gap-4 md:col-span-3">
             <div class="flex-1">
                 {{ form_label(form.type, 'Type', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
                 {{ form_widget(form.type, {
@@ -32,6 +32,15 @@
                     'attr': {
                         'class': 'w-full',
                         'data-status-filter-target': 'client'
+                    }
+                }) }}
+            </div>
+            <div class="flex-1">
+                {{ form_label(form.externalInvoice, 'Facture externe', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+                {{ form_widget(form.externalInvoice, {
+                    'attr': {
+                        'class': 'w-full rounded border border-gray-300 p-2 text-gray-900',
+                        'data-status-filter-target': 'externalInvoice'
                     }
                 }) }}
             </div>

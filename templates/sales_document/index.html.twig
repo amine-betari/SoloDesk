@@ -33,7 +33,14 @@
                     {% for document in pagination.items %}
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.id }}</td>
-                            <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ document.type|document_type_label }}</td>
+                            <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                                {{ document.type|document_type_label }}
+                                {% if document.type == 'invoice' and document.externalInvoice %}
+                                    <span class="ml-2 inline-flex items-center rounded-full bg-orange-100 px-2 py-0.5 text-xs font-semibold text-orange-700">
+                                        Externe
+                                    </span>
+                                {% endif %}
+                            </td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ document.reference }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">
                                 {{ document.getResolvedClient() ? document.getResolvedClient().getName() : '–' }}

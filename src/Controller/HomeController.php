@@ -170,25 +170,46 @@ class HomeController extends AbstractController
 
 
         $invoicesByYear = [];
+        $externalInvoicesByYear = [];
+        $totalExternalInvoices = 0;
         foreach ($invoices as $invoice) {
             $year = $invoice->getInvoiceDate() ? $invoice->getInvoiceDate()->format('Y') : 'N/A';
             if (!isset($invoicesByYear[$year])) {
                 $invoicesByYear[$year] = 0;
             }
             $invoicesByYear[$year]++;
+
+            if ($invoice->isExternalInvoice()) {
+                if (!isset($externalInvoicesByYear[$year])) {
+                    $externalInvoicesByYear[$year] = 0;
+                }
+                $externalInvoicesByYear[$year]++;
+                $totalExternalInvoices++;
+            }
         }
 
         // Crée le chart
         ksort($invoicesByYear); // Trie par année croissante
 
+        $labels = array_keys($invoicesByYear);
+        $externalData = [];
+        foreach ($labels as $label) {
+            $externalData[] = $externalInvoicesByYear[$label] ?? 0;
+        }
+
         $invoiceChart = $chartBuilder->createChart(Chart::TYPE_BAR);
         $invoiceChart->setData([
-            'labels' => array_keys($invoicesByYear),
+            'labels' => $labels,
             'datasets' => [[
                 'label' => 'Nombre de factures par année',
                 'backgroundColor' => 'rgba(255, 159, 64, 0.5)',
                 'borderColor' => 'rgb(255, 159, 64)',
                 'data' => array_values($invoicesByYear),
+            ], [
+                'label' => 'Factures externes',
+                'backgroundColor' => 'rgba(234, 88, 12, 0.5)',
+                'borderColor' => 'rgb(234, 88, 12)',
+                'data' => $externalData,
             ]],
         ]);
         $invoiceChart->setOptions([
@@ -210,6 +231,7 @@ class HomeController extends AbstractController
             'totalProjects' => $totalProjects,
             'totalEstimates' => $totalEstimates,
             'totalInvoices' => $totalInvoices,
+            'totalExternalInvoices' => $totalExternalInvoices,
             'estimateChart' => $estimateChart,
             'invoiceChart' => $invoiceChart,
         ]);

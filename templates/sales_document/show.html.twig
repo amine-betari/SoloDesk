@@ -41,6 +41,12 @@
                 <h2 class="text-gray-500 font-semibold mb-2">Type</h2>
                 <p class="text-gray-900">{{ sales_document.type|document_type_label }}</p>
             </div>
+            {% if sales_document.type == 'invoice' %}
+                <div class="bg-gray-50 p-6 rounded-lg shadow">
+                    <h2 class="text-gray-500 font-semibold mb-2">Facture externe</h2>
+                    <p class="text-gray-900">{{ sales_document.externalInvoice ? 'Oui' : 'Non' }}</p>
+                </div>
+            {% endif %}
             <div class="bg-gray-50 p-6 rounded-lg shadow">
                 <h2 class="text-gray-500 font-semibold mb-2">Statut</h2>
                 {% set status_class = sales_document.status == 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %}
