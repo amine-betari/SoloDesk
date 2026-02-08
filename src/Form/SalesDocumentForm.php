@@ -30,7 +30,7 @@ class SalesDocumentForm extends AbstractType
         // Déterminer les statuts selon le type
         $statusChoices = [];
         if ($data instanceof SalesDocument) {
-            if ($data->getType() === SalesDocument::TYPE_ESTIMATE) {
+            if ($data->isEstimate()) {
                 $statusChoices = EstimateStatuses::CHOICES;
             } else {
                 $statusChoices = InvoiceStatus::CHOICES;
@@ -82,7 +82,7 @@ class SalesDocumentForm extends AbstractType
                ])
            ;
 
-        if ($data instanceof SalesDocument && $data->getType() === SalesDocument::TYPE_INVOICE) {
+        if ($data instanceof SalesDocument && $data->isInvoice()) {
             $builder->add('externalInvoice', CheckboxType::class, [
                 'label' => 'Facture externe (pour un ami)',
                 'required' => false,

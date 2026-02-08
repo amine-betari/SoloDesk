@@ -20,11 +20,15 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use App\Form\AutoComplete\ClientAutocompleteField;
+use App\Form\AutoComplete\InvoiceAutocompleteField;
+use Doctrine\ORM\EntityRepository;
 
 class ProjectForm extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $project = $options['data'] ?? null;
+
         $builder
             ->add('name')
             ->add('projectNumber', TextType::class, [
@@ -118,6 +122,24 @@ class ProjectForm extends AbstractType
                 'label' => 'Documents',
             ])
         ;
+
+        if ($project instanceof Project && $project->getId() !== null) {
+            $builder->add('salesDocuments', InvoiceAutocompleteField::class, [
+                'required' => false,
+                'multiple' => true,
+                'by_reference' => false,
+                'label' => 'Factures liées',
+                'query_builder' => function (EntityRepository $er) use ($project) {
+                    return $er->createQueryBuilder('s')
+                        ->where('s.type = :type1 OR s.type = :type2')
+                        ->andWhere('s.project IS NULL OR s.project = :project')
+                        ->setParameter('type1', 'invoice')
+                        ->setParameter('type2', 'project')
+                        ->setParameter('project', $project)
+                        ->orderBy('s.reference', 'ASC');
+                },
+            ]);
+        }
     }
 
     public function configureOptions(OptionsResolver $resolver): void

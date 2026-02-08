@@ -169,8 +169,7 @@ final class SalesDocumentController extends AbstractController
                 $salesDocument->setEstimate($estimate);
                 $salesDocument->setType("estimate");
                 $salesDocument->setReference($estimate->getEstimateNumber());
-                $salesDocument->setTaxApplied($estimate->getVatRate() > 0); // <--- ici
-                $salesDocument->setVatRate($estimate->getVatRate()); // <--- ici
+                $this->applyVatFromRate($salesDocument, $estimate->getVatRate());
                 $salesDocument->setStatus($estimate->getStatus());
                 $salesDocument->setInvoiceDate($estimate->getStartDate());
 
@@ -181,15 +180,13 @@ final class SalesDocumentController extends AbstractController
                 $salesDocument->setProject($project);
                 $salesDocument->setType("invoice");
                 $salesDocument->setReference($project->getProjectNumber());
-                $salesDocument->setTaxApplied((bool)$project->getVatRate() > 0); // <--- ici
-                $salesDocument->setVatRate($project->getVatRate()); // <--- ici
+                $this->applyVatFromRate($salesDocument, $project->getVatRate());
             }
         } else {
             $salesDocument->setType("invoice");
             $salesDocument->setReference('INV-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(3))));
             // Display les deux champs dans le formulaire (TVA ou non and Taux TVA) car tu dépend plus de projets mais il s'agit d'une facture directe
-            $salesDocument->setTaxApplied(false);
-            $salesDocument->setVatRate(0.0);
+            $this->applyVatFromRate($salesDocument, 0.0);
         }
 
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);
@@ -339,9 +336,7 @@ final class SalesDocumentController extends AbstractController
     #[Route('/invoice/new', name: 'app_invoice_new')]
     public function createInvoice(Request $request, EntityManagerInterface $em): Response
     {
-        $invoice = new SalesDocument();
-        $invoice->setType(SalesDocument::TYPE_INVOICE);
-        $invoice->setCreatedAt(new \DateTimeImmutable());
+        $invoice = $this->createInvoiceBase();
         $invoice->setReference('INV-' . date('Ymd-His'));
 
         $form = $this->createForm(SalesDocumentForm::class, $invoice);
@@ -368,22 +363,21 @@ final class SalesDocumentController extends AbstractController
     ): Response {
 
         // Vérifier que le document est bien un devis
-        if (!in_array($salesDocument->getType(), [SalesDocument::TYPE_ESTIMATE, SalesDocument::TYPE_ESTIMATE])) {
+        if (!$salesDocument->isEstimate()) {
             throw $this->createNotFoundException('Ce document n’est pas un devis valide.');
         }
         // Nouveau SalesDocument
         $estimateRelated = $em->getRepository(Estimate::class)->find($salesDocument->getEstimate()?->getId());
        // dd($salesDocument);
-        $invoice = new SalesDocument();
-        $invoice->setType(SalesDocument::TYPE_INVOICE);
-        $invoice->setCreatedAt(new \DateTimeImmutable());
+        $invoice = $this->createInvoiceBase();
         $invoice->setInvoiceDate($salesDocument->getInvoiceDate());
         $invoice->setReference('INV-' . date('Ymd-His'));
         $invoice->setClient($salesDocument->getResolvedClient());
         $invoice->setEstimate($estimateRelated);
         $invoice->setStatus('draft');
-        $invoice->setTaxApplied($estimateRelated->getVatRate() > 0);
-        $invoice->setVatRate($estimateRelated->getVatRate());
+        if ($estimateRelated) {
+            $this->applyVatFromRate($invoice, $estimateRelated->getVatRate());
+        }
 
         // Copier les items de l'estimate
         foreach ($salesDocument->getSalesDocumentItems() as $item) {
@@ -398,7 +392,20 @@ final class SalesDocumentController extends AbstractController
         return $this->redirectToRoute('app_sales_document_show', ['id' => $invoice->getId()]);
     }
 
+    private function createInvoiceBase(): SalesDocument
+    {
+        $invoice = new SalesDocument();
+        $invoice->setType(SalesDocument::TYPE_INVOICE);
+        $invoice->setCreatedAt(new \DateTimeImmutable());
 
+        return $invoice;
+    }
 
+    private function applyVatFromRate(SalesDocument $salesDocument, ?float $rate): void
+    {
+        $rate = (float) ($rate ?? 0.0);
+        $salesDocument->setVatRate($rate);
+        $salesDocument->setTaxApplied($rate > 0);
+    }
 
 }

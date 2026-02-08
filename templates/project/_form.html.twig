@@ -135,6 +135,50 @@
         {% include 'partials/_documents_form.html.twig' with { form: form, relatedEntity: project } %}
     </fieldset>
 
+    {% if form.salesDocuments is defined %}
+        <!-- Factures liées -->
+        <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200">
+            <legend class="text-2xl font-semibold text-gray-700">Factures liées</legend>
+            <div class="space-y-2">
+                {{ form_label(form.salesDocuments, 'Sélectionner des factures', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.salesDocuments, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                {{ form_errors(form.salesDocuments) }}
+            </div>
+            {% if project.salesDocuments|length > 0 %}
+                <div class="pt-4">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Factures déjà liées</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full text-sm text-left text-gray-700">
+                            <thead class="bg-gray-100 text-xs uppercase">
+                            <tr>
+                                <th class="px-4 py-2 border-b">Réf.</th>
+                                <th class="px-4 py-2 border-b">Type</th>
+                                <th class="px-4 py-2 border-b">Date</th>
+                                <th class="px-4 py-2 border-b">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody class="divide-y">
+                            {% for doc in project.salesDocuments %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-2">{{ doc.reference }}</td>
+                                    <td class="px-4 py-2">{{ doc.type }}</td>
+                                    <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : '—' }}</td>
+                                    <td class="px-4 py-2">
+                                        <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
+                                           class="text-blue-600 hover:text-blue-500">Voir</a>
+                                        <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
+                                           class="ml-3 text-yellow-600 hover:text-yellow-500">Modifier</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endif %}
+        </fieldset>
+    {% endif %}
+
     <!-- Bouton -->
     <div class="flex justify-end mt-6">
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Enregistrer</button>

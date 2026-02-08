@@ -1,0 +1,24 @@
+<div data-controller="sales-document-items" data-sales-document-items-items-container-target="itemsContainer" class="mt-8">
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900">Lignes d'articles</h2>
+
+    <div data-sales-document-items-target="itemsContainer"
+         data-prototype="{{ include('sales_document_item/_form.html.twig', { form: form.salesDocumentItems.vars.prototype })|e('html_attr') }}">
+        {% for itemForm in form.salesDocumentItems %}
+            <div class="mb-4 p-4 border rounded-lg bg-gray-100 relative shadow-sm">
+                {% include 'sales_document_item/_form.html.twig' with { 'form': itemForm } %}
+
+                <button type="button"
+                        class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-green-500"
+                        onclick="this.closest('div').remove()">
+                    Supprimer
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <button type="button"
+            data-action="click->sales-document-items#addItem"
+            class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-500">
+        + Ajouter une ligne
+    </button>
+</div>

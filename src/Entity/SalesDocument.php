@@ -17,6 +17,7 @@ class SalesDocument
 
     public const TYPE_ESTIMATE = 'estimate';
     public const TYPE_INVOICE = 'invoice';
+    public const TYPE_PROJECT = 'project';
 
 
     #[ORM\Id]
@@ -93,6 +94,21 @@ class SalesDocument
     public function getType(): ?string
     {
         return $this->type;
+    }
+
+    public function isInvoice(): bool
+    {
+        return $this->type === self::TYPE_INVOICE;
+    }
+
+    public function isEstimate(): bool
+    {
+        return $this->type === self::TYPE_ESTIMATE;
+    }
+
+    public function isProject(): bool
+    {
+        return $this->type === self::TYPE_PROJECT;
     }
 
     public function setType(string $type): static
