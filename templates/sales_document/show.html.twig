@@ -13,10 +13,10 @@
                 <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}"
                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Modifier</a>
                 {{ include('sales_document/_delete_form.html.twig') }}
-                {# <a href="{{ path('app_sales_document_generate_pdf', { id: sales_document.id }) }}"
-                   class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">📄 PDF</a>
                 <a href="{{ path('app_sales_document_generate_word', { id: sales_document.id }) }}"
                    class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">📝 Word</a>
+                {# <a href="{{ path('app_sales_document_generate_pdf', { id: sales_document.id }) }}"
+                   class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">📄 PDF</a>
                 <a href="{{ path('app_sales_document_generate_excel', { id: sales_document.id }) }}"
                    class="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-800">📊 Excel</a> #}
                 {# Afficher le lien uniquement si c'est une facture et s'il y a des paiements #}

@@ -348,6 +348,7 @@ class HomeController extends AbstractController
 
         // CA depuis le début (toutes années)
         $totauxParDeviseGlobal = [];
+        $totauxParDeviseGlobalExternes = [];
         foreach ($payments as $payment) {
             $paymentDate = $payment->getDate();
             if (!$paymentDate) continue;
@@ -362,6 +363,11 @@ class HomeController extends AbstractController
 
             $totauxParDeviseGlobal[$devise] =
                 ($totauxParDeviseGlobal[$devise] ?? 0) + $payment->getAmount();
+
+            if ($salesDocument && $salesDocument->isExternalInvoice()) {
+                $totauxParDeviseGlobalExternes[$devise] =
+                    ($totauxParDeviseGlobalExternes[$devise] ?? 0) + $payment->getAmount();
+            }
         }
 
         $caGlobalAffichage = [];
@@ -370,6 +376,13 @@ class HomeController extends AbstractController
         }
 
         $caGlobalTexte = $caGlobalAffichage ? implode(' • ', $caGlobalAffichage) : '0';
+
+        $caGlobalExternesAffichage = [];
+        foreach ($totauxParDeviseGlobalExternes as $devise => $montant) {
+            $caGlobalExternesAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+        $caGlobalExternesTexte =
+            $caGlobalExternesAffichage ? implode(' • ', $caGlobalExternesAffichage) : '0';
 
         // Ratios par trimestre (impôts)
         $ratiosParTrimestre = [];
@@ -434,6 +447,7 @@ class HomeController extends AbstractController
             'anneeSelectionnee' => $anneeSelectionnee,
             'caAnneeTexte' => $caAnneeTexte,
             'caGlobalTexte' => $caGlobalTexte,
+            'caGlobalExternesTexte' => $caGlobalExternesTexte,
             'caAnneePrecedenteTexte' => $caAnneePrecedenteTexte,
         ]);
     }

@@ -26,12 +26,14 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use App\Services\FilterService;
 use PhpOffice\PhpWord\TemplateProcessor;
+use App\Entity\DocumentTemplate;
 
 #[Route('/sales/document')]
 final class SalesDocumentController extends AbstractController
 {
     public function __construct(
         protected ToolsHelper $toolsHelper,
+        protected EntityManagerInterface $entityManager
     ) {
 
     }
@@ -220,7 +222,36 @@ final class SalesDocumentController extends AbstractController
     #[Route('/sales-document/{id}/word', name: 'app_sales_document_generate_word')]
     public function generateWord(SalesDocument $salesDocument): Response
     {
-        // à refaire
+        $templatePath = $this->getWordTemplatePath($salesDocument);
+        if ($templatePath) {
+            $template = new TemplateProcessor($templatePath);
+            $data = $this->buildTemplateData($salesDocument);
+
+            foreach ($data['scalar'] as $key => $value) {
+                $template->setValue($key, $value);
+            }
+
+            $items = $data['items'];
+            if (count($items) > 0) {
+                $template->cloneRow('item_description', count($items));
+                foreach ($items as $i => $item) {
+                    $index = $i + 1;
+                    $template->setValue("item_description#{$index}", $item['description']);
+                    $template->setValue("item_qty#{$index}", $item['quantity']);
+                    $template->setValue("item_unit_price#{$index}", $item['unit_price']);
+                    $template->setValue("item_total#{$index}", $item['total']);
+                }
+            }
+
+            $safeReference = $this->sanitizeFilename((string) $salesDocument->getReference());
+            $fileName = ($salesDocument->isEstimate() ? 'devis-' : 'facture-') . $safeReference . '.docx';
+            $tempFile = tempnam(sys_get_temp_dir(), 'docx_');
+            $template->saveAs($tempFile);
+
+            return $this->file($tempFile, $fileName, ResponseHeaderBag::DISPOSITION_INLINE);
+        }
+
+        // fallback simple si aucun modèle Word
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
 
@@ -258,7 +289,8 @@ final class SalesDocumentController extends AbstractController
         $section->addTextBreak(1);
         $section->addText("Total : " . number_format($salesDocument->getTotalTTC(), 2, ',', ' ') . ' €', ['bold' => true]);
 
-        $fileName = 'devis-' . $salesDocument->getReference() . '.docx';
+        $safeReference = $this->sanitizeFilename((string) $salesDocument->getReference());
+        $fileName = ($salesDocument->isEstimate() ? 'devis-' : 'facture-') . $safeReference . '.docx';
 
         $tempFile = tempnam(sys_get_temp_dir(), $fileName);
         IOFactory::createWriter($phpWord, 'Word2007')->save($tempFile);
@@ -421,4 +453,98 @@ final class SalesDocumentController extends AbstractController
         $salesDocument->setTaxApplied($rate > 0);
     }
 
+    private function getWordTemplatePath(SalesDocument $salesDocument): ?string
+    {
+        $company = $salesDocument->getCompany();
+        if (!$company) {
+            return null;
+        }
+
+        $type = $salesDocument->isEstimate() ? DocumentTemplate::TYPE_ESTIMATE : DocumentTemplate::TYPE_INVOICE;
+        $repo = $this->entityManager->getRepository(DocumentTemplate::class);
+
+        $template = $repo->findOneBy([
+            'company' => $company,
+            'type' => $type,
+            'format' => DocumentTemplate::FORMAT_WORD,
+            'isDefault' => true,
+        ]);
+
+        if (!$template) {
+            $template = $repo->findOneBy(
+                [
+                    'company' => $company,
+                    'type' => $type,
+                    'format' => DocumentTemplate::FORMAT_WORD,
+                ],
+                ['createdAt' => 'DESC']
+            );
+        }
+
+        if (!$template) {
+            return null;
+        }
+
+        $relativePath = $template->getFilePath();
+        $fullPath = rtrim((string) $this->getParameter('kernel.project_dir'), '/') . '/public/' . ltrim($relativePath, '/');
+
+        return file_exists($fullPath) ? $fullPath : null;
+    }
+
+    private function buildTemplateData(SalesDocument $salesDocument): array
+    {
+        $company = $salesDocument->getCompany();
+        $client = $salesDocument->getResolvedClient();
+
+        $currency = $salesDocument->getResolvedCurrency('EUR');
+        $formatMoney = fn (?string $amount) => $this->toolsHelper->formatCurrency($amount ?? 0, $currency);
+
+        $items = [];
+        foreach ($salesDocument->getSalesDocumentItems() as $item) {
+            $qty = $item->getQuantity() ?? 0;
+            $unit = $item->getUnitPrice() ?? 0;
+            $total = (float) $qty * (float) $unit;
+            $items[] = [
+                'description' => $item->getDescription() ?? '',
+                'quantity' => (string) $qty,
+                'unit_price' => $formatMoney((string) $unit),
+                'total' => $formatMoney((string) $total),
+            ];
+        }
+
+        return [
+            'scalar' => [
+                'company_name' => $company?->getName() ?? '',
+                'company_ice' => $company?->getIce() ?? '',
+                'company_if' => $company?->getFiscalId() ?? '',
+                'company_tp' => $company?->getTaxProfessional() ?? '',
+                'company_address' => $company?->getAddress() ?? '',
+                'company_city' => $company?->getCity() ?? '',
+                'company_country' => $company?->getCountry() ?? '',
+                'company_phone' => $company?->getPhone() ?? '',
+                'company_email' => $company?->getEmail() ?? '',
+                'company_logo' => $company?->getLogoPath() ?? '',
+                'reference' => $salesDocument->getReference() ?? '',
+                'type' => $salesDocument->getType() ?? '',
+                'date' => ($salesDocument->getInvoiceDate() ?? $salesDocument->getCreatedAt())?->format('d/m/Y') ?? '',
+                'client_name' => $client?->getName() ?? '',
+                'client_email' => $client?->getEmail() ?? '',
+                'client_phone' => $client?->getPhone() ?? '',
+                'client_address' => $client?->getAddress() ?? '',
+                'client_country' => $client?->getCountry() ?? '',
+                'total_ht' => $formatMoney((string) $salesDocument->getTotalHT()),
+                'total_ttc' => $formatMoney((string) $salesDocument->getTotalTTC()),
+                'vat_rate' => (string) $salesDocument->getVatRate(),
+            ],
+            'items' => $items,
+        ];
+    }
+
+    private function sanitizeFilename(string $name): string
+    {
+        $name = str_replace(['/', '\\'], '-', $name);
+        $name = preg_replace('/[^A-Za-z0-9._-]/', '-', $name) ?? $name;
+        $name = trim($name, '-');
+        return $name !== '' ? $name : 'document';
+    }
 }
