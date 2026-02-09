@@ -27,7 +27,13 @@ class DocumentTemplateController extends AbstractController
     #[Route('/upload', name: 'app_templates_upload')]
     public function upload(Request $request, EM $em): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise liée.');
+        }
+
         $template = new DocumentTemplate();
+        $template->setCompany($company);
 
         $form = $this->createForm(DocumentTemplateType::class, $template);
         $form->handleRequest($request);
@@ -47,8 +53,8 @@ class DocumentTemplateController extends AbstractController
 
             if ($template->isDefault()) {
                 // on enlève l’ancien default pour ce couple (type+format)
-                $em->createQuery('UPDATE App\Entity\DocumentTemplate t SET t.isDefault = false WHERE t.type = :type AND t.format = :format')
-                    ->setParameters(['type' => $template->getType(), 'format' => $template->getFormat()])
+                $em->createQuery('UPDATE App\Entity\DocumentTemplate t SET t.isDefault = false WHERE t.type = :type AND t.format = :format AND t.company = :company')
+                    ->setParameters(['type' => $template->getType(), 'format' => $template->getFormat(), 'company' => $company])
                     ->execute();
             }
 
@@ -67,8 +73,13 @@ class DocumentTemplateController extends AbstractController
     #[Route('/{id}/default', name: 'app_templates_set_default')]
     public function setDefault(DocumentTemplate $template, EM $em): Response
     {
-        $em->createQuery('UPDATE App\Entity\DocumentTemplate t SET t.isDefault = false WHERE t.type = :type AND t.format = :format')
-            ->setParameters(['type' => $template->getType(), 'format' => $template->getFormat()])
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise liée.');
+        }
+
+        $em->createQuery('UPDATE App\Entity\DocumentTemplate t SET t.isDefault = false WHERE t.type = :type AND t.format = :format AND t.company = :company')
+            ->setParameters(['type' => $template->getType(), 'format' => $template->getFormat(), 'company' => $company])
             ->execute();
 
         $template->setIsDefault(true);

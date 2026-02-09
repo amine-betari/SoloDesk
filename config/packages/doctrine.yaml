@@ -17,6 +17,10 @@ doctrine:
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
+        filters:
+            company_filter:
+                class: App\Doctrine\CompanyFilter
+                enabled: false
         mappings:
             App:
                 type: attribute

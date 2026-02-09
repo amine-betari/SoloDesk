@@ -64,11 +64,18 @@ final class PaymentController extends AbstractController
     {
         $payment = new Payment();
         $payment->setDate(new \DateTimeImmutable());
+        $company = $this->getUser()?->getCompany();
+        if ($company) {
+            $payment->setCompany($company);
+        }
 
         $form = $this->createForm(PaymentForm::class, $payment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($payment->getSalesDocument()) {
+                $payment->setCompany($payment->getSalesDocument()->getCompany());
+            }
             $entityManager->persist($payment);
             $entityManager->flush();
 

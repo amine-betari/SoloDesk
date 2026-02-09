@@ -40,6 +40,11 @@ final class ClientController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $client = new Client();
+        $company = $this->getUser()?->getCompany();
+        if ($company) {
+            $client->setCompany($company);
+        }
+
         $form = $this->createForm(ClientForm::class, $client);
         $form->handleRequest($request);
 

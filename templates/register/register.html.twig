@@ -17,6 +17,14 @@
         </div>
 
         <div class="mb-4">
+            {{ form_label(registrationForm.companyName, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_widget(registrationForm.companyName, {'attr': {'class': 'mt-1 w-full p-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
+            <div class="text-sm text-red-600 mt-1">
+                {{ form_errors(registrationForm.companyName) }}
+            </div>
+        </div>
+
+        <div class="mb-4">
             {{ form_label(registrationForm.plainPassword, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
             {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'mt-1 w-full p-2 rounded-md border border-gray-300 bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500'}}) }}
             <div class="text-sm text-red-600 mt-1">

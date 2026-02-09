@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\DocumentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Company;
 
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
 class Document
@@ -24,6 +25,10 @@ class Document
 
     #[ORM\ManyToOne(inversedBy: 'documents')]
     private ?Project $project = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     public function __construct()
     {
@@ -67,6 +72,9 @@ class Document
     public function setEstimate(?Estimate $estimate): static
     {
         $this->estimate = $estimate;
+        if ($estimate) {
+            $this->company = $estimate->getCompany();
+        }
 
         return $this;
     }
@@ -79,7 +87,21 @@ class Document
     public function setProject(?Project $project): static
     {
         $this->project = $project;
+        if ($project) {
+            $this->company = $project->getCompany();
+        }
 
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
         return $this;
     }
 }

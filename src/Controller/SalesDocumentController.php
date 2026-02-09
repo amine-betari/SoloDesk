@@ -80,6 +80,11 @@ final class SalesDocumentController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $salesDocument = new SalesDocument();
+        $company = $this->getUser()?->getCompany();
+        if ($company) {
+            $salesDocument->setCompany($company);
+        }
+
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);
         $form->handleRequest($request);
 
@@ -187,6 +192,10 @@ final class SalesDocumentController extends AbstractController
             $salesDocument->setReference('INV-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(3))));
             // Display les deux champs dans le formulaire (TVA ou non and Taux TVA) car tu dépend plus de projets mais il s'agit d'une facture directe
             $this->applyVatFromRate($salesDocument, 0.0);
+            $company = $this->getUser()?->getCompany();
+            if ($company) {
+                $salesDocument->setCompany($company);
+            }
         }
 
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);
@@ -397,6 +406,10 @@ final class SalesDocumentController extends AbstractController
         $invoice = new SalesDocument();
         $invoice->setType(SalesDocument::TYPE_INVOICE);
         $invoice->setCreatedAt(new \DateTimeImmutable());
+        $company = $this->getUser()?->getCompany();
+        if ($company) {
+            $invoice->setCompany($company);
+        }
 
         return $invoice;
     }

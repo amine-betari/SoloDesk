@@ -73,6 +73,11 @@ final class EstimateController extends AbstractController
     ): Response
     {
         $estimate = new Estimate();
+        $company = $this->getUser()?->getCompany();
+        if ($company) {
+            $estimate->setCompany($company);
+        }
+
         $form = $this->createForm(EstimateForm::class, $estimate);
         $form->handleRequest($request);
 

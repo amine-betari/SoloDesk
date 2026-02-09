@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Entity\Company;
 
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
@@ -36,6 +37,10 @@ class Project
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     private ?Client $client = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     #[ORM\Column(length: 255, unique: true)]
     private ?string $projectNumber = null;
@@ -171,6 +176,9 @@ class Project
     public function setClient(?Client $client): static
     {
         $this->client = $client;
+        if ($client) {
+            $this->company = $client->getCompany();
+        }
 
         return $this;
     }
@@ -329,6 +337,17 @@ class Project
     {
         $this->currency = $currency;
     } // ex: 'MAD', 'EUR', 'USD'
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+        return $this;
+    }
 
     /**
      * @throws \Exception

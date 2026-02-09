@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Company;
 
 #[ORM\Entity]
 class DocumentTemplate
@@ -41,6 +42,10 @@ class DocumentTemplate
 
     // 🔜 plus tard:
     // #[ORM\ManyToOne(User::class)] private ?User $owner = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     public function __construct()
     {
@@ -112,6 +117,16 @@ class DocumentTemplate
         return $this->createdAt;
     }
 
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): void
+    {
+        $this->updatedAt = $updatedAt;
+    }
+
     /**
      * @return string
      */
@@ -144,6 +159,15 @@ class DocumentTemplate
         return $this->filePath;
     }
 
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): void
+    {
+        $this->company = $company;
+    }
+
 
 }
-

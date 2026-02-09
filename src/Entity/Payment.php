@@ -8,6 +8,7 @@ use Symfony\UX\Autocomplete\AsEntityAutocompleteField;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use App\EventListener\PaymentListener;
+use App\Entity\Company;
 
 #[ORM\Entity(repositoryClass: PaymentRepository::class)]
 #[ORM\EntityListeners([PaymentListener::class])]
@@ -37,6 +38,10 @@ class Payment
     #[ORM\JoinColumn(nullable: true)]
     private ?SalesDocument $salesDocument = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
+
     // --- Getters & Setters ---
     #[Assert\Callback]
     public function validateContext(ExecutionContextInterface $context): void
@@ -57,6 +62,9 @@ class Payment
     public function setSalesDocument(?SalesDocument $salesDocument): static
     {
         $this->salesDocument = $salesDocument;
+        if ($salesDocument) {
+            $this->company = $salesDocument->getCompany();
+        }
         return $this;
     }
 
@@ -129,6 +137,17 @@ class Payment
     public function setInvoiceReference(?string $invoiceReference): static
     {
         $this->invoiceReference = $invoiceReference;
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
         return $this;
     }
 

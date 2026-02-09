@@ -7,7 +7,6 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use App\Entity\Client;
 use App\Form\AutoComplete\ClientAutocompleteField;
@@ -31,10 +30,7 @@ class ProjectFilterForm extends AbstractType
             $client = $this->entityManager->getReference(Client::class, $client->getId());
         }
         $builder
-      //      ->add('client', ClientAutocompleteField::class, [
-            ->add('client', EntityType::class, [
-                'class' => Client::class,
-                'choice_label' => 'name',
+            ->add('client', ClientAutocompleteField::class, [
                 'required' => false,
                 'placeholder' => 'Tous les clients',
                 'data' => $client,

@@ -1,7 +1,10 @@
 {# templates/partials/sidebar.html.twig #}
 <aside class="w-64 bg-[#1F2732] min-h-screen flex flex-col">
-    <div class="px-6 py-4 text-white text-2xl font-bold">
-        SoloDesk
+    <div class="px-6 py-4">
+        <div class="text-white text-2xl font-bold">SoloDesk</div>
+        {% if app.user and app.user.company %}
+            <div class="text-xs text-gray-400 mt-1 truncate">{{ app.user.company.name }}</div>
+        {% endif %}
     </div>
 
     <nav class="flex-1 px-2 space-y-2">
@@ -11,7 +14,8 @@
             {'route':'app_estimate_index', 'label':'Pré-Estimations', 'icon':'file-text'},
             {'route':'app_payment_index', 'label':'Paiements', 'icon':'credit-card'},
             {'route':'app_sales_document_index', 'label':'Documents de Vente', 'icon':'file'},
-            {'route':'app_client_index', 'label':'Clients', 'icon':'users'}
+            {'route':'app_client_index', 'label':'Clients', 'icon':'users'},
+            {'route':'app_company_edit', 'label':'Entreprise', 'icon':'briefcase'}
         ] %}
 
         {% for item in menuItems %}
@@ -32,6 +36,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                     {% elseif item.icon == 'users' %}
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 0 0-4-4h-1M9 20h5v-2a4 4 0 0 0-4-4H9M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/>
+                    {% elseif item.icon == 'briefcase' %}
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1m-7 4h10m-11 4h12m-12 0v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-5m-12 0h12"/>
                     {% endif %}
                 </svg>
 

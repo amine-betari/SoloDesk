@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\SalesDocumentItemRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Company;
 
 #[ORM\Entity(repositoryClass: SalesDocumentItemRepository::class)]
 class SalesDocumentItem
@@ -17,6 +18,10 @@ class SalesDocumentItem
     #[ORM\ManyToOne(inversedBy: 'salesDocumentItems')]
     #[ORM\JoinColumn(nullable: false)]
     private ?SalesDocument $salesDocument = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -43,6 +48,9 @@ class SalesDocumentItem
     public function setSalesDocument(?SalesDocument $salesDocument): static
     {
         $this->salesDocument = $salesDocument;
+        if ($salesDocument) {
+            $this->company = $salesDocument->getCompany();
+        }
 
         return $this;
     }
@@ -92,6 +100,17 @@ class SalesDocumentItem
     {
         $this->lineTotal = $lineTotal;
 
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
         return $this;
     }
 }

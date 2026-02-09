@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use App\Constants\InvoiceStatus;
+use App\Entity\Company;
 
 #[ORM\Entity(repositoryClass: SalesDocumentRepository::class)]
 class SalesDocument
@@ -48,6 +49,10 @@ class SalesDocument
 
     #[ORM\ManyToOne(inversedBy: 'salesDocuments')]
     private ?Client $client = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     #[ORM\OneToMany(targetEntity: Payment::class, mappedBy: 'salesDocument')]
     private Collection $payments;
@@ -174,6 +179,9 @@ class SalesDocument
     public function setProject(?Project $project): static
     {
         $this->project = $project;
+        if ($project) {
+            $this->company = $project->getCompany();
+        }
 
         return $this;
     }
@@ -186,6 +194,9 @@ class SalesDocument
     public function setEstimate(?Estimate $estimate): static
     {
         $this->estimate = $estimate;
+        if ($estimate) {
+            $this->company = $estimate->getCompany();
+        }
 
         return $this;
     }
@@ -285,6 +296,9 @@ class SalesDocument
     public function setClient(?Client $client): self
     {
         $this->client = $client;
+        if ($client) {
+            $this->company = $client->getCompany();
+        }
         return $this;
     }
 
@@ -387,6 +401,17 @@ class SalesDocument
     public function setVatRate(float $vatRate): self
     {
         $this->vatRate = $vatRate;
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): self
+    {
+        $this->company = $company;
         return $this;
     }
 

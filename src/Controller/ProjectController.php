@@ -68,6 +68,11 @@ final class ProjectController extends AbstractController
     ): Response
     {
         $project = new Project();
+        $company = $this->getUser()?->getCompany();
+        if ($company) {
+            $project->setCompany($company);
+        }
+
         $form = $this->createForm(ProjectForm::class, $project);
         $form->handleRequest($request);
 

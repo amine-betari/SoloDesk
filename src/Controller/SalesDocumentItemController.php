@@ -26,10 +26,18 @@ final class SalesDocumentItemController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $salesDocumentItem = new SalesDocumentItem();
+        $company = $this->getUser()?->getCompany();
+        if ($company) {
+            $salesDocumentItem->setCompany($company);
+        }
+
         $form = $this->createForm(SalesDocumentItemForm::class, $salesDocumentItem);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if ($salesDocumentItem->getSalesDocument()) {
+                $salesDocumentItem->setCompany($salesDocumentItem->getSalesDocument()->getCompany());
+            }
             $entityManager->persist($salesDocumentItem);
             $entityManager->flush();
 

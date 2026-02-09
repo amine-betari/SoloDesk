@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Company;
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,6 +28,12 @@ class RegisterController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $companyName = (string) $form->get('companyName')->getData();
+            $company = new Company();
+            $company->setName($companyName ?: 'Entreprise');
+            $em->persist($company);
+            $user->setCompany($company);
+
             $user->setPassword(
                 $passwordHasher->hashPassword(
                     $user,

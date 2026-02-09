@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use \NumberFormatter;
@@ -239,14 +240,19 @@ class HomeController extends AbstractController
 
 
     #[Route('/stats/ca/trimestre', name: 'stats_ca_trimestre')]
-    public function caParTrimestre(PaymentRepository $paymentRepository, ChartBuilderInterface $chartBuilder, Request $request): Response
-    {
+    public function caParTrimestre(
+        PaymentRepository $paymentRepository,
+        ChartBuilderInterface $chartBuilder,
+        Request $request,
+        #[Autowire('%env(float:TAX_IMPOT_RATE)%')] float $taxImpotRate
+    ): Response {
         $anneeSelectionnee = $request->query->get('annee', date('Y')); // année par défaut
         $anneeDebut = 2017;
         $anneesDisponibles = range($anneeDebut, date('Y'));
 
         $payments = $paymentRepository->findPaymentsForReports(); // ✅ paiement réel
         $revenusParTrimestreEtClient = [];
+        $totauxParTrimestreParDevise = [];
 
         $trimestrePeriodes = [
             'T1' => 'Janv - Mars',
@@ -283,7 +289,14 @@ class HomeController extends AbstractController
                 $revenusParTrimestreEtClient[$periode][$key] = 0;
             }
 
-            $revenusParTrimestreEtClient[$periode][$key] += $payment->getAmount();
+            $amount = $payment->getAmount();
+            $revenusParTrimestreEtClient[$periode][$key] += $amount;
+
+            if (!isset($totauxParTrimestreParDevise[$periode])) {
+                $totauxParTrimestreParDevise[$periode] = [];
+            }
+            $totauxParTrimestreParDevise[$periode][$devise] =
+                ($totauxParTrimestreParDevise[$periode][$devise] ?? 0) + $amount;
         }
 
         // Crée les charts
@@ -330,6 +343,48 @@ class HomeController extends AbstractController
         $fmt = new NumberFormatter('fr_FR', NumberFormatter::DECIMAL);
         $fmt->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
+        $taxImpotRatePercent = $taxImpotRate * 100;
+        $taxImpotRateLabel = rtrim(rtrim($fmt->format($taxImpotRatePercent), '0'), ',');
+
+        // CA depuis le début (toutes années)
+        $totauxParDeviseGlobal = [];
+        foreach ($payments as $payment) {
+            $paymentDate = $payment->getDate();
+            if (!$paymentDate) continue;
+
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
+
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue;
+
+            $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+
+            $totauxParDeviseGlobal[$devise] =
+                ($totauxParDeviseGlobal[$devise] ?? 0) + $payment->getAmount();
+        }
+
+        $caGlobalAffichage = [];
+        foreach ($totauxParDeviseGlobal as $devise => $montant) {
+            $caGlobalAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+
+        $caGlobalTexte = $caGlobalAffichage ? implode(' • ', $caGlobalAffichage) : '0';
+
+        // Ratios par trimestre (impôts)
+        $ratiosParTrimestre = [];
+        foreach ($totauxParTrimestreParDevise as $periode => $parDevise) {
+            $impotsAffichage = [];
+
+            foreach ($parDevise as $devise => $montant) {
+                $impotsAffichage[] = $fmt->format($montant * $taxImpotRate) . ' ' . $devise;
+            }
+
+            $ratiosParTrimestre[$periode] = [
+                'impots' => $impotsAffichage ? implode(' • ', $impotsAffichage) : '0',
+            ];
+        }
+
         $caAnneeAffichage = [];
         foreach ($totauxParDevise as $devise => $montant) {
             $caAnneeAffichage[] = $fmt->format($montant) . ' ' . $devise;
@@ -373,9 +428,12 @@ class HomeController extends AbstractController
 
         return $this->render('stats/trimestriels.html.twig', [
             'charts' => $charts,
+            'ratiosParTrimestre' => $ratiosParTrimestre,
+            'taxImpotRateLabel' => $taxImpotRateLabel,
             'annees' => $anneesDisponibles,
             'anneeSelectionnee' => $anneeSelectionnee,
             'caAnneeTexte' => $caAnneeTexte,
+            'caGlobalTexte' => $caGlobalTexte,
             'caAnneePrecedenteTexte' => $caAnneePrecedenteTexte,
         ]);
     }

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\Company;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -30,6 +31,10 @@ class Client
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $country = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
 
     /**
      * @var Collection<int, Project>
@@ -108,6 +113,17 @@ class Client
     {
         $this->country = $country;
 
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
         return $this;
     }
 

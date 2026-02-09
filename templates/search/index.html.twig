@@ -1,0 +1,97 @@
+{% extends 'base.html.twig' %}
+
+{% macro highlight(text, term) %}
+    {% if text is empty or term is empty %}
+        {{ text|e }}
+    {% else %}
+        {% set safe = text|e %}
+        {% set needle = term|e %}
+        {{ safe|replace({ (needle): '<span class="bg-yellow-500/20 text-yellow-200 px-1 rounded">' ~ needle ~ '</span>' })|raw }}
+    {% endif %}
+{% endmacro %}
+
+{% import _self as ui %}
+
+{% block title %}Recherche{% endblock %}
+
+{% block body %}
+    <div class="max-w-5xl mx-auto px-6 py-8">
+        <h1 class="text-3xl font-bold text-gray-100 mb-6">Recherche</h1>
+
+        {% if term is empty %}
+            <div class="bg-[#1F2732] border border-[#2A3747] rounded-lg p-4 text-gray-300">
+                Saisis un mot-clé pour lancer la recherche.
+            </div>
+        {% elseif term|length < 2 %}
+            <div class="bg-[#1F2732] border border-[#2A3747] rounded-lg p-4 text-gray-300">
+                Merci d’entrer au moins 2 caractères.
+            </div>
+        {% else %}
+            <div class="space-y-8">
+                <section>
+                    <h2 class="text-lg font-semibold text-white mb-3">Clients</h2>
+                    {% if clients is empty %}
+                        <div class="text-gray-400">Aucun résultat</div>
+                    {% else %}
+                        <div class="bg-[#1F2732] rounded-lg overflow-hidden border border-[#2A3747]">
+                            {% for client in clients %}
+                                <a href="{{ path('app_client_show', {id: client.id}) }}" class="block px-4 py-3 border-b border-[#2A3747] hover:bg-[#2A3747]">
+                                    <div class="text-white font-medium">{{ ui.highlight(client.name, term) }}</div>
+                                    <div class="text-sm text-gray-400">{{ ui.highlight(client.email ?? '—', term) }}</div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-semibold text-white mb-3">Projets</h2>
+                    {% if projects is empty %}
+                        <div class="text-gray-400">Aucun résultat</div>
+                    {% else %}
+                        <div class="bg-[#1F2732] rounded-lg overflow-hidden border border-[#2A3747]">
+                            {% for project in projects %}
+                                <a href="{{ path('app_project_show', {id: project.id}) }}" class="block px-4 py-3 border-b border-[#2A3747] hover:bg-[#2A3747]">
+                                    <div class="text-white font-medium">{{ ui.highlight(project.name, term) }}</div>
+                                    <div class="text-sm text-gray-400">{{ ui.highlight(project.projectNumber ?? '—', term) }}</div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-semibold text-white mb-3">Pré-Estimations</h2>
+                    {% if estimates is empty %}
+                        <div class="text-gray-400">Aucun résultat</div>
+                    {% else %}
+                        <div class="bg-[#1F2732] rounded-lg overflow-hidden border border-[#2A3747]">
+                            {% for estimate in estimates %}
+                                <a href="{{ path('app_estimate_show', {id: estimate.id}) }}" class="block px-4 py-3 border-b border-[#2A3747] hover:bg-[#2A3747]">
+                                    <div class="text-white font-medium">{{ ui.highlight(estimate.name, term) }}</div>
+                                    <div class="text-sm text-gray-400">{{ ui.highlight(estimate.estimateNumber ?? '—', term) }}</div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </section>
+
+                <section>
+                    <h2 class="text-lg font-semibold text-white mb-3">Documents de vente</h2>
+                    {% if salesDocuments is empty %}
+                        <div class="text-gray-400">Aucun résultat</div>
+                    {% else %}
+                        <div class="bg-[#1F2732] rounded-lg overflow-hidden border border-[#2A3747]">
+                            {% for doc in salesDocuments %}
+                                <a href="{{ path('app_sales_document_show', {id: doc.id}) }}" class="block px-4 py-3 border-b border-[#2A3747] hover:bg-[#2A3747]">
+                                    <div class="text-white font-medium">{{ ui.highlight(doc.reference, term) }}</div>
+                                    <div class="text-sm text-gray-400">{{ doc.type }}</div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </section>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
