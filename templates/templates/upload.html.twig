@@ -2,46 +2,54 @@
 {% block title %}Uploader un modèle{% endblock %}
 
 {% block body %}
-    <div class="max-w-2xl mx-auto mt-10 bg-gray-800 p-8 rounded-lg shadow-lg text-white">
-        <h1 class="text-3xl font-bold mb-6">Uploader un modèle</h1>
+    <div class="mt-12 p-8 bg-white text-gray-900 rounded-xl">
+        <h1 class="text-4xl font-extrabold mb-8">Uploader un modèle</h1>
+
         {{ form_start(form, {
             'attr': {
                 'enctype':'multipart/form-data',
-                'class':'space-y-4'
-                }
+                'class':'space-y-6'
+            }
         }) }}
-        <fieldset class="mb-6 p-4 border rounded bg-gray-700">
-            <legend class="text-lg font-semibold mb-4">Informations générales</legend>
-            <div>
-                {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+
+        <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6">
+            <legend class="text-lg font-semibold text-gray-900">Informations générales</legend>
+
+            <div class="space-y-2">
+                {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.name) }}
             </div>
-            <div>
-                {{ form_label(form.type, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.type, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+
+            <div class="space-y-2">
+                {{ form_label(form.type, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                {{ form_widget(form.type, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.type) }}
             </div>
-            <div>
-                {{ form_label(form.format, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.format, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+
+            <div class="space-y-2">
+                {{ form_label(form.format, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                {{ form_widget(form.format, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.format) }}
             </div>
-            <div>
-                {{ form_label(form.file, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.file, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
+
+            <div class="space-y-2">
+                {{ form_label(form.file, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                {{ form_widget(form.file, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.file) }}
             </div>
-            <div>
-                {{ form_label(form.isDefault, null, {'label_attr': {'class': 'block text-sm font-medium'}}) }}
-                {{ form_widget(form.isDefault, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 text-black'}}) }}
-                {{ form_errors(form.isDefault) }}
 
+            <div class="space-y-2">
+                {{ form_label(form.isDefault, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                {{ form_widget(form.isDefault, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                {{ form_errors(form.isDefault) }}
             </div>
-            <div class="flex justify-end">
-                <button class="px-4 py-2 bg-blue-600 text-white rounded">Enregistrer</button>
+
+            <div class="flex justify-end items-center">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enregistrer</button>
             </div>
         </fieldset>
+
         {{ form_end(form) }}
     </div>
 {% endblock %}
