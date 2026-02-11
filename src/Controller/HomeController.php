@@ -26,18 +26,11 @@ class HomeController extends AbstractController
         SalesDocumentRepository $salesDocumentRepository,
         ChartBuilderInterface $chartBuilder
     ): Response {
-        $clients   = $clientRepository->findAll();
-        $projects  = $projectRepository->findAll();
-
-        $estimates      = $salesDocumentRepository->findBy(['type' => 'estimate']);
-        $invoicesManual = $salesDocumentRepository->count(['type' => 'invoice']);
-        $invoices       = $salesDocumentRepository->findBy(['type' => 'invoice']);
-
         $totalClients   = $clientRepository->count([]);
         $totalProjects  = $projectRepository->count([]);
         $totalEstimates = $estimateRepository->count([]);
 
-        $totalInvoices  = $invoicesManual;
+        $totalInvoices  = $salesDocumentRepository->count(['type' => 'invoice']);
 
 
 
@@ -144,9 +137,10 @@ class HomeController extends AbstractController
 
         // EstimateStats Graph
         $estimateStats = [];
-        foreach ($estimates as $e) {
-            $status = $e->getStatus(); // ex: 'accepted', 'rejected', 'draft', 'sent'
-            // Traduction
+        $estimateCounts = $salesDocumentRepository->countEstimatesByStatus();
+        foreach ($estimateCounts as $row) {
+            $status = (string) $row['status'];
+            $total = (int) $row['total'];
             switch ($status) {
                 case 'draft':    $label = 'Brouillon'; break;
                 case 'sent':     $label = 'Envoyé'; break;
@@ -154,10 +148,7 @@ class HomeController extends AbstractController
                 case 'rejected': $label = 'Refusé'; break;
                 default:         $label = $status; break;
             }
-
-            // $estimateStats[$e->getStatus()] = ($estimateStats[$e->getStatus()] ?? 0) + 1;
-            $estimateStats[$label] = ($estimateStats[$label] ?? 0) + 1;
-
+            $estimateStats[$label] = ($estimateStats[$label] ?? 0) + $total;
         }
         $estimateChart = $chartBuilder->createChart(Chart::TYPE_DOUGHNUT);
         $estimateChart->setData([
@@ -173,19 +164,16 @@ class HomeController extends AbstractController
         $invoicesByYear = [];
         $externalInvoicesByYear = [];
         $totalExternalInvoices = 0;
-        foreach ($invoices as $invoice) {
-            $year = $invoice->getInvoiceDate() ? $invoice->getInvoiceDate()->format('Y') : 'N/A';
-            if (!isset($invoicesByYear[$year])) {
-                $invoicesByYear[$year] = 0;
-            }
-            $invoicesByYear[$year]++;
+        $invoiceCounts = $salesDocumentRepository->countInvoicesByYearAndExternal();
+        foreach ($invoiceCounts as $row) {
+            $year = (string) $row['year'];
+            $total = (int) $row['total'];
+            $isExternal = (bool) $row['external_flag'];
 
-            if ($invoice->isExternalInvoice()) {
-                if (!isset($externalInvoicesByYear[$year])) {
-                    $externalInvoicesByYear[$year] = 0;
-                }
-                $externalInvoicesByYear[$year]++;
-                $totalExternalInvoices++;
+            $invoicesByYear[$year] = ($invoicesByYear[$year] ?? 0) + $total;
+            if ($isExternal) {
+                $externalInvoicesByYear[$year] = ($externalInvoicesByYear[$year] ?? 0) + $total;
+                $totalExternalInvoices += $total;
             }
         }
 
@@ -225,9 +213,6 @@ class HomeController extends AbstractController
             'clientDataChart' => $clientData,
             'projectDataChart' => $projectChart,
             'paymentsChart' => $paymentsChart,
-            'clients' => $clients,
-            'projects' => $projects,
-            'estimates' => $estimates,
             'totalClients' => $totalClients,
             'totalProjects' => $totalProjects,
             'totalEstimates' => $totalEstimates,

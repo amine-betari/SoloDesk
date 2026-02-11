@@ -16,6 +16,37 @@ class SalesDocumentRepository extends ServiceEntityRepository
         parent::__construct($registry, SalesDocument::class);
     }
 
+    public function countEstimatesByStatus(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s.status AS status, COUNT(s.id) AS total')
+            ->where('s.type = :type')
+            ->setParameter('type', SalesDocument::TYPE_ESTIMATE)
+            ->groupBy('s.status')
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function countInvoicesByYearAndExternal(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = <<<'SQL'
+            SELECT
+                YEAR(invoice_date) AS year,
+                external_invoice AS external_flag,
+                COUNT(id) AS total
+            FROM sales_document
+            WHERE type = :type
+              AND invoice_date IS NOT NULL
+            GROUP BY year, external_flag
+            ORDER BY year ASC
+            SQL;
+
+        return $conn->fetchAllAssociative($sql, [
+            'type' => SalesDocument::TYPE_INVOICE,
+        ]);
+    }
+
     //    /**
     //     * @return SalesDocument[] Returns an array of SalesDocument objects
     //     */
