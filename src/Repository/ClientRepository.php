@@ -18,16 +18,18 @@ class ClientRepository extends ServiceEntityRepository
 
     public function countClientsGroupedByYear(?\DateTime $startDate = null, ?\DateTime $endDate = null): array
     {
-        // Déterminer la plage automatiquement si absente
-        if (!$startDate || !$endDate) {
-            $range = $this->createQueryBuilder('c')
-                ->select('MIN(c.firstContactAt) AS minDate, MAX(c.firstContactAt) AS maxDate')
-                ->where('c.firstContactAt IS NOT NULL')
-                ->getQuery()
-                ->getOneOrNullResult();
+        $conn = $this->getEntityManager()->getConnection();
 
-            if (!$range['minDate'] || !$range['maxDate']) {
-                return []; // aucune donnée
+        if (!$startDate || !$endDate) {
+            $rangeSql = <<<'SQL'
+                SELECT MIN(first_contact_at) AS minDate, MAX(first_contact_at) AS maxDate
+                FROM client
+                WHERE first_contact_at IS NOT NULL
+                SQL;
+            $range = $conn->fetchAssociative($rangeSql);
+
+            if (empty($range['minDate']) || empty($range['maxDate'])) {
+                return [];
             }
 
             $startDate = $startDate ?: new \DateTime($range['minDate']);
@@ -37,23 +39,28 @@ class ClientRepository extends ServiceEntityRepository
         $startYear = (int) $startDate->format('Y');
         $endYear = (int) $endDate->format('Y');
 
-        $clients = $this->createQueryBuilder('c')
-            ->where('c.firstContactAt IS NOT NULL')
-            ->andWhere('c.firstContactAt BETWEEN :start AND :end')
-            ->setParameter('start', $startDate->setTime(0, 0))
-            ->setParameter('end', $endDate->setTime(23, 59))
-            ->getQuery()
-            ->getResult();
+        $sql = <<<'SQL'
+            SELECT YEAR(first_contact_at) AS year, COUNT(id) AS total
+            FROM client
+            WHERE first_contact_at IS NOT NULL
+              AND first_contact_at BETWEEN :start AND :end
+            GROUP BY year
+            ORDER BY year ASC
+            SQL;
 
-        // Init tableau avec toutes les années même si 0
+        $rows = $conn->fetchAllAssociative($sql, [
+            'start' => $startDate->setTime(0, 0)->format('Y-m-d H:i:s'),
+            'end' => $endDate->setTime(23, 59)->format('Y-m-d H:i:s'),
+        ]);
+
         $data = [];
         for ($y = $startYear; $y <= $endYear; $y++) {
-            $data[(string)$y] = 0;
+            $data[(string) $y] = 0;
         }
 
-        foreach ($clients as $client) {
-            $year = $client->getFirstContactAt()->format('Y');
-            $data[$year]++;
+        foreach ($rows as $row) {
+            $year = (string) $row['year'];
+            $data[$year] = (int) $row['total'];
         }
 
         ksort($data);
