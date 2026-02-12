@@ -56,6 +56,11 @@
                 {% if app.user %}
                     <a href="{{ path('app_profile') }}" class="hover:text-[#6cc7cd]">Profile</a>
                     <div>|</div>
+                    <form method="post" action="{{ path('app_logout') }}" class="inline">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
+                        <button type="submit" class="hover:text-[#6cc7cd]">Déconnexion</button>
+                    </form>
+                    <div>|</div>
                 {% endif %}
                 <a href="{{ path('app_help_estimation') }}" class="hover:text-[#6cc7cd]">FAQ</a>
                 <div>|</div>
