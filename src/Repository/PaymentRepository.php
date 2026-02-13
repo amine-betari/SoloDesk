@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Constants\ProjectStatuses;
+use App\Entity\Company;
 use App\Entity\Payment;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -27,14 +28,16 @@ class PaymentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-    public function findPaymentsForReports(): array
+    public function findPaymentsForReports(Company $company): array
     {
         $qb = $this->createQueryBuilder('pay')
             ->leftJoin('pay.salesDocument', 'sd')
             ->addSelect('sd')
             ->where('sd IS NOT NULL')
             ->andWhere('sd.status = :paidStatus')
+            ->andWhere('sd.company = :company')
             ->setParameter('paidStatus', 'paid')
+            ->setParameter('company', $company)
             ->orderBy('pay.date', 'ASC');
 
         return $qb->getQuery()->getResult();

@@ -26,16 +26,22 @@ class HomeController extends AbstractController
         SalesDocumentRepository $salesDocumentRepository,
         ChartBuilderInterface $chartBuilder
     ): Response {
-        $totalClients   = $clientRepository->count([]);
-        $totalProjects  = $projectRepository->count([]);
-        $totalEstimates = $estimateRepository->count([]);
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
 
-        $totalInvoices  = $salesDocumentRepository->count(['type' => 'invoice']);
+        $totalClients   = $clientRepository->count(['company' => $company]);
+        $totalProjects  = $projectRepository->count(['company' => $company]);
+        $totalEstimates = $estimateRepository->count(['company' => $company]);
+
+        $totalInvoices  = $salesDocumentRepository->count(['type' => 'invoice', 'company' => $company]);
 
 
 
 
         $data = $clientRepository->countClientsGroupedByYear(
+            $company,
             new \DateTime('2017-01-01'),
             new \DateTime('2026-12-31')
         );
@@ -65,6 +71,7 @@ class HomeController extends AbstractController
 
 
         $projectData = $projectRepository->countProjectsActiveByYear(
+            $company,
             new \DateTime('2017-01-01'),
             new \DateTime('2025-12-31')
         );
@@ -95,7 +102,7 @@ class HomeController extends AbstractController
 
 
         // Graph réellement paies
-        $payments = $paymentRepository->findPaymentsForReports();
+        $payments = $paymentRepository->findPaymentsForReports($company);
         $revenuesFromPayments = [];
 
         foreach ($payments as $payment) {
@@ -137,7 +144,7 @@ class HomeController extends AbstractController
 
         // EstimateStats Graph
         $estimateStats = [];
-        $estimateCounts = $salesDocumentRepository->countEstimatesByStatus();
+        $estimateCounts = $salesDocumentRepository->countEstimatesByStatus($company);
         foreach ($estimateCounts as $row) {
             $status = (string) $row['status'];
             $total = (int) $row['total'];
@@ -164,7 +171,7 @@ class HomeController extends AbstractController
         $invoicesByYear = [];
         $externalInvoicesByYear = [];
         $totalExternalInvoices = 0;
-        $invoiceCounts = $salesDocumentRepository->countInvoicesByYearAndExternal();
+        $invoiceCounts = $salesDocumentRepository->countInvoicesByYearAndExternal($company);
         foreach ($invoiceCounts as $row) {
             $year = (string) $row['year'];
             $total = (int) $row['total'];
@@ -231,11 +238,16 @@ class HomeController extends AbstractController
         Request $request,
         #[Autowire('%env(float:TAX_IMPOT_RATE)%')] float $taxImpotRate
     ): Response {
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
         $anneeSelectionnee = $request->query->get('annee', date('Y')); // année par défaut
         $anneeDebut = 2017;
         $anneesDisponibles = range($anneeDebut, date('Y'));
 
-        $payments = $paymentRepository->findPaymentsForReports(); // ✅ paiement réel
+        $payments = $paymentRepository->findPaymentsForReports($company); // ✅ paiement réel
         $revenusParTrimestreEtClient = [];
         $totauxParTrimestreParDevise = [];
 

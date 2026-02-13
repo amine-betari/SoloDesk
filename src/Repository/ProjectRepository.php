@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Constants\ProjectStatuses;
+use App\Entity\Company;
 use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -17,17 +18,21 @@ class ProjectRepository extends ServiceEntityRepository
         parent::__construct($registry, Project::class);
     }
 
-    public function countProjectsActiveByYear(?\DateTime $startDate = null, ?\DateTime $endDate = null): array
+    public function countProjectsActiveByYear(Company $company, ?\DateTime $startDate = null, ?\DateTime $endDate = null): array
     {
         $conn = $this->getEntityManager()->getConnection();
+        $companyId = $company->getId();
 
         $rangeSql = <<<'SQL'
             SELECT MIN(start_date) AS minStart, MAX(end_date) AS maxEnd
             FROM project
             WHERE start_date IS NOT NULL
               AND end_date IS NOT NULL
+              AND company_id = :companyId
             SQL;
-        $range = $conn->fetchAssociative($rangeSql);
+        $range = $conn->fetchAssociative($rangeSql, [
+            'companyId' => $companyId,
+        ]);
 
         if (empty($range['minStart']) || empty($range['maxEnd'])) {
             return [];
@@ -42,11 +47,13 @@ class ProjectRepository extends ServiceEntityRepository
             WHERE start_date IS NOT NULL
               AND end_date IS NOT NULL
               AND status = :status
+              AND company_id = :companyId
               AND end_date BETWEEN :start AND :end
             SQL;
 
         $rows = $conn->fetchAllAssociative($sql, [
             'status' => 'completed',
+            'companyId' => $companyId,
             'start' => (new \DateTime())->setDate($startYear, 1, 1)->setTime(0, 0)->format('Y-m-d H:i:s'),
             'end' => (new \DateTime())->setDate($endYear, 12, 31)->setTime(23, 59)->format('Y-m-d H:i:s'),
         ]);

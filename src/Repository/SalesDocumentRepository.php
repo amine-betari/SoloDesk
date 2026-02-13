@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Company;
 use App\Entity\SalesDocument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -16,18 +17,20 @@ class SalesDocumentRepository extends ServiceEntityRepository
         parent::__construct($registry, SalesDocument::class);
     }
 
-    public function countEstimatesByStatus(): array
+    public function countEstimatesByStatus(Company $company): array
     {
         return $this->createQueryBuilder('s')
             ->select('s.status AS status, COUNT(s.id) AS total')
             ->where('s.type = :type')
+            ->andWhere('s.company = :company')
             ->setParameter('type', SalesDocument::TYPE_ESTIMATE)
+            ->setParameter('company', $company)
             ->groupBy('s.status')
             ->getQuery()
             ->getArrayResult();
     }
 
-    public function countInvoicesByYearAndExternal(): array
+    public function countInvoicesByYearAndExternal(Company $company): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = <<<'SQL'
@@ -37,6 +40,7 @@ class SalesDocumentRepository extends ServiceEntityRepository
                 COUNT(id) AS total
             FROM sales_document
             WHERE type = :type
+              AND company_id = :companyId
               AND invoice_date IS NOT NULL
             GROUP BY year, external_flag
             ORDER BY year ASC
@@ -44,6 +48,7 @@ class SalesDocumentRepository extends ServiceEntityRepository
 
         return $conn->fetchAllAssociative($sql, [
             'type' => SalesDocument::TYPE_INVOICE,
+            'companyId' => $company->getId(),
         ]);
     }
 
