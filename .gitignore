@@ -52,7 +52,7 @@ cache
 /config/secrets/*/*.decrypt.private.php
 
 # Uploaded files (if you store them under public/)
-# /public/uploads/
+/public/uploads/
 
 # Public bundles (when running `assets:install`)
 /public/bundles/
