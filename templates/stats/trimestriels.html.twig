@@ -59,24 +59,30 @@
     </div>
     <div class="mt-4 h-px bg-gray-700"></div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {% for quarter, chart in charts %}
-            <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl shadow">
-                <h2 class="text-lg font-semibold mb-4 text-gray-100">
-                    {{ quarter }}
-                </h2>
+    {% if charts is empty %}
+        <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl text-gray-300">
+            Aucune donnée disponible pour {{ anneeSelectionnee }}.
+        </div>
+    {% else %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for quarter, chart in charts %}
+                <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl shadow">
+                    <h2 class="text-lg font-semibold mb-4 text-gray-100">
+                        {{ quarter }}
+                    </h2>
 
-                <div class="flex-1">
-                    {{ render_chart(chart) }}
-                </div>
+                    <div class="flex-1">
+                        {{ render_chart(chart) }}
+                    </div>
 
-                {% set ratios = ratiosParTrimestre[quarter] ?? {'impots': '0', 'cnss': '0'} %}
-                <div class="mt-4 text-sm text-gray-400">
-                    <span class="text-yellow-300 font-semibold">{{ taxImpotRateLabel }}% impôts :</span>
-                    <span class="text-gray-100 ml-1">{{ ratios.impots }}</span>
+                    {% set ratios = ratiosParTrimestre[quarter] ?? {'impots': '0', 'cnss': '0'} %}
+                    <div class="mt-4 text-sm text-gray-400">
+                        <span class="text-yellow-300 font-semibold">{{ taxImpotRateLabel }}% impôts :</span>
+                        <span class="text-gray-100 ml-1">{{ ratios.impots }}</span>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
-    </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 
 {% endblock %}
