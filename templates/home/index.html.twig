@@ -46,10 +46,12 @@
             </h3>
             {{ render_chart(paymentsChart) }}
             <div class="mt-4">
-                <a href="{{ path('stats_ca_trimestre') }}"
-                   class="text-blue-600 hover:underline text-sm font-medium">
-                    Voir le CA par trimestre →
-                </a>
+                {% if hasPaymentsStats %}
+                    <a href="{{ path('stats_ca_trimestre') }}"
+                       class="text-blue-600 hover:underline text-sm font-medium">
+                        Voir le CA par trimestre →
+                    </a>
+                {% endif %}
 
             </div>
         </div>

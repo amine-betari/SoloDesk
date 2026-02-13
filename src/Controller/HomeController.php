@@ -220,6 +220,7 @@ class HomeController extends AbstractController
             'clientDataChart' => $clientData,
             'projectDataChart' => $projectChart,
             'paymentsChart' => $paymentsChart,
+            'hasPaymentsStats' => count($revenuesFromPayments) > 0,
             'totalClients' => $totalClients,
             'totalProjects' => $totalProjects,
             'totalEstimates' => $totalEstimates,
