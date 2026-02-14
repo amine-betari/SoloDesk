@@ -28,7 +28,8 @@ final class EstimateController extends AbstractController
         EstimateRepository $estimateRepository,
         Request $request,
         PaginationService $paginator,
-        FilterService $filterService
+        FilterService $filterService,
+        \App\Service\CompanySettings $settings
     ): Response
     {
 
@@ -39,7 +40,19 @@ final class EstimateController extends AbstractController
         // Search Form
         $filterForm = $this->createForm(ProjectFilterForm::class);
         // QueryBuilder
-        $qb = $estimateRepository->createQueryBuilder('e')->orderBy('e.startDate', 'DESC');
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
+        $activityStartDate = $settings->getDate($company, \App\Service\CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+
+        $qb = $estimateRepository->createQueryBuilder('e')
+            ->andWhere('e.company = :company')
+            ->andWhere('COALESCE(e.startDate, e.createdAt) >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('start', $activityStartDate)
+            ->orderBy('e.startDate', 'DESC');
 
         // Handle Generic
         $filterForm = $filterService->handle(

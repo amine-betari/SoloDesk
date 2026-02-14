@@ -26,7 +26,8 @@ final class PaymentController extends AbstractController
         PaymentRepository $paymentRepository,
         Request $request,
         PaginationService $paginator,
-        FilterService $filterService
+        FilterService $filterService,
+        \App\Service\CompanySettings $settings
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
@@ -36,7 +37,19 @@ final class PaymentController extends AbstractController
         // Search Form
         $filterForm = $this->createForm(PaymentFilterForm::class);
         // Search Form
-        $qb = $paymentRepository->createQueryBuilder('p')->orderBy('p.date', 'DESC');
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
+        $activityStartDate = $settings->getDate($company, \App\Service\CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+
+        $qb = $paymentRepository->createQueryBuilder('p')
+            ->andWhere('p.company = :company')
+            ->andWhere('p.date >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('start', $activityStartDate)
+            ->orderBy('p.date', 'DESC');
 
         // Handle Generic
         $filterForm = $filterService->handle(

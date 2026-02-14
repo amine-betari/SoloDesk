@@ -42,7 +42,8 @@ final class SalesDocumentController extends AbstractController
         SalesDocumentRepository $salesDocumentRepository,
         Request $request,
         PaginationService $paginator,
-        FilterService $filterService
+        FilterService $filterService,
+        \App\Service\CompanySettings $settings
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
@@ -53,7 +54,19 @@ final class SalesDocumentController extends AbstractController
         $filterForm = $this->createForm(SalesDocumentFilterForm::class);
         // Search Form
 
-        $qb = $salesDocumentRepository->createQueryBuilder('s')->orderBy('s.invoiceDate', 'DESC');
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
+        $activityStartDate = $settings->getDate($company, \App\Service\CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+
+        $qb = $salesDocumentRepository->createQueryBuilder('s')
+            ->andWhere('s.company = :company')
+            ->andWhere('COALESCE(s.invoiceDate, s.createdAt) >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('start', $activityStartDate)
+            ->orderBy('s.invoiceDate', 'DESC');
 
         // Handle Generic
         $filterForm = $filterService->handle(

@@ -24,7 +24,8 @@ final class ProjectController extends AbstractController
         ProjectRepository $projectRepository,
         Request $request,
         PaginationService $paginator,
-        FilterService $filterService
+        FilterService $filterService,
+        \App\Service\CompanySettings $settings
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
@@ -34,7 +35,19 @@ final class ProjectController extends AbstractController
         // Search Form
         $filterForm = $this->createForm(ProjectFilterForm::class);
         // Search Form
-        $qb = $projectRepository->createQueryBuilder('p')->orderBy('p.name', 'ASC');
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
+        $activityStartDate = $settings->getDate($company, \App\Service\CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+
+        $qb = $projectRepository->createQueryBuilder('p')
+            ->andWhere('p.company = :company')
+            ->andWhere('COALESCE(p.startDate, p.createdAt) >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('start', $activityStartDate)
+            ->orderBy('p.name', 'ASC');
 
         // Handle Generic
         $filterForm = $filterService->handle(
