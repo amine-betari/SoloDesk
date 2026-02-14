@@ -64,12 +64,54 @@
                 </div>
 
                 <!-- Client -->
-                <div class="md:col-span-2" data-controller="sales-document"
+                <div class="md:col-span-2"
+                     data-controller="sales-document client-modal"
+                     data-client-modal-endpoint-value="{{ path('client_create_from_modal') }}"
                      data-action="change->sales-document#toggleClient"
                      data-has-project-select="false"
                      data-has-estimate-select="false">
                     <div data-sales-document-target="clientField">
-                        {{ f.field_row(form.client, 'Client', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
+                        {{ form_label(form.client, 'Client', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                        {{ form_widget(form.client, {
+                            'attr': {
+                                'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.client.vars.errors|length ? 'border-red-500' : 'border-gray-300'),
+                                'data-client-modal-target': 'clientSelect'
+                            }
+                        }) }}
+                        {{ f.field_errors(form.client) }}
+                        <div class="flex flex-wrap gap-3 text-sm mt-2">
+                            <button type="button" class="text-blue-600 hover:text-blue-700" data-action="client-modal#openModal">+ Ajouter un nouveau client</button>
+                            <a href="{{ path('app_client_new') }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-700">Ouvrir dans un nouvel onglet</a>
+                        </div>
+
+                        <div data-client-modal-target="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+                            <div class="w-full max-w-md rounded-lg bg-white p-6 text-gray-900 shadow-xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h2 class="text-lg font-semibold">Créer un client</h2>
+                                    <button type="button" class="text-gray-500 hover:text-gray-700" data-action="client-modal#closeModal">X</button>
+                                </div>
+                                <div class="space-y-4">
+                                    <div class="space-y-1">
+                                        <label class="block text-sm font-medium text-gray-700">Nom</label>
+                                        <input type="text" class="w-full rounded-md border border-gray-300 px-3 py-2" data-client-modal-target="nameInput" data-action="keydown.enter->client-modal#createClient" />
+                                    </div>
+                                    <div class="space-y-1">
+                                        <label class="block text-sm font-medium text-gray-700">Devise</label>
+                                        <select class="w-full rounded-md border border-gray-300 px-3 py-2" data-client-modal-target="currencySelect">
+                                            <option value="">Sélectionnez une devise</option>
+                                            <option value="EUR">Euro (€)</option>
+                                            <option value="MAD">Dirham marocain (MAD)</option>
+                                            <option value="USD">Dollar américain ($)</option>
+                                        </select>
+                                    </div>
+                                    <div data-client-modal-target="error" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2"></div>
+                                    <div class="flex justify-end gap-2">
+                                        <button type="button" class="px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800" data-action="client-modal#closeModal">Annuler</button>
+                                        <button type="button" class="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white" data-action="client-modal#createClient">Créer</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

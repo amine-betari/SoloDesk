@@ -9,6 +9,7 @@ use App\Repository\PaginationService;
 use App\Repository\ProjectRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -61,7 +62,7 @@ final class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_client_show', methods: ['GET'])]
+    #[Route('/{id}', name: 'app_client_show', requirements: ['id' => '\\d+'], methods: ['GET'])]
     public function show(Client $client, ProjectRepository $projectRepo): Response
     {
         $projectsCount = $projectRepo->count(['client' => $client]);
@@ -72,7 +73,7 @@ final class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}/edit', name: 'app_client_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_client_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request, Client $client, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(ClientForm::class, $client);
@@ -90,7 +91,7 @@ final class ClientController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_client_delete', methods: ['POST'])]
+    #[Route('/{id}', name: 'app_client_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
     public function delete(Request $request, Client $client, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$client->getId(), $request->getPayload()->getString('_token'))) {
@@ -101,21 +102,48 @@ final class ClientController extends AbstractController
         return $this->redirectToRoute('app_client_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/create-from-modal', name: 'client_create_from_modal', methods: ['POST', 'GET'])]
-    public function createFromModal(Request $request, EntityManagerInterface $em): JsonResponse
+    #[Route('/create-from-modal', name: 'client_create_from_modal', methods: ['POST'])]
+    public function createFromModal(Request $request, EntityManagerInterface $em, ClientRepository $clientRepository): JsonResponse
     {
-      //  $data = json_decode($request->getContent(), true);
-      //  $data = json_decode($request->getContent(), true);
-      //  $client = new Client();
-      //  $client->setName($data['name']);
-      //  $client->setCountry('FR');
-      //  $em->persist($client);
-      //  $em->flush();
-        return 'OK';
-        return $this->json([
-            'id' => 11,
-            'name' => 'AZERTY',
-        ]);
+        if (!$request->isXmlHttpRequest()) {
+            return new JsonResponse(['error' => 'Requete invalide.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $rawName = trim((string) ($data['name'] ?? ''));
+        $currency = trim((string) ($data['currency'] ?? ''));
+
+        if ($rawName === '') {
+            return new JsonResponse(['error' => 'Le nom du client est obligatoire.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        if ($currency === '') {
+            return new JsonResponse(['error' => 'Veuillez choisir une devise.'], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            return new JsonResponse(['error' => 'Entreprise introuvable.'], Response::HTTP_FORBIDDEN);
+        }
+
+        $name = preg_replace('/\\s+/', ' ', $rawName);
+        $normalizedName = mb_strtolower($name);
+        $existingClient = $clientRepository->findOneByNameForCompany($company, $normalizedName);
+        if ($existingClient) {
+            return new JsonResponse([
+                'error' => 'Client deja existant.',
+                'id' => $existingClient->getId(),
+                'name' => $existingClient->getName(),
+            ], Response::HTTP_CONFLICT);
+        }
+
+        $client = new Client();
+        $client->setCompany($company);
+        $client->setName($name);
+        $client->setCurrency($currency);
+
+        $em->persist($client);
+        $em->flush();
 
         return $this->json([
             'id' => $client->getId(),

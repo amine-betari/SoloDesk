@@ -17,6 +17,18 @@ class ClientRepository extends ServiceEntityRepository
         parent::__construct($registry, Client::class);
     }
 
+    public function findOneByNameForCompany(Company $company, string $normalizedName): ?Client
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.company = :company')
+            ->andWhere('LOWER(c.name) = :name')
+            ->setParameter('company', $company)
+            ->setParameter('name', $normalizedName)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function countClientsGroupedByYear(Company $company, ?\DateTime $startDate = null, ?\DateTime $endDate = null): array
     {
         $conn = $this->getEntityManager()->getConnection();
