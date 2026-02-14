@@ -27,7 +27,7 @@ class SalesDocumentRepository extends ServiceEntityRepository
             ->setParameter('company', $company);
 
         if ($startDate) {
-            $qb->andWhere('s.createdAt >= :start')
+            $qb->andWhere('COALESCE(s.invoiceDate, s.createdAt) >= :start')
                ->setParameter('start', $startDate);
         }
 
