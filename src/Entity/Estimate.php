@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use App\Entity\Company;
 
 
@@ -324,5 +326,15 @@ class Estimate
         }
 
         return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateDates(ExecutionContextInterface $context): void
+    {
+        if ($this->startDate !== null && $this->endDate !== null && $this->endDate < $this->startDate) {
+            $context->buildViolation('La date de fin ne peut pas être antérieure à la date de début.')
+                ->atPath('endDate')
+                ->addViolation();
+        }
     }
 }

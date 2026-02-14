@@ -6,13 +6,13 @@
     <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
 
         {# Header avec titre et actions #}
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
             <h1 class="text-4xl font-bold text-gray-900">Pré‑Estimation : {{ estimate.estimateNumber }}</h1>
-            <div class="flex space-x-3">
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <a href="{{ path('app_estimate_index') }}"
-                   class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900">← Retour</a>
+                   class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 btn-mobile">← Retour</a>
                 <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}"
-                   class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white">Modifier</a>
+                   class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white btn-mobile">Modifier</a>
                 {{ include('estimate/_delete_form.html.twig') }}
             </div>
         </div>
@@ -59,13 +59,13 @@
         {# Conversion en projet #}
         {% if not estimate.project %}
             <a href="{{ path('app_estimate_convert_to_project', { id: estimate.id }) }}"
-               class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4">
+               class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4 btn-mobile">
                 Convertir en projet
             </a>
         {% else %}
             <p class="text-green-600 mt-4">
                 Déjà converti en projet :
-                <a href="{{ path('app_project_show', { id: estimate.project.id }) }}" class="underline text-blue-600">voir le projet</a>
+                <a href="{{ path('app_project_show', { id: estimate.project.id }) }}" class="underline text-blue-600 btn-mobile inline-block">voir le projet</a>
             </p>
         {% endif %}
 
@@ -73,7 +73,7 @@
         {% if estimate.id %}
             <div class="mt-6 pb-4">
                 <a href="{{ path('app_sales_document_new', {'estimateId': estimate.id}) }}"
-                   class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                   class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 btn-mobile">
                     Générer un devis commercial
                 </a>
             </div>
@@ -81,9 +81,9 @@
         {% endif %}
 
         {# Footer actions #}
-        <div class="flex flex-wrap gap-4 mt-6">
-            <a href="{{ path('app_estimate_index') }}" class="px-4 py-2 bg-gray-200 text-gray-900 rounded hover:bg-gray-300 transition">← Retour à la liste</a>
-            <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Modifier</a>
+        <div class="flex flex-col sm:flex-row gap-3 mt-6">
+            <a href="{{ path('app_estimate_index') }}" class="px-4 py-2 bg-gray-200 text-gray-900 rounded hover:bg-gray-300 transition btn-mobile">← Retour à la liste</a>
+            <a href="{{ path('app_estimate_edit', {'id': estimate.id}) }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition btn-mobile">Modifier</a>
             {{ include('estimate/_delete_form.html.twig') }}
         </div>
 

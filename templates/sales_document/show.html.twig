@@ -5,16 +5,16 @@
 {% block body %}
     <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
         {# Header #}
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
             <h1 class="text-3xl font-bold">Document : {{ sales_document.reference }}</h1>
-            <div class="flex flex-wrap gap-2">
+            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
                 <a href="{{ path('app_sales_document_index') }}"
-                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300">← Retour</a>
+                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 btn-mobile">← Retour</a>
                 <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}"
-                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Modifier</a>
+                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 btn-mobile">Modifier</a>
                 {{ include('sales_document/_delete_form.html.twig') }}
                 <a href="{{ path('app_sales_document_generate_word', { id: sales_document.id }) }}"
-                   class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700">📝 Word</a>
+                   class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 btn-mobile">📝 Word</a>
                 {# <a href="{{ path('app_sales_document_generate_pdf', { id: sales_document.id }) }}"
                    class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">📄 PDF</a>
                 <a href="{{ path('app_sales_document_generate_excel', { id: sales_document.id }) }}"
@@ -23,7 +23,7 @@
                 {% if sales_document.isInvoice() or sales_document.isProject() %}
                     {% if sales_document.payments|length > 0 %}
                         <a href="#paiements"
-                           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 flex items-center gap-2">
+                           class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 flex items-center gap-2 w-full sm:w-auto justify-center sm:justify-start">
                             Paiements
                             <span class="ml-2 inline-block bg-white/10 text-white text-xs px-2 py-0.5 rounded">
                                  {{ sales_document.payments|length }}
@@ -113,7 +113,7 @@
                     {% if not hasInvoice %}
                         <div class="mt-4">
                         <a href="{{ path('app_sales_document_from_estimate', {'salesDocument': sales_document.id}) }}"
-                           class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                           class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition btn-mobile">
                             📄 Créer une facture depuis ce devis
                         </a>
                     </div>

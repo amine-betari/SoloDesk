@@ -55,7 +55,20 @@
             <div>
                 {{ form_label(form.endDate, 'Date de fin', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                 {{ form_widget(form.endDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
-                {{ form_errors(form.endDate) }}
+                {% if form.endDate.vars.errors|length > 0 %}
+                    <div class="mt-2 text-sm font-semibold text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2">
+                        <div class="flex items-start gap-2">
+                            <span class="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-100 text-red-700 text-xs font-bold">!</span>
+                            <div>
+                                <div class="uppercase tracking-wide text-[11px] text-red-700">Erreur</div>
+                                {{ form_errors(form.endDate) }}
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    {{ form_errors(form.endDate) }}
+                {% endif %}
+                <p class="text-xs text-gray-500 mt-1">La date de fin doit être postérieure ou égale à la date de début.</p>
             </div>
         </div>
 
@@ -66,7 +79,7 @@
         </div>
 
         <div data-controller="toggle-vat">
-            <div class="flex items-center space-x-2 mb-4">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
                 {{ form_widget(form.noVat, {
                     'attr': {
                         'data-toggle-vat-target': 'checkbox',
@@ -94,16 +107,16 @@
         {# Documents liés #}
 
         <div class="flex justify-end items-center">
-            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Enregistrer</button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded btn-mobile">Enregistrer</button>
         </div>
     </fieldset>
 
     {{ form_end(form) }}
 
     {% if button_label is defined %}
-        <div class="flex space-x-4 mt-4">
+        <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <a href="{{ path('app_estimate_index') }}"
-               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900">← Retour à la liste</a>
+               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 btn-mobile">← Retour à la liste</a>
 
             {{ include('estimate/_delete_form.html.twig') }}
         </div>

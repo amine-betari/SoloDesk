@@ -7,7 +7,7 @@
 
     <div data-documents-target="container" class="space-y-2 mb-2">
         {% for documentField in form.documents %}
-            <div class="flex items-center space-x-2">
+            <div class="flex flex-wrap items-center gap-2">
                 {{ form_widget(documentField) }}
             </div>
         {% endfor %}
@@ -29,7 +29,7 @@
         <label class="block font-medium mb-2">Documents existants</label>
         <ul>
             {% for document in relatedEntity.documents %}
-                <li class="flex items-center space-x-2 mb-1">
+                <li class="flex flex-wrap items-center gap-2 mb-1">
                     <a href="{{ asset('uploads/documents/' ~ document.filename) }}" target="_blank" class="underline text-blue-600">{{ document.filename }}</a>
                     <label class="ml-4 text-sm text-red-600 cursor-pointer">
                         <input type="checkbox" name="documents_to_remove[]" value="{{ document.id }}">

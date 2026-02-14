@@ -1,10 +1,10 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
 
     {% set cardConfig = [
-        {title: 'Clients', value: clientCount, color: 'blue', link: path('app_client_index')},
-        {title: 'Projets', value: projectCount, color: 'green', link: path('app_project_index')},
-        {title: 'Devis', value: estimateCount, color: 'yellow', link: path('app_estimate_index')},
-        {title: 'Factures', value: invoiceCount, color: 'red', link1: path('app_sales_document_index'), link2: path('app_invoice_new')}
+        {title: 'Clients', value: clientCount, color: 'blue', link: path('app_client_index'), createLink: path('app_client_new'), createLabel: 'Nouveau client'},
+        {title: 'Projets', value: projectCount, color: 'green', link: path('app_project_index'), createLink: path('app_project_new'), createLabel: 'Nouveau projet'},
+        {title: 'Devis', value: estimateCount, color: 'yellow', link: path('app_estimate_index'), createLink: path('app_estimate_new'), createLabel: 'Nouveau devis'},
+        {title: 'Factures', value: invoiceCount, color: 'red', link1: path('app_sales_document_index'), link2: path('app_invoice_new'), createLabel: 'Nouvelle facture'}
     ] %}
 
     {% set colors = {
@@ -37,14 +37,23 @@
             <!-- Actions -->
             <div class="mt-4 text-sm">
                 {% if card.link is defined %}
-                    <a href="{{ card.link }}" class="{{ links[card.color] }} hover:underline">
-                        Voir {{ card.title|lower }} →
-                    </a>
+                    {% if card.createLink is defined %}
+                        <a href="{{ card.createLink }}" class="{{ links[card.color] }} hover:underline block btn-mobile">
+                            + {{ card.createLabel }} →
+                        </a>
+                        <a href="{{ card.link }}" class="{{ links[card.color] }} hover:underline block mt-1 btn-mobile">
+                            Voir {{ card.title|lower }} →
+                        </a>
+                    {% else %}
+                        <a href="{{ card.link }}" class="{{ links[card.color] }} hover:underline btn-mobile inline-block">
+                            Voir {{ card.title|lower }} →
+                        </a>
+                    {% endif %}
                 {% elseif card.link1 is defined and card.link2 is defined %}
-                    <a href="{{ card.link2 }}" class="{{ links[card.color] }} hover:underline block">
-                        Créer {{ card.title|lower }} →
+                    <a href="{{ card.link2 }}" class="{{ links[card.color] }} hover:underline block btn-mobile">
+                        + {{ card.createLabel }} →
                     </a>
-                    <a href="{{ card.link1 }}" class="{{ links[card.color] }} hover:underline block mt-1">
+                    <a href="{{ card.link1 }}" class="{{ links[card.color] }} hover:underline block mt-1 btn-mobile">
                         Voir toutes les {{ card.title|lower }} →
                     </a>
                 {% endif %}

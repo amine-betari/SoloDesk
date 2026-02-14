@@ -51,15 +51,15 @@
 
     <!-- Bouton -->
     <div class="flex justify-end mt-6">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">Enregistrer</button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors btn-mobile">Enregistrer</button>
     </div>
 
     {{ form_end(form) }}
 
     {% if button_label is defined  %}
-        <div class="flex space-x-4 mt-4">
+        <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <a href="{{ path('app_payment_index') }}"
-               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900">← Retour à la liste</a>
+               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 btn-mobile">← Retour à la liste</a>
 
             {{ include('payment/_delete_form.html.twig') }}
         </div>

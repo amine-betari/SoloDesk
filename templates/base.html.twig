@@ -10,6 +10,10 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Playfair:ital,opsz,wght@1,5..1200,600&display=swap" rel="stylesheet">
 
     {% block stylesheets %}
+        <style>
+            .btn-mobile { width: 100%; text-align: center; }
+            @media (min-width: 640px) { .btn-mobile { width: auto; } }
+        </style>
     {% endblock %}
 
     {% block javascripts %}
@@ -28,7 +32,7 @@
         {% if app.user %}
             <div class="bg-[#1F2732] border-b border-[#2A3747] px-6 py-4">
                 <form action="{{ path('app_search') }}" method="get" class="max-w-3xl">
-                    <div class="flex gap-3">
+                    <div class="flex flex-col sm:flex-row gap-3">
                         <input
                             type="text"
                             name="q"
@@ -36,7 +40,7 @@
                             placeholder="Rechercher un client, projet, devis..."
                             class="flex-1 px-3 py-2 rounded-md bg-[#16202A] border border-[#2A3747] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
-                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold">
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold w-full sm:w-auto">
                             Rechercher
                         </button>
                     </div>
@@ -52,21 +56,21 @@
     <footer class="max-w-screen-xl mx-auto">
         <p class="text-white opacity-60">Fait avec attention, pour votre support</p>
         <div class="md:flex md:justify-between items-center">
-            <div class="flex gap-4">
+            <div class="flex flex-wrap gap-4">
                 {% if app.user %}
-                    <a href="{{ path('app_profile') }}" class="hover:text-[#6cc7cd]">Profile</a>
+                    <a href="{{ path('app_profile') }}" class="hover:text-[#6cc7cd] btn-mobile inline-block">Profile</a>
                     <div>|</div>
                     <form method="post" action="{{ path('app_logout') }}" class="inline">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                        <button type="submit" class="hover:text-[#6cc7cd]">Déconnexion</button>
+                        <button type="submit" class="hover:text-[#6cc7cd] btn-mobile">Déconnexion</button>
                     </form>
                     <div>|</div>
                 {% endif %}
-                <a href="{{ path('app_help_estimation') }}" class="hover:text-[#6cc7cd]">FAQ</a>
+                <a href="{{ path('app_help_estimation') }}" class="hover:text-[#6cc7cd] btn-mobile inline-block">FAQ</a>
                 <div>|</div>
-                <a href="#" class="hover:text-[#6cc7cd]">Support</a>
+                <a href="#" class="hover:text-[#6cc7cd] btn-mobile inline-block">Support</a>
             </div>
-            <div class="flex gap-4 mt-4 md:mt-0">
+            <div class="flex flex-wrap gap-4 mt-4 md:mt-0">
                 <a href="#" class="w-7 h-7 fill-white hover:fill-[#6cc7cd]">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Pro 6.1.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2022 Fonticons, Inc. --><path d="M504 256C504 119 393 8 256 8S8 119 8 256c0 123.78 90.69 226.38 209.25 245V327.69h-63V256h63v-54.64c0-62.15 37-96.48 93.67-96.48 27.14 0 55.52 4.84 55.52 4.84v61h-31.28c-30.8 0-40.41 19.12-40.41 38.73V256h68.78l-11 71.69h-57.78V501C413.31 482.38 504 379.78 504 256z"/></svg>
                 </a>

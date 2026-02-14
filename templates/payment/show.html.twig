@@ -5,13 +5,13 @@
 {% block body %}
     <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
 
-        <div class="flex justify-between items-center mb-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
             <h1 class="text-4xl font-extrabold">Paiement n°{{ payment.id }}</h1>
-            <div class="flex space-x-3">
+            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <a href="{{ path('app_payment_index') }}"
-                   class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 text-sm transition-colors">← Retour</a>
+                   class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 text-sm transition-colors btn-mobile">← Retour</a>
                 <a href="{{ path('app_payment_edit', {'id': payment.id}) }}"
-                   class="px-5 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm transition-colors">Modifier</a>
+                   class="px-5 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white text-sm transition-colors btn-mobile">Modifier</a>
                 {{ include('payment/_delete_form.html.twig') }}
             </div>
         </div>
