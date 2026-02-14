@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Harmonise form fields inside white cards */
+main .bg-white form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+main .bg-white form select,
+main .bg-white form textarea {
+    background-color: #ffffff;
+    color: #111827;
+    border: 1.5px solid #9ca3af;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 0 rgba(17, 24, 39, 0.03);
+}
+
+main .bg-white form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
+main .bg-white form select:focus,
+main .bg-white form textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+main .bg-white form input:disabled,
+main .bg-white form select:disabled,
+main .bg-white form textarea:disabled {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
 
 
 /* Zone d’édition CKEditor (et aussi le rendu, car CK ajoute .ck-content) */

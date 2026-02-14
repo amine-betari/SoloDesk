@@ -17,20 +17,26 @@ class SalesDocumentRepository extends ServiceEntityRepository
         parent::__construct($registry, SalesDocument::class);
     }
 
-    public function countEstimatesByStatus(Company $company): array
+    public function countEstimatesByStatus(Company $company, ?\DateTimeInterface $startDate = null): array
     {
-        return $this->createQueryBuilder('s')
+        $qb = $this->createQueryBuilder('s')
             ->select('s.status AS status, COUNT(s.id) AS total')
             ->where('s.type = :type')
             ->andWhere('s.company = :company')
             ->setParameter('type', SalesDocument::TYPE_ESTIMATE)
-            ->setParameter('company', $company)
-            ->groupBy('s.status')
+            ->setParameter('company', $company);
+
+        if ($startDate) {
+            $qb->andWhere('s.createdAt >= :start')
+               ->setParameter('start', $startDate);
+        }
+
+        return $qb->groupBy('s.status')
             ->getQuery()
             ->getArrayResult();
     }
 
-    public function countInvoicesByYearAndExternal(Company $company): array
+    public function countInvoicesByYearAndExternal(Company $company, ?\DateTimeInterface $startDate = null): array
     {
         $conn = $this->getEntityManager()->getConnection();
         $sql = <<<'SQL'
@@ -42,6 +48,7 @@ class SalesDocumentRepository extends ServiceEntityRepository
             WHERE type = :type
               AND company_id = :companyId
               AND invoice_date IS NOT NULL
+              AND (:startDate IS NULL OR invoice_date >= :startDate)
             GROUP BY year, external_flag
             ORDER BY year ASC
             SQL;
@@ -49,6 +56,7 @@ class SalesDocumentRepository extends ServiceEntityRepository
         return $conn->fetchAllAssociative($sql, [
             'type' => SalesDocument::TYPE_INVOICE,
             'companyId' => $company->getId(),
+            'startDate' => $startDate ? $startDate->format('Y-m-d H:i:s') : null,
         ]);
     }
 

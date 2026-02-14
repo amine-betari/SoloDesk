@@ -10,10 +10,10 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use \NumberFormatter;
+use App\Service\CompanySettings;
 
 class HomeController extends AbstractController
 {
@@ -24,26 +24,59 @@ class HomeController extends AbstractController
         EstimateRepository $estimateRepository,
         PaymentRepository $paymentRepository,
         SalesDocumentRepository $salesDocumentRepository,
-        ChartBuilderInterface $chartBuilder
+        ChartBuilderInterface $chartBuilder,
+        CompanySettings $settings
     ): Response {
         $company = $this->getUser()?->getCompany();
         if (!$company) {
             throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
         }
 
-        $totalClients   = $clientRepository->count(['company' => $company]);
-        $totalProjects  = $projectRepository->count(['company' => $company]);
-        $totalEstimates = $estimateRepository->count(['company' => $company]);
+        $activityStartDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $activityEndDate = new \DateTimeImmutable('now');
 
-        $totalInvoices  = $salesDocumentRepository->count(['type' => 'invoice', 'company' => $company]);
+        $totalClients = (int) $clientRepository->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->andWhere('c.company = :company')
+            ->andWhere('c.createdAt >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('start', $activityStartDate)
+            ->getQuery()
+            ->getSingleScalarResult();
 
+        $totalProjects = (int) $projectRepository->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->andWhere('p.company = :company')
+            ->andWhere('p.createdAt >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('start', $activityStartDate)
+            ->getQuery()
+            ->getSingleScalarResult();
 
+        $totalEstimates = (int) $estimateRepository->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->andWhere('e.company = :company')
+            ->andWhere('e.createdAt >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('start', $activityStartDate)
+            ->getQuery()
+            ->getSingleScalarResult();
 
+        $totalInvoices = (int) $salesDocumentRepository->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->andWhere('s.company = :company')
+            ->andWhere('s.type = :type')
+            ->andWhere('s.createdAt >= :start')
+            ->setParameter('company', $company)
+            ->setParameter('type', 'invoice')
+            ->setParameter('start', $activityStartDate)
+            ->getQuery()
+            ->getSingleScalarResult();
 
         $data = $clientRepository->countClientsGroupedByYear(
             $company,
-            new \DateTime('2017-01-01'),
-            new \DateTime('2026-12-31')
+            \DateTime::createFromImmutable($activityStartDate),
+            \DateTime::createFromImmutable($activityEndDate)
         );
 
         $clientData = $chartBuilder->createChart(Chart::TYPE_BAR);
@@ -72,8 +105,8 @@ class HomeController extends AbstractController
 
         $projectData = $projectRepository->countProjectsActiveByYear(
             $company,
-            new \DateTime('2017-01-01'),
-            new \DateTime('2025-12-31')
+            \DateTime::createFromImmutable($activityStartDate),
+            \DateTime::createFromImmutable($activityEndDate)
         );
         $projectChart = $chartBuilder->createChart(Chart::TYPE_BAR);
         $projectChart->setData([
@@ -106,6 +139,11 @@ class HomeController extends AbstractController
         $revenuesFromPayments = [];
 
         foreach ($payments as $payment) {
+            $paymentDate = $payment->getDate();
+            if ($paymentDate < $activityStartDate) {
+                continue;
+            }
+
             $salesDocument = $payment->getSalesDocument();
             $project       = $payment->getSalesDocument()->getProject();
 
@@ -144,7 +182,7 @@ class HomeController extends AbstractController
 
         // EstimateStats Graph
         $estimateStats = [];
-        $estimateCounts = $salesDocumentRepository->countEstimatesByStatus($company);
+        $estimateCounts = $salesDocumentRepository->countEstimatesByStatus($company, $activityStartDate);
         foreach ($estimateCounts as $row) {
             $status = (string) $row['status'];
             $total = (int) $row['total'];
@@ -171,7 +209,7 @@ class HomeController extends AbstractController
         $invoicesByYear = [];
         $externalInvoicesByYear = [];
         $totalExternalInvoices = 0;
-        $invoiceCounts = $salesDocumentRepository->countInvoicesByYearAndExternal($company);
+        $invoiceCounts = $salesDocumentRepository->countInvoicesByYearAndExternal($company, $activityStartDate);
         foreach ($invoiceCounts as $row) {
             $year = (string) $row['year'];
             $total = (int) $row['total'];
@@ -237,7 +275,7 @@ class HomeController extends AbstractController
         PaymentRepository $paymentRepository,
         ChartBuilderInterface $chartBuilder,
         Request $request,
-        #[Autowire('%env(float:TAX_IMPOT_RATE)%')] float $taxImpotRate
+        CompanySettings $settings
     ): Response {
         $company = $this->getUser()?->getCompany();
         if (!$company) {
@@ -245,7 +283,8 @@ class HomeController extends AbstractController
         }
 
         $anneeSelectionnee = $request->query->get('annee', date('Y')); // année par défaut
-        $anneeDebut = 2017;
+        $startDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $anneeDebut = (int) $startDate->format('Y');
         $anneesDisponibles = range($anneeDebut, date('Y'));
 
         $payments = $paymentRepository->findPaymentsForReports($company); // ✅ paiement réel
@@ -272,6 +311,8 @@ class HomeController extends AbstractController
 
             $paymentDate = $payment->getDate();
             if (!$paymentDate) continue;
+
+            if ($paymentDate < $startDate) continue;
 
             $year = $paymentDate->format('Y');
             if ($year != $anneeSelectionnee) continue;
@@ -323,8 +364,12 @@ class HomeController extends AbstractController
             $paymentDate = $payment->getDate();
             if (!$paymentDate) continue;
 
+            if ($paymentDate < $startDate) continue;
+
             $year = $paymentDate->format('Y');
             if ($year != $anneeSelectionnee) continue;
+
+            if ($paymentDate < $startDate) continue;
 
             $salesDocument = $payment->getSalesDocument();
             $project = $salesDocument?->getProject();
@@ -341,6 +386,7 @@ class HomeController extends AbstractController
         $fmt = new NumberFormatter('fr_FR', NumberFormatter::DECIMAL);
         $fmt->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
 
+        $taxImpotRate = $settings->getFloat($company, CompanySettings::KEY_TAX_IMPOT_RATE, 0.01);
         $taxImpotRatePercent = $taxImpotRate * 100;
         $taxImpotRateLabel = rtrim(rtrim($fmt->format($taxImpotRatePercent), '0'), ',');
 
@@ -350,6 +396,8 @@ class HomeController extends AbstractController
         foreach ($payments as $payment) {
             $paymentDate = $payment->getDate();
             if (!$paymentDate) continue;
+
+            if ($paymentDate < $startDate) continue;
 
             $salesDocument = $payment->getSalesDocument();
             $project = $salesDocument?->getProject();
@@ -412,6 +460,8 @@ class HomeController extends AbstractController
         foreach ($payments as $payment) {
             $paymentDate = $payment->getDate();
             if (!$paymentDate) continue;
+
+            if ($paymentDate < $startDate) continue;
 
             $year = $paymentDate->format('Y');
             if ($year != $anneePrecedente) continue;

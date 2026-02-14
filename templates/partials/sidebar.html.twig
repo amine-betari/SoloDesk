@@ -78,6 +78,15 @@
                 </svg>
                 Modèles
             </a>
+
+            <a href="{{ path('app_settings') }}"
+               class="group flex items-center ml-6 px-4 py-2 rounded-md transition-colors
+               {% if app.request.attributes.get('_route') starts with 'app_settings' %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
+                <svg class="w-4 h-4 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+                </svg>
+                Paramètres
+            </a>
         </div>
 
         {% if app.user %}
