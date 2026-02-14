@@ -47,6 +47,10 @@ class ProjectForm extends AbstractType
                 'choices' => ProjectTypes::TYPES,
                 'placeholder' => 'Sélectionner un type',
             ])
+            ->add('typeDescription', TextType::class, [
+                'label' => 'Précisez le type',
+                'required' => false,
+            ])
             ->add('startDate', DateType::class, [
                 'required' => false,
                 'widget' => 'single_text',

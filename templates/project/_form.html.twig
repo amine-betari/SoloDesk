@@ -84,7 +84,7 @@
             {{ form_errors(form.description) }}
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-4" data-controller="project-type" data-project-type-other-value-value="other">
             <div>
                 {{ form_label(form.status, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
@@ -92,8 +92,20 @@
             </div>
             <div>
                 {{ form_label(form.type, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-                {{ form_widget(form.type, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                {{ form_widget(form.type, {
+                    'attr': {
+                        'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900',
+                        'data-project-type-target': 'typeSelect',
+                        'data-action': 'change->project-type#toggle'
+                    }
+                }) }}
                 {{ form_errors(form.type) }}
+            </div>
+            <div class="col-span-2 hidden" data-project-type-target="details">
+                {{ form_label(form.typeDescription, 'Précisez le type *', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.typeDescription, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                {{ form_errors(form.typeDescription) }}
+                <p class="text-xs text-gray-500 mt-1">Obligatoire si le type est “Autre”.</p>
             </div>
         </div>
 

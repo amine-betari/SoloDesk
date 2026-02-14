@@ -35,6 +35,9 @@ class Project
     private ?string $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    private ?string $typeDescription = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
@@ -168,6 +171,32 @@ class Project
         $this->type = $type;
 
         return $this;
+    }
+
+    public function getTypeDescription(): ?string
+    {
+        return $this->typeDescription;
+    }
+
+    public function setTypeDescription(?string $typeDescription): static
+    {
+        $this->typeDescription = $typeDescription;
+
+        return $this;
+    }
+
+    #[Assert\Callback]
+    public function validateTypeDescription(ExecutionContextInterface $context): void
+    {
+        if ($this->type !== \App\Constants\ProjectTypes::AUTRE) {
+            return;
+        }
+
+        if ($this->typeDescription === null || trim($this->typeDescription) === '') {
+            $context->buildViolation('Veuillez préciser le type de projet.')
+                ->atPath('typeDescription')
+                ->addViolation();
+        }
     }
 
     public function getClient(): ?Client
