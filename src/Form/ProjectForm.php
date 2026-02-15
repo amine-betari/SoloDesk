@@ -36,8 +36,6 @@ class ProjectForm extends AbstractType
                 'label' => 'Référence',
                 'disabled' => $options['data'] && $options['data']->getId() === null, // désactivé en création
             ])
-            ->add('startDate')
-            ->add('endDate')
             ->add('status', ChoiceType::class, [
                     'choices' => ProjectStatuses::CHOICES,
                     'label' => 'Statut du projet',

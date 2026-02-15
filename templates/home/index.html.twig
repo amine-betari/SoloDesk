@@ -4,6 +4,35 @@
 
 {% block body %}
 
+    <div class="bg-[#1F2732] border border-[#2A3747] rounded-xl p-6 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-white">Démarrage rapide</h2>
+                <p class="text-sm text-gray-400 mt-1">Complète ces 3 étapes pour générer ta première facture.</p>
+            </div>
+            <a href="{{ path('app_settings') }}" class="px-4 py-2 bg-blue-600 text-white rounded font-semibold text-sm hover:bg-blue-700 btn-mobile">
+                Paramètres
+            </a>
+        </div>
+        <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <a href="{{ path('app_company_edit') }}" class="group bg-[#16202A] border border-[#2A3747] rounded-lg p-4 hover:border-blue-500 transition">
+                <div class="text-xs uppercase text-gray-500">Étape 1</div>
+                <div class="text-white font-semibold mt-1">Configurer l’entreprise</div>
+                <div class="text-sm text-gray-400 mt-2">Nom, logo, infos légales</div>
+            </a>
+            <a href="{{ path('app_client_new') }}" class="group bg-[#16202A] border border-[#2A3747] rounded-lg p-4 hover:border-blue-500 transition">
+                <div class="text-xs uppercase text-gray-500">Étape 2</div>
+                <div class="text-white font-semibold mt-1">Créer un client</div>
+                <div class="text-sm text-gray-400 mt-2">Contact + devise</div>
+            </a>
+            <a href="{{ path('app_invoice_new') }}" class="group bg-[#16202A] border border-[#2A3747] rounded-lg p-4 hover:border-blue-500 transition">
+                <div class="text-xs uppercase text-gray-500">Étape 3</div>
+                <div class="text-white font-semibold mt-1">Créer une facture</div>
+                <div class="text-sm text-gray-400 mt-2">Générer et envoyer</div>
+            </a>
+        </div>
+    </div>
+
     <h2 class="text-2xl font-semibold text-gray-100 mb-8">
         Bienvenue sur <span class="font-bold">SoloDesk</span> 👋
     </h2>

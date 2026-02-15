@@ -15,12 +15,9 @@ export default class extends Controller {
         const hasProject  = this.data.get('has-project-select') === 'true';
         const hasEstimate = this.data.get('has-estimate-select') === 'true';
 
-        console.log(hasEstimate);
-        console.log(hasProject);
         if (hasProject || hasEstimate) {
             this.clientFieldTarget.classList.add("hidden");
         } else {
-            console.log('dd');
             this.clientFieldTarget.classList.remove("hidden");
         }
     }

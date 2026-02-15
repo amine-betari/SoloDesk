@@ -29,7 +29,8 @@
                         <tr class="hover:bg-gray-50 transition-colors cursor-pointer">
                             <td class="px-6 py-4 text-sm text-gray-700">{{ payment.id }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ payment.date ? payment.date|date('d/m/Y') : '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ payment.amount|format_currency(payment.salesDocument.client.currency, app.request.locale ?: 'fr_FR') }}</td>
+                            {% set paymentCurrency = payment.salesDocument ? (payment.salesDocument.getResolvedClient() ? payment.salesDocument.getResolvedClient().currency : (payment.salesDocument.project ? payment.salesDocument.project.currency : 'EUR')) : 'EUR' %}
+                            <td class="px-6 py-4 text-sm text-gray-700">{{ payment.amount|format_currency(paymentCurrency, app.request.locale ?: 'fr_FR') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ payment.method }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ payment.label ?: '—' }}</td>
                             <td class="px-6 py-4 text-sm">
