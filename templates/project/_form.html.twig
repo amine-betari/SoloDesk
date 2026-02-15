@@ -35,7 +35,7 @@
                 }
             }) }}
             <div class="flex flex-wrap gap-3 text-sm">
-                <button type="button" class="text-blue-600 hover:text-blue-700" data-action="client-modal#openModal">+ Ajouter un nouveau client</button>
+                <button type="button" class="text-blue-600 hover:text-blue-700" data-action="click->client-modal#openModal touchstart->client-modal#openModal">+ Ajouter un nouveau client</button>
                 <a href="{{ path('app_client_new') }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-700">Ouvrir dans un nouvel onglet</a>
             </div>
 
@@ -43,7 +43,7 @@
                 <div class="w-full max-w-md rounded-lg bg-white p-6 text-gray-900 shadow-xl">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold">Créer un client</h2>
-                        <button type="button" class="text-gray-500 hover:text-gray-700" data-action="client-modal#closeModal">X</button>
+                        <button type="button" class="text-gray-500 hover:text-gray-700" data-action="click->client-modal#closeModal touchstart->client-modal#closeModal">X</button>
                     </div>
                     <div class="space-y-4">
                         <div class="space-y-1">
@@ -61,8 +61,8 @@
                         </div>
                         <div data-client-modal-target="error" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2"></div>
                         <div class="flex justify-end gap-2">
-                            <button type="button" class="px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800" data-action="client-modal#closeModal">Annuler</button>
-                            <button type="button" class="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white" data-action="client-modal#createClient">Créer</button>
+                            <button type="button" class="px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800" data-action="click->client-modal#closeModal touchstart->client-modal#closeModal">Annuler</button>
+                            <button type="button" class="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white" data-action="click->client-modal#createClient touchstart->client-modal#createClient">Créer</button>
                         </div>
                     </div>
                 </div>

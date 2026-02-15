@@ -4,18 +4,28 @@ export default class extends Controller {
     static targets = ["modal", "nameInput", "currencySelect", "clientSelect", "error"];
     static values = { endpoint: String };
 
-    openModal() {
+    openModal(event) {
+        if (event?.preventDefault) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         this.clearError();
         this.modalTarget.classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
         this.nameInputTarget.focus();
     }
 
-    closeModal() {
+    closeModal(event) {
+        if (event?.preventDefault) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
         this.modalTarget.classList.add("hidden");
         this.nameInputTarget.value = "";
         if (this.hasCurrencySelectTarget) {
             this.currencySelectTarget.selectedIndex = 0;
         }
+        document.body.classList.remove("overflow-hidden");
         this.clearError();
     }
 
