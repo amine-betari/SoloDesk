@@ -105,6 +105,10 @@ final class PaymentController extends AbstractController
     #[Route('/{id}', name: 'app_payment_show', methods: ['GET'])]
     public function show(Payment $payment): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $payment->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         return $this->render('payment/show.html.twig', [
             'payment' => $payment,
         ]);
@@ -113,6 +117,10 @@ final class PaymentController extends AbstractController
     #[Route('/{id}/edit', name: 'app_payment_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Payment $payment, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $payment->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $form = $this->createForm(PaymentForm::class, $payment);
         $form->handleRequest($request);
 
@@ -131,6 +139,10 @@ final class PaymentController extends AbstractController
     #[Route('/{id}', name: 'app_payment_delete', methods: ['POST'])]
     public function delete(Request $request, Payment $payment, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $payment->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         if ($this->isCsrfTokenValid('delete'.$payment->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($payment);
             $entityManager->flush();

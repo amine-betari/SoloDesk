@@ -132,6 +132,10 @@ final class ProjectController extends AbstractController
     #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
     public function show(Project $project): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $project->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
 
         return $this->render('project/show.html.twig', [
             'project' => $project,
@@ -147,6 +151,10 @@ final class ProjectController extends AbstractController
         DocumentManager $documentManager
     ): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $project->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $form = $this->createForm(ProjectForm::class, $project);
 
         // 3. **Important** : Préremplir la checkbox 'noVat' selon la valeur dans $project
@@ -201,6 +209,10 @@ final class ProjectController extends AbstractController
     #[Route('/{id}', name: 'app_project_delete', methods: ['POST'])]
     public function delete(Request $request, Project $project, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $project->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         if ($this->isCsrfTokenValid('delete'.$project->getId(), $request->getPayload()->getString('_token'))) {
 
             if ($project->getEstimate()) {

@@ -26,8 +26,14 @@ final class ClientController extends AbstractController
     {
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
 
         $qb = $clientRepository->createQueryBuilder('c')
+            ->andWhere('c.company = :company')
+            ->setParameter('company', $company)
             ->orderBy('c.name', 'ASC');
 
         $pagination = $paginator->paginate($qb, $page, $limit);
@@ -65,6 +71,10 @@ final class ClientController extends AbstractController
     #[Route('/{id}', name: 'app_client_show', requirements: ['id' => '\\d+'], methods: ['GET'])]
     public function show(Client $client, ProjectRepository $projectRepo): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $client->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $projectsCount = $projectRepo->count(['client' => $client]);
 
         return $this->render('client/show.html.twig', [
@@ -76,6 +86,10 @@ final class ClientController extends AbstractController
     #[Route('/{id}/edit', name: 'app_client_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
     public function edit(Request $request, Client $client, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $client->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $form = $this->createForm(ClientForm::class, $client);
         $form->handleRequest($request);
 
@@ -94,6 +108,10 @@ final class ClientController extends AbstractController
     #[Route('/{id}', name: 'app_client_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
     public function delete(Request $request, Client $client, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $client->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         if ($this->isCsrfTokenValid('delete'.$client->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($client);
             $entityManager->flush();

@@ -126,6 +126,10 @@ final class SalesDocumentController extends AbstractController
     #[Route('/{id}', name: 'app_sales_document_show', methods: ['GET'])]
     public function show(SalesDocument $salesDocument): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $salesDocument->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         return $this->render('sales_document/show.html.twig', [
             'sales_document' => $salesDocument,
         ]);
@@ -134,6 +138,10 @@ final class SalesDocumentController extends AbstractController
     #[Route('/{id}/edit', name: 'app_sales_document_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, SalesDocument $salesDocument, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $salesDocument->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);
         $form->handleRequest($request);
 
@@ -161,6 +169,10 @@ final class SalesDocumentController extends AbstractController
     #[Route('/{id}', name: 'app_sales_document_delete', methods: ['POST'])]
     public function delete(Request $request, SalesDocument $salesDocument, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $salesDocument->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         if (!$salesDocument->getPayments()->isEmpty()) {
             $this->addFlash('error', 'Impossible de supprimer : des paiements existent.');
             return $this->redirectToRoute('app_sales_document_show', ['id' => $salesDocument->getId()]);

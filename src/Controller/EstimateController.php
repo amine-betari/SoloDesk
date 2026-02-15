@@ -129,6 +129,10 @@ final class EstimateController extends AbstractController
     #[Route('/{id}', name: 'app_estimate_show', methods: ['GET'])]
     public function show(Estimate $estimate): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $estimate->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         return $this->render('estimate/show.html.twig', [
             'estimate' => $estimate,
         ]);
@@ -143,6 +147,10 @@ final class EstimateController extends AbstractController
         DocumentManager $documentManager
     ): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $estimate->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         $form = $this->createForm(EstimateForm::class, $estimate);
 
         // 1. **Important** : Préremplir la checkbox 'noVat' selon la valeur dans $project
@@ -192,6 +200,10 @@ final class EstimateController extends AbstractController
     #[Route('/{id}', name: 'app_estimate_delete', methods: ['POST'])]
     public function delete(Request $request, Estimate $estimate, EntityManagerInterface $entityManager): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $estimate->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
         if ($this->isCsrfTokenValid('delete'.$estimate->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($estimate);
             $entityManager->flush();
