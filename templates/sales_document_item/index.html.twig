@@ -5,37 +5,39 @@
 {% block body %}
     <h1>SalesDocumentItem index</h1>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Description</th>
-                <th>UnitPrice</th>
-                <th>Quantity</th>
-                <th>LineTotal</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for sales_document_item in sales_document_items %}
-            <tr>
-                <td>{{ sales_document_item.id }}</td>
-                <td>{{ sales_document_item.description }}</td>
-                <td>{{ sales_document_item.unitPrice }}</td>
-                <td>{{ sales_document_item.quantity }}</td>
-                <td>{{ sales_document_item.lineTotal }}</td>
-                <td>
-                    <a href="{{ path('app_sales_document_item_show', {'id': sales_document_item.id}) }}">show</a>
-                    <a href="{{ path('app_sales_document_item_edit', {'id': sales_document_item.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Description</th>
+                    <th>UnitPrice</th>
+                    <th>Quantity</th>
+                    <th>LineTotal</th>
+                    <th>actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for sales_document_item in sales_document_items %}
+                <tr>
+                    <td>{{ sales_document_item.id }}</td>
+                    <td>{{ sales_document_item.description }}</td>
+                    <td>{{ sales_document_item.unitPrice }}</td>
+                    <td>{{ sales_document_item.quantity }}</td>
+                    <td>{{ sales_document_item.lineTotal }}</td>
+                    <td>
+                        <a href="{{ path('app_sales_document_item_show', {'id': sales_document_item.id}) }}">show</a>
+                        <a href="{{ path('app_sales_document_item_edit', {'id': sales_document_item.id}) }}">edit</a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">no records found</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
 
     <a href="{{ path('app_sales_document_item_new') }}">Create new</a>
 {% endblock %}

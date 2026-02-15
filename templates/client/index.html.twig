@@ -13,7 +13,7 @@
             {# {% include 'components/_filter_client_form.html.twig' with {'form': filterForm, 'action': path('app_client_index') } %} #}
 
             {% if pagination.items is not empty %}
-                <div class="overflow-x-auto bg-white rounded-xl shadow-lg border">
+                <div class="overflow-x-auto table-responsive bg-white rounded-xl shadow-lg border">
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>
@@ -31,11 +31,26 @@
                                 <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ client.name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ client.email ?: '–' }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ client.country ?: '–' }}</td>
-                                <td class="px-6 py-4 text-sm flex flex-col sm:flex-row gap-2">
-                                    <a href="{{ path('app_client_show', {'id': client.id}) }}"
-                                       class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs btn-mobile">Voir</a>
-                                    <a href="{{ path('app_client_edit', {'id': client.id}) }}"
-                                       class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition text-xs btn-mobile">Modifier</a>
+                                <td class="px-6 py-4 text-sm">
+                                    <div class="hidden sm:flex flex-col sm:flex-row gap-2">
+                                        <a href="{{ path('app_client_show', {'id': client.id}) }}"
+                                           class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs btn-mobile">Voir</a>
+                                        <a href="{{ path('app_client_edit', {'id': client.id}) }}"
+                                           class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition text-xs btn-mobile">Modifier</a>
+                                    </div>
+                                    <div class="sm:hidden">
+                                        <details class="relative">
+                                            <summary class="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold rounded bg-gray-100 text-gray-700">
+                                                Actions
+                                            </summary>
+                                            <div class="mt-2 flex flex-col gap-2">
+                                                <a href="{{ path('app_client_show', {'id': client.id}) }}"
+                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs">Voir</a>
+                                                <a href="{{ path('app_client_edit', {'id': client.id}) }}"
+                                                   class="px-3 py-2 rounded bg-indigo-600 text-white text-xs">Modifier</a>
+                                            </div>
+                                        </details>
+                                    </div>
                                 </td>
                             </tr>
                         {% else %}

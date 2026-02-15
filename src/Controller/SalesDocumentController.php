@@ -240,7 +240,30 @@ final class SalesDocumentController extends AbstractController
             $template = new TemplateProcessor($templatePath);
             $data = $this->buildTemplateData($salesDocument);
 
+            $logoRelativePath = $data['scalar']['company_logo'] ?? '';
+            $logoAbsolutePath = null;
+            if ($logoRelativePath) {
+                $publicDir = $this->getParameter('kernel.project_dir') . '/public';
+                $candidate = $publicDir . '/' . ltrim($logoRelativePath, '/');
+                if (is_file($candidate)) {
+                    $logoAbsolutePath = $candidate;
+                }
+            }
+
             foreach ($data['scalar'] as $key => $value) {
+                if ($key === 'company_logo') {
+                    if ($logoAbsolutePath) {
+                        $template->setImageValue('company_logo', [
+                            'path' => $logoAbsolutePath,
+                            'width' => 140,
+                            'height' => 60,
+                            'ratio' => true,
+                        ]);
+                    } else {
+                        $template->setValue('company_logo', '');
+                    }
+                    continue;
+                }
                 $template->setValue($key, $value);
             }
 

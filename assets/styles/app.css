@@ -28,6 +28,35 @@ main .bg-white form textarea:disabled {
     color: #6b7280;
 }
 
+/* Tables: improve mobile readability */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+    .table-responsive {
+        margin-left: -1rem;
+        margin-right: -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .table-responsive table {
+        min-width: 700px;
+    }
+
+    .table-responsive th,
+    .table-responsive td {
+        padding: 0.5rem 0.75rem;
+        white-space: nowrap;
+    }
+
+    .table-responsive .btn-mobile {
+        width: auto;
+        display: inline-block;
+    }
+}
 
 
 /* Zone d’édition CKEditor (et aussi le rendu, car CK ajoute .ck-content) */

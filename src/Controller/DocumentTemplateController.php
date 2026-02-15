@@ -90,6 +90,8 @@ class DocumentTemplateController extends AbstractController
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
 
+        // Placeholder logo (remplacé par l'image si company_logo est défini)
+        $section->addText('${company_logo}');
         $section->addTitle($label . ' ${reference}', 1);
         $section->addText('Entreprise : ${company_name}');
         $section->addText('Client : ${client_name}');
