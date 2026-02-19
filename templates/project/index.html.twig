@@ -3,107 +3,150 @@
 {% block title %}Liste des projets{% endblock %}
 
 {% block body %}
-    <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
-
-        <h1 class="text-3xl font-bold mb-8">Projets</h1>
-
-        {# Filtre projets #}
-        {% include 'components/_filter_project_estimate_form.html.twig' with {'form': filterForm, 'action': path('app_project_index') } %}
-
-        {% if pagination.items is not empty %}
-            <div class="overflow-x-auto table-responsive bg-white rounded-xl shadow-xl">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Début</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fin</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Client</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                    {% for project in pagination.items %}
-                        <tr class="hover:bg-gray-50 transition-colors cursor-pointer">
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ project.id }}</td>
-                            <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ project.name }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ project.startDate ? project.startDate|date('d/m/Y') : '-' }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ project.endDate ? project.endDate|date('d/m/Y') : '-' }}</td>
-                            <td class="px-6 py-4">
-                                {% set statusColors = {
-                                    'in_progress': 'bg-yellow-500 text-black',
-                                    'completed': 'bg-green-600 text-white',
-                                    'cancelled': 'bg-red-600 text-white'
-                                } %}
-                                <span class="px-3 py-1 rounded-full text-xs font-semibold {{ statusColors[project.status]|default('bg-gray-400 text-white') }}">
-                                {{ project.status|trans }}
-                            </span>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">
-                                {% if project.isRecurring %}
-                                    {{ project.calculatedAmount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
-                                {% else %}
-                                    {{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
-                                {% endif %}
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-700">{{ project.client.name }}</td>
-                            <td class="px-6 py-4 text-sm">
-                                <div class="hidden sm:flex flex-col sm:flex-row gap-2">
-                                    <a href="{{ path('app_project_show', {'id': project.id}) }}"
-                                       class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-xs btn-mobile">Voir</a>
-                                    <a href="{{ path('app_project_edit', {'id': project.id}) }}"
-                                       class="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition text-xs btn-mobile">Modifier</a>
-                                </div>
-                                <div class="sm:hidden">
-                                    <details class="relative">
-                                        <summary class="inline-flex items-center gap-2 px-3 py-1 text-xs font-semibold rounded bg-gray-100 text-gray-700">
-                                            Actions
-                                        </summary>
-                                        <div class="mt-2 flex flex-col gap-2">
-                                            <a href="{{ path('app_project_show', {'id': project.id}) }}"
-                                               class="px-3 py-2 rounded bg-blue-600 text-white text-xs">Voir</a>
-                                            <a href="{{ path('app_project_edit', {'id': project.id}) }}"
-                                               class="px-3 py-2 rounded bg-indigo-600 text-white text-xs">Modifier</a>
-                                        </div>
-                                    </details>
-                                </div>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="8" class="px-6 py-4 text-center text-gray-400">Aucun projet trouvé</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            {# Pagination #}
-            <div class="mt-4 flex flex-wrap justify-center gap-2">
-                {% for i in 1..pagination.pages %}
-                    <a href="?page={{ i }}"
-                       class="px-3 py-1 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
-                        {{ i }}
+    <div class="w-full px-6 py-8">
+        <div class="space-y-6">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">Projets</h1>
+                    <p class="text-sm text-gray-400 mt-2">Suivez l’avancement, les dates et les montants par projet.</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
+                        <span class="text-gray-500">Total</span>
+                        <span class="text-white font-semibold">{{ pagination.total }}</span>
+                    </div>
+                    <a href="{{ path('app_project_new') }}"
+                       class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
+                        Nouveau projet
                     </a>
-                {% endfor %}
+                </div>
             </div>
 
-            <p class="mt-2 text-center text-gray-500 text-sm">
-                Affichage de {{ pagination.items|length }} sur {{ pagination.total }} projets
-            </p>
-        {% else %}
-            <p class="text-gray-500">Aucun projet trouvé.</p>
-        {% endif %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">Projets affichés</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">Projets au total</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">Page</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+                </div>
+            </div>
 
-        <div class="mt-6 text-right">
-            <a href="{{ path('app_project_new') }}"
-               class="inline-block px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition btn-mobile">
-                Nouveau projet
-            </a>
+            {# Filtre projets #}
+            {% include 'components/_filter_project_estimate_form.html.twig' with {'form': filterForm, 'action': path('app_project_index') } %}
+
+            {% if pagination.items is not empty %}
+                <div class="overflow-x-auto table-responsive rounded-2xl border border-gray-200 bg-white shadow-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Projet</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Dates</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Statut</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Montant</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">Client</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                        {% for project in pagination.items %}
+                            <tr class="hover:bg-gray-50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="min-w-0">
+                                        <a href="{{ path('app_project_show', {'id': project.id}) }}"
+                                           class="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                                            {{ project.name }}
+                                        </a>
+                                        <div class="text-xs text-gray-500">#{{ project.projectNumber }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">
+                                    {{ project.startDate ? project.startDate|date('d/m/Y') : '—' }}
+                                    <span class="text-gray-400">→</span>
+                                    {{ project.endDate ? project.endDate|date('d/m/Y') : '—' }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    {% set statusColors = {
+                                        'in_progress': 'bg-yellow-100 text-yellow-800',
+                                        'completed': 'bg-green-100 text-green-800',
+                                        'cancelled': 'bg-red-100 text-red-800'
+                                    } %}
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold {{ statusColors[project.status]|default('bg-gray-100 text-gray-800') }}">
+                                        {{ project.status|trans }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    {% if project.isRecurring %}
+                                        {{ project.calculatedAmount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
+                                    {% else %}
+                                        {{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
+                                    {{ project.client.name }}
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    <div class="hidden sm:flex flex-wrap gap-2">
+                                        <a href="{{ path('app_project_show', {'id': project.id}) }}"
+                                           class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
+                                            Voir
+                                        </a>
+                                        <a href="{{ path('app_project_edit', {'id': project.id}) }}"
+                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                                            Modifier
+                                        </a>
+                                    </div>
+                                    <div class="sm:hidden">
+                                        <details class="relative">
+                                            <summary class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700">
+                                                Actions
+                                            </summary>
+                                            <div class="mt-2 flex flex-col gap-2">
+                                                <a href="{{ path('app_project_show', {'id': project.id}) }}"
+                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">Voir</a>
+                                                <a href="{{ path('app_project_edit', {'id': project.id}) }}"
+                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">Modifier</a>
+                                            </div>
+                                        </details>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="6" class="px-6 py-10 text-center text-gray-400">Aucun projet trouvé</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <p class="text-sm text-gray-400">
+                        Affichage de {{ pagination.items|length }} sur {{ pagination.total }} projets
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for i in 1..pagination.pages %}
+                            <a href="?page={{ i }}"
+                               class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
+                                {{ i }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="rounded-2xl border border-dashed border-[#2A3747] bg-[#111922] p-10 text-center">
+                    <p class="text-gray-400 mb-4">Aucun projet trouvé.</p>
+                    <a href="{{ path('app_project_new') }}"
+                       class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
+                        Créer votre premier projet
+                    </a>
+                </div>
+            {% endif %}
         </div>
-
     </div>
 {% endblock %}

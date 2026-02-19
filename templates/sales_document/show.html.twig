@@ -3,18 +3,22 @@
 {% block title %}Document : {{ sales_document.reference }}{% endblock %}
 
 {% block body %}
-    <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
-        {# Header #}
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
-            <h1 class="text-3xl font-bold">Document : {{ sales_document.reference }}</h1>
-            <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
-                <a href="{{ path('app_sales_document_index') }}"
-                   class="px-4 py-2 bg-gray-200 rounded hover:bg-gray-300 btn-mobile">← Retour</a>
-                <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}"
-                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 btn-mobile">Modifier</a>
-                {{ include('sales_document/_delete_form.html.twig') }}
-                <a href="{{ path('app_sales_document_generate_word', { id: sales_document.id }) }}"
-                   class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 btn-mobile">📝 Word</a>
+    <div class="w-full px-6 py-8">
+        <div class="space-y-6">
+            {# Header #}
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">Document : {{ sales_document.reference }}</h1>
+                    <p class="text-sm text-gray-400 mt-2">Suivi du document, client, statut et paiements.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row flex-wrap gap-2 w-full sm:w-auto">
+                    <a href="{{ path('app_sales_document_index') }}"
+                       class="px-4 py-2 bg-[#223044] rounded hover:bg-[#2E415B] text-white btn-mobile">← Retour</a>
+                    <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}"
+                       class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold btn-mobile">Modifier</a>
+                    {{ include('sales_document/_delete_form.html.twig') }}
+                    <a href="{{ path('app_sales_document_generate_word', { id: sales_document.id }) }}"
+                       class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 btn-mobile">📝 Word</a>
                 {# <a href="{{ path('app_sales_document_generate_pdf', { id: sales_document.id }) }}"
                    class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-600">📄 PDF</a>
                 <a href="{{ path('app_sales_document_generate_excel', { id: sales_document.id }) }}"
@@ -32,74 +36,72 @@
                     {% endif %}
                 {% endif %}
 
+                </div>
             </div>
-        </div>
 
-        {# Informations principales #}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div class="bg-gray-50 p-6 rounded-lg shadow">
-                <h2 class="text-gray-500 font-semibold mb-2">Type</h2>
-                <p class="text-gray-900">{{ sales_document.type|document_type_label }}</p>
-            </div>
-            {% if sales_document.isInvoice() %}
-                <div class="bg-gray-50 p-6 rounded-lg shadow">
-                    <h2 class="text-gray-500 font-semibold mb-2">Facture externe</h2>
-                    <p class="text-gray-900">{{ sales_document.externalInvoice ? 'Oui' : 'Non' }}</p>
+            {# Informations principales #}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-gray-500 font-semibold mb-2">Type</h2>
+                    <p class="text-gray-900">{{ sales_document.type|document_type_label }}</p>
                 </div>
-            {% endif %}
-            <div class="bg-gray-50 p-6 rounded-lg shadow">
-                <h2 class="text-gray-500 font-semibold mb-2">Statut</h2>
-                {% set status_class = sales_document.status == 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %}
-                <span class="px-3 py-1 rounded-full font-semibold {{ status_class }}">{{ sales_document.status|trans }}</span>
-            </div>
-            <div class="bg-gray-50 p-6 rounded-lg shadow">
-                <h2 class="text-gray-500 font-semibold mb-2">Emis le</h2>
-                <p class="text-gray-900">{{ sales_document.invoiceDate ? sales_document.invoiceDate|date('d/m/Y') : 'N/A' }}</p>
-            </div>
-            <div class="bg-gray-50 p-6 rounded-lg shadow">
-                <h2 class="text-gray-500 font-semibold mb-2">Modifié le</h2>
-                <p class="text-gray-900">{{ sales_document.modifiedAt ? sales_document.modifiedAt|date('d/m/Y') : 'N/A' }}</p>
-            </div>
-            {% if sales_document.project %}
-                <div class="bg-gray-50 p-6 rounded-lg shadow">
-                    <h2 class="text-gray-500 font-semibold mb-2">Projet Concerné</h2>
-                    <p class="text-gray-900">{{ sales_document.project.name }}</p>
+                {% if sales_document.isInvoice() %}
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h2 class="text-gray-500 font-semibold mb-2">Facture externe</h2>
+                        <p class="text-gray-900">{{ sales_document.externalInvoice ? 'Oui' : 'Non' }}</p>
+                    </div>
+                {% endif %}
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-gray-500 font-semibold mb-2">Statut</h2>
+                    {% set status_class = sales_document.status == 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %}
+                    <span class="px-3 py-1 rounded-full font-semibold {{ status_class }}">{{ sales_document.status|trans }}</span>
                 </div>
-            {% elseif sales_document.estimate %}
-                <div class="bg-gray-50 p-6 rounded-lg shadow ">
-                    <h2 class="text-gray-500 font-semibold mb-2">Devis Concerné</h2>
-                    <p class="text-gray-900"> <a href="{{ path('app_estimate_show', {'id': sales_document.estimate.id}) }}"> {{ sales_document.estimate.estimateNumber }} </a></p>
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-gray-500 font-semibold mb-2">Emis le</h2>
+                    <p class="text-gray-900">{{ sales_document.invoiceDate ? sales_document.invoiceDate|date('d/m/Y') : 'N/A' }}</p>
                 </div>
-            {% endif %}
-            <div class="bg-gray-50 p-6 rounded-lg shadow">
-                <h2 class="text-gray-500 font-semibold mb-2">Montant</h2>
-                <p class="text-gray-900"><span class="text-gray-500 font-semibold mb-2"> Montant (HT) : </span>
-                    {% if sales_document.project %}
-                        {# {{ sales_document.project ? sales_document.project.amount|format_currency(sales_document.project.currency, app.request.locale ?: 'fr_FR') }} #}
-                        {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
-                    {% elseif sales_document.estimate %}
-                        {# {{ sales_document.estimate ? sales_document.estimate.amount|format_currency(sales_document.estimate.currency, app.request.locale ?: 'fr_FR') }} #}
-                        {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
-                    {% else %}
-                        {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
-                    {% endif %}
-                </p>
-                <p class="text-gray-900"><span class="text-gray-500 font-semibold mb-2"> TVA Appliquée : </span> {{ sales_document.taxApplied ? sales_document.vatRate : '–' }}</p>
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-gray-500 font-semibold mb-2">Modifié le</h2>
+                    <p class="text-gray-900">{{ sales_document.modifiedAt ? sales_document.modifiedAt|date('d/m/Y') : 'N/A' }}</p>
+                </div>
+                {% if sales_document.project %}
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h2 class="text-gray-500 font-semibold mb-2">Projet Concerné</h2>
+                        <p class="text-gray-900">{{ sales_document.project.name }}</p>
+                    </div>
+                {% elseif sales_document.estimate %}
+                    <div class="bg-white p-6 rounded-2xl shadow-md">
+                        <h2 class="text-gray-500 font-semibold mb-2">Devis Concerné</h2>
+                        <p class="text-gray-900"> <a class="text-blue-600 hover:text-blue-500" href="{{ path('app_estimate_show', {'id': sales_document.estimate.id}) }}"> {{ sales_document.estimate.estimateNumber }} </a></p>
+                    </div>
+                {% endif %}
+                <div class="bg-white p-6 rounded-2xl shadow-md">
+                    <h2 class="text-gray-500 font-semibold mb-2">Montant</h2>
+                    <p class="text-gray-900"><span class="text-gray-500 font-semibold mb-2"> Montant (HT) : </span>
+                        {% if sales_document.project %}
+                            {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
+                        {% elseif sales_document.estimate %}
+                            {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
+                        {% else %}
+                            {{ sales_document.getTotalHT|format_currency(sales_document.client.currency, app.request.locale ?: 'fr_FR') }}
+                        {% endif %}
+                    </p>
+                    <p class="text-gray-900"><span class="text-gray-500 font-semibold mb-2"> TVA Appliquée : </span> {{ sales_document.taxApplied ? sales_document.vatRate : '–' }}</p>
+                </div>
             </div>
-        </div>
 
         {# Client #}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div class="bg-gray-50 p-6 rounded-lg shadow">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-md">
                 <h2 class="text-gray-500 font-semibold mb-2">Client</h2>
                 <p class="text-gray-900">{{ sales_document.getResolvedClient() ? sales_document.getResolvedClient().getName() : '–' }}</p>
             </div>
-            <div class="bg-gray-50 p-6 rounded-lg shadow">
+            <div class="bg-white p-6 rounded-2xl shadow-md">
                 <h2 class="text-gray-500 font-semibold mb-2">Email</h2>
                 <p class="text-gray-900">{{ sales_document.getResolvedClient() ? sales_document.getResolvedClient().getEmail() : '–' }}</p>
             </div>
             {% if sales_document.getResolvedClient() and sales_document.getResolvedClient().country %}
-                <div class="bg-gray-50 p-6 rounded-lg shadow">
+                <div class="bg-white p-6 rounded-2xl shadow-md">
                     <h2 class="text-gray-500 font-semibold mb-2">Pays</h2>
                     <p class="text-gray-900">{{ sales_document.getResolvedClient().country }}</p>
                 </div>
@@ -111,7 +113,7 @@
             {% if sales_document.estimate and sales_document.estimate.status == 'accepted' %}
                 {% set hasInvoice = sales_document.estimate.salesDocuments|filter(doc => doc.isInvoice())|length > 0 %}
                     {% if not hasInvoice %}
-                        <div class="mt-4">
+                        <div class="mt-2">
                         <a href="{{ path('app_sales_document_from_estimate', {'salesDocument': sales_document.id}) }}"
                            class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition btn-mobile">
                             📄 Créer une facture depuis ce devis
@@ -122,13 +124,13 @@
         {% endif %}
 
         {% if sales_document.isInvoice() or sales_document.isProject() %}
-            <div id="paiements" class="mt-6 p-4 bg-gray-50 rounded-lg shadow text-gray-900">
+            <div id="paiements" class="p-4 bg-white rounded-2xl shadow-md text-gray-900">
                 <h3 class="text-lg font-semibold mb-3">Paiements ({{ sales_document.payments|length }})</h3>
 
                 {% if sales_document.payments|length > 0 %}
                     <ul class="space-y-2 text-sm">
                         {% for payment in sales_document.payments %}
-                            <li class="flex justify-between items-center bg-white/60 p-2 rounded">
+                            <li class="flex justify-between items-center bg-gray-50 p-2 rounded">
                                     <div>
                                         <div class="text-xs text-gray-500">
                                             <a href="{{ path('app_payment_show', { id: payment.id }) }}" class="flex-1 flex items-center gap-4 text-gray-900 no-underline hover:underline">
@@ -154,7 +156,7 @@
         {% endif %}
 
         {# Lignes d'articles #}
-        <div class="mb-6">
+        <div>
             {% if sales_document.salesDocumentItems is not empty %}
                 {% include 'components/_items_table.html.twig' with {
                     items: sales_document.salesDocumentItems,
@@ -162,8 +164,9 @@
                     dark_mode: false
                 } %}
             {% else %}
-                <div class="bg-gray-50 p-6 rounded-lg shadow text-gray-400 text-center">Aucune ligne d'article enregistrée.</div>
+                <div class="bg-white p-6 rounded-2xl shadow-md text-gray-400 text-center">Aucune ligne d'article enregistrée.</div>
             {% endif %}
+        </div>
         </div>
     </div>
 {% endblock %}

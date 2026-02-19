@@ -16,7 +16,8 @@
     {{ _self.field_errors(field) }}
 {% endmacro %}
 
-<div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
+<div class="w-full px-6 py-8">
+    <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-8">
         <h1 class="text-3xl font-bold mb-8 text-gray-900">
             {% if button_label is defined %}Modifier le document{% else %}Nouveau document{% endif %}
         </h1>
@@ -150,12 +151,13 @@
         {% if button_label is defined %}
             <div class="flex flex-col sm:flex-row gap-3 mt-4">
                 <a href="{{ path('app_sales_document_index') }}"
-                   class="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded text-gray-900 btn-mobile">← Retour à la liste</a>
+                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← Retour à la liste</a>
 
                 {{ include('sales_document/_delete_form.html.twig') }}
             </div>
         {% else %}
             <a href="{{ path('app_sales_document_index') }}"
-               class="px-4 py-2 bg-gray-300 hover:bg-gray-200 rounded text-gray-900 mt-4 inline-block">← Retour à la liste</a>
+               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← Retour à la liste</a>
         {% endif %}
+    </div>
 </div>

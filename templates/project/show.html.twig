@@ -3,94 +3,100 @@
 {% block title %}Projet : {{ project.name }}{% endblock %}
 
 {% block body %}
-    <div class="w-full mt-10 p-8 bg-white text-gray-900 rounded-xl shadow-xl">
+    <div class="w-full px-6 py-8">
+        <div class="space-y-6">
+            {# Header #}
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">Projet : {{ project.name }}</h1>
+                    <p class="text-sm text-gray-400 mt-2">Détails, documents et suivi du projet.</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+                    <a href="{{ path('app_project_index') }}"
+                       class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← Retour</a>
+                    <a href="{{ path('app_project_edit', {'id': project.id}) }}"
+                       class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold btn-mobile">Modifier</a>
+                    {{ include('project/_delete_form.html.twig') }}
+                </div>
+            </div>
 
-        {# Header #}
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
-            <h1 class="text-4xl font-bold text-gray-900">Projet : {{ project.name }}</h1>
-            <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            {# Infos principales en cartes #}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-md">
+                    <h2 class="text-sm font-semibold text-gray-500 mb-2">Référence Projet</h2>
+                    <p class="text-gray-900 text-xl">{{ project.projectNumber }}</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-md">
+                    <h2 class="text-sm font-semibold text-gray-500 mb-2">Client</h2>
+                    <p class="text-gray-900 text-xl">{{ project.client.name }}</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-md">
+                    <h2 class="text-sm font-semibold text-gray-500 mb-2">Montant</h2>
+                    <p class="text-gray-900 text-xl font-semibold">
+                        {{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
+                    </p>
+                </div>
+            </div>
+
+            {# Dates et statut #}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-md">
+                    <h2 class="text-sm font-semibold text-gray-500 mb-2">Date de début</h2>
+                    <p class="text-gray-900 text-xl">{{ project.startDate ? project.startDate|date('d/m/Y') : 'N/A' }}</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-md">
+                    <h2 class="text-sm font-semibold text-gray-500 mb-2">Date de fin</h2>
+                    <p class="text-gray-900 text-xl">{{ project.endDate ? project.endDate|date('d/m/Y') : 'N/A' }}</p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 shadow-md">
+                    <h2 class="text-sm font-semibold text-gray-500 mb-2">Statut</h2>
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                    {% if project.status == 'in_progress' %}bg-yellow-100 text-yellow-800
+                    {% elseif project.status == 'completed' %}bg-green-100 text-green-800
+                    {% elseif project.status == 'cancelled' %}bg-red-100 text-red-800
+                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                    {{ project.status|trans }}
+                    </span>
+                </div>
+                {% if project.estimate %}
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <h2 class="text-sm font-semibold text-gray-500 mb-2">Devis lié</h2>
+                        <p class="text-gray-900 text-xl">
+                            <a class="text-blue-600 hover:text-blue-500" href="{{ path('app_estimate_show', {'id': project.estimate.id}) }}">
+                                {{ project.estimate ? project.estimate.name }}
+                            </a>
+                        </p>
+                    </div>
+                {% endif %}
+                {% if project.description is not null %}
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <h2 class="text-sm font-semibold text-gray-500 mb-2">Description</h2>
+                        <p class="text-gray-700">{{ project.description|sanitize_html ?: 'Aucune description disponible.' }}</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Documents et actions #}
+            {% if project.id %}
+                <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+                    <a href="{{ path('app_sales_document_new', {'projectId': project.id}) }}"
+                       class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition btn-mobile">
+                        Générer un document commercial
+                    </a>
+                    {% include 'components/_list_for_estimate.html.twig' with { estimate: project } %}
+                </div>
+            {% endif %}
+
+            {% include 'components/_documents_list.html.twig' with { documents: project.documents } %}
+
+            {# Footer actions #}
+            <div class="flex flex-col sm:flex-row gap-3">
                 <a href="{{ path('app_project_index') }}"
-                   class="px-5 py-2 bg-gray-200 hover:bg-gray-300 rounded text-gray-900 btn-mobile">← Retour</a>
+                   class="px-4 py-2 bg-[#223044] text-white rounded hover:bg-[#2E415B] transition btn-mobile">← Retour à la liste</a>
                 <a href="{{ path('app_project_edit', {'id': project.id}) }}"
-                   class="px-5 py-2 bg-blue-600 hover:bg-blue-500 rounded text-white btn-mobile">Modifier</a>
+                   class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition font-semibold btn-mobile">Modifier</a>
                 {{ include('project/_delete_form.html.twig') }}
             </div>
         </div>
-
-        {# Infos principales en cartes #}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-500 mb-2">Référence Projet</h2>
-                <p class="text-gray-900 text-xl">{{ project.projectNumber }}</p>
-            </div>
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-500 mb-2">Client</h2>
-                <p class="text-gray-900 text-xl">{{ project.client.name }}</p>
-            </div>
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-500 mb-2">Montant</h2>
-                <p class="text-gray-900 text-xl font-semibold">
-                    {{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
-                </p>
-            </div>
-        </div>
-
-        {# Dates et statut #}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-500 mb-2">Date de début</h2>
-                <p class="text-gray-900 text-xl">{{ project.startDate ? project.startDate|date('d/m/Y') : 'N/A' }}</p>
-            </div>
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-500 mb-2">Date de fin</h2>
-                <p class="text-gray-900 text-xl">{{ project.endDate ? project.endDate|date('d/m/Y') : 'N/A' }}</p>
-            </div>
-            <div class="bg-white rounded-xl p-6 shadow-md">
-                <h2 class="text-lg font-semibold text-gray-500 mb-2">Statut</h2>
-                <span class="px-3 py-1 rounded-full text-xs font-semibold
-                {% if project.status == 'in_progress' %}bg-yellow-100 text-yellow-800
-                {% elseif project.status == 'completed' %}bg-green-100 text-green-800
-                {% elseif project.status == 'cancelled' %}bg-red-100 text-red-800
-                {% else %}bg-gray-100 text-gray-800{% endif %}">
-                {{ project.status|trans }}
-                </span>
-            </div>
-            {% if project.estimate %}
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <h2 class="text-lg font-semibold text-gray-500 mb-2">Devis lié</h2>
-                    <p class="text-gray-900 text-xl"><a href="{{ path('app_estimate_show', {'id': project.estimate.id}) }}"> {{ project.estimate ? project.estimate.name }}</a></p>
-                </div>
-            {% endif %}
-            {# Section détails supplémentaires #}
-            {% if project.description is not null %}
-                <div class="bg-white rounded-xl p-6 shadow-md">
-                    <h2 class="text-lg font-semibold text-gray-500 mb-2">Description</h2>
-                    <p class="">{{ project.description|sanitize_html ?: 'Aucune description disponible.' }}</p>
-                </div>
-            {% endif %}
-        </div>
-
-        {# Documents et actions #}
-        {% if project.id %}
-            <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0 mb-6">
-                <a href="{{ path('app_sales_document_new', {'projectId': project.id}) }}"
-                   class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition btn-mobile">
-                    Générer un document commercial
-                </a>
-                {% include 'components/_list_for_estimate.html.twig' with { estimate: project } %}
-            </div>
-        {% endif %}
-
-        {% include 'components/_documents_list.html.twig' with { documents: project.documents } %}
-
-        {# Footer actions #}
-        <div class="flex flex-col sm:flex-row gap-3 mt-6">
-            <a href="{{ path('app_project_index') }}"
-               class="px-4 py-2 bg-gray-200 text-gray-900 rounded hover:bg-gray-300 transition btn-mobile">← Retour à la liste</a>
-            <a href="{{ path('app_project_edit', {'id': project.id}) }}"
-               class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition btn-mobile">Modifier</a>
-            {{ include('project/_delete_form.html.twig') }}
-        </div>
-
     </div>
 {% endblock %}
