@@ -26,6 +26,7 @@ class Project
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: 'La date de début est obligatoire.')]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(nullable: true)]

@@ -50,7 +50,7 @@ class ProjectForm extends AbstractType
                 'required' => false,
             ])
             ->add('startDate', DateType::class, [
-                'required' => false,
+                'required' => true,
                 'widget' => 'single_text',
                 'label' => 'Date de premier contact',
                 'html5' => true, // active le datepicker natif
