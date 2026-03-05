@@ -8,6 +8,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
@@ -28,6 +29,19 @@ class CompanyForm extends AbstractType
                     'max' => 255,
                 ]),
             ],
+        ])
+        ->add('legalForm', ChoiceType::class, [
+            'required' => false,
+            'label' => 'Forme juridique',
+            'placeholder' => 'Choisir une forme',
+            'choices' => [
+                'Auto-entrepreneur (AE)' => 'AE',
+                'SARL AU' => 'SARL_AU',
+            ],
+        ])
+        ->add('rcNumber', TextType::class, [
+            'required' => false,
+            'label' => 'RC (Registre de commerce)',
         ])
         ->add('ice', TextType::class, [
             'required' => false,

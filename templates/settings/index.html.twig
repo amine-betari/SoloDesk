@@ -12,7 +12,13 @@
             <legend class="text-2xl font-semibold text-gray-700">Général</legend>
 
             <div class="space-y-2">
-                {{ form_label(form.taxImpotRate, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {% set rateLabel = 'Taux impôt (%)' %}
+                {% if legalForm == 'AE' %}
+                    {% set rateLabel = 'Taux AE (%)' %}
+                {% elseif legalForm == 'SARL_AU' %}
+                    {% set rateLabel = 'Taux IS (%)' %}
+                {% endif %}
+                {{ form_label(form.taxImpotRate, rateLabel, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.taxImpotRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.taxImpotRate) }}
                 <p class="text-xs text-gray-500">Exemple: 1.00 pour 1%</p>

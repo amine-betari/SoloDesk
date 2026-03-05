@@ -17,7 +17,17 @@
                 {{ form_errors(form.name) }}
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4" data-controller="company-legal-form">
+                <div class="space-y-2">
+                    {{ form_label(form.legalForm, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_widget(form.legalForm, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900', 'data-company-legal-form-target': 'legalForm', 'data-action': 'change->company-legal-form#toggle'}}) }}
+                    {{ form_errors(form.legalForm) }}
+                </div>
+                <div class="space-y-2 hidden" data-company-legal-form-target="rcField">
+                    {{ form_label(form.rcNumber, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_widget(form.rcNumber, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                    {{ form_errors(form.rcNumber) }}
+                </div>
                 <div class="space-y-2">
                     {{ form_label(form.ice, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                     {{ form_widget(form.ice, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}

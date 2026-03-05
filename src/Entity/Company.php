@@ -41,6 +41,12 @@ class Company
     #[ORM\Column(length: 180, nullable: true)]
     private ?string $email = null;
 
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $legalForm = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $rcNumber = null;
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logoPath = null;
 
@@ -175,6 +181,28 @@ class Company
     public function setLogoPath(?string $logoPath): static
     {
         $this->logoPath = $logoPath;
+        return $this;
+    }
+
+    public function getLegalForm(): ?string
+    {
+        return $this->legalForm;
+    }
+
+    public function setLegalForm(?string $legalForm): static
+    {
+        $this->legalForm = $legalForm;
+        return $this;
+    }
+
+    public function getRcNumber(): ?string
+    {
+        return $this->rcNumber;
+    }
+
+    public function setRcNumber(?string $rcNumber): static
+    {
+        $this->rcNumber = $rcNumber;
         return $this;
     }
 

@@ -46,6 +46,7 @@ class SettingsController extends AbstractController
 
         return $this->render('settings/index.html.twig', [
             'form' => $form,
+            'legalForm' => $company->getLegalForm(),
         ]);
     }
 }

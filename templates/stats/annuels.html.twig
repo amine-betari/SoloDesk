@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="bg-gray-900 border border-gray-700 rounded-xl p-6 mb-8">
+
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+
+            <!-- Titre + CA -->
+            <div>
+                <h1 class="text-2xl font-bold text-gray-100">
+                    CA annuel – {{ anneeSelectionnee }}
+                </h1>
+                <p class="mt-2 text-xs text-gray-400">
+                    Profil SARL AU → Vue annuelle.
+                </p>
+
+                <div class="mt-3 space-y-1 text-sm">
+                    <div>
+                        <span class="text-gray-400">CA total (depuis le début) :</span>
+                        <span class="text-blue-300 font-semibold ml-1">
+                        {{ caGlobalTexte }}
+                    </span>
+                        <span class="text-gray-500 ml-2">dont externes :</span>
+                        <span class="text-amber-300 font-semibold ml-1">
+                        {{ caGlobalExternesTexte }}
+                    </span>
+                    </div>
+
+                    <div>
+                        <span class="text-gray-400">CA {{ anneeSelectionnee }} :</span>
+                        <span class="text-green-400 font-semibold ml-1">
+                        {{ caAnneeTexte }}
+                    </span>
+                    </div>
+
+                    <div>
+                        <span class="text-gray-400">CA {{ anneeSelectionnee - 1 }} :</span>
+                        <span class="text-gray-300 ml-1">
+                        {{ caAnneePrecedenteTexte }}
+                    </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Select année -->
+            <form method="get" class="flex items-center gap-2">
+                <label for="annee" class="text-gray-400 text-sm">
+                    Année
+                </label>
+                <select name="annee" id="annee" onchange="this.form.submit()"
+                        class="bg-gray-800 text-gray-100 border border-gray-600 rounded-md px-3 py-2
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    {% for y in annees %}
+                        <option value="{{ y }}" {% if y == anneeSelectionnee %}selected{% endif %}>
+                            {{ y }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </form>
+
+        </div>
+    </div>
+    <div class="mt-4 h-px bg-gray-700"></div>
+
+    {% if chart is null %}
+        <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl text-gray-300">
+            Aucune donnée disponible pour {{ anneeSelectionnee }}.
+        </div>
+    {% else %}
+        <div class="bg-gray-900 border border-gray-700 p-6 rounded-xl shadow">
+            <h2 class="text-lg font-semibold mb-4 text-gray-100">
+                Répartition du CA par client
+            </h2>
+
+            <div class="flex-1">
+                {{ render_chart(chart) }}
+            </div>
+
+            <div class="mt-4 text-sm text-gray-400">
+                <span class="text-yellow-300 font-semibold">{{ taxImpotRateLabel }}% impôts :</span>
+                <span class="text-gray-100 ml-1">{{ impotsTexte }}</span>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock %}

@@ -282,6 +282,11 @@ class HomeController extends AbstractController
             throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
         }
 
+        if ($company->getLegalForm() === 'SARL_AU') {
+            $anneeSelectionnee = $request->query->get('annee', date('Y'));
+            return $this->redirectToRoute('stats_ca_annuel', ['annee' => $anneeSelectionnee]);
+        }
+
         $anneeSelectionnee = $request->query->get('annee', date('Y')); // année par défaut
         $startDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
         $anneeDebut = (int) $startDate->format('Y');
@@ -497,6 +502,165 @@ class HomeController extends AbstractController
             'caGlobalTexte' => $caGlobalTexte,
             'caGlobalExternesTexte' => $caGlobalExternesTexte,
             'caAnneePrecedenteTexte' => $caAnneePrecedenteTexte,
+            'legalForm' => $company->getLegalForm(),
+        ]);
+    }
+
+    #[Route('/stats/ca/annuel', name: 'stats_ca_annuel')]
+    public function caParAnnee(
+        PaymentRepository $paymentRepository,
+        ChartBuilderInterface $chartBuilder,
+        Request $request,
+        CompanySettings $settings
+    ): Response {
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
+        $anneeSelectionnee = $request->query->get('annee', date('Y'));
+        $startDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $anneeDebut = (int) $startDate->format('Y');
+        $anneesDisponibles = range($anneeDebut, date('Y'));
+
+        $payments = $paymentRepository->findPaymentsForReports($company);
+        $revenusParClient = [];
+        $totauxParDevise = [];
+
+        foreach ($payments as $payment) {
+            $paymentDate = $payment->getDate();
+            if (!$paymentDate) continue;
+
+            if ($paymentDate < $startDate) continue;
+
+            $year = $paymentDate->format('Y');
+            if ($year != $anneeSelectionnee) continue;
+
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
+
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue;
+
+            $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+            $key = $client->getName() . ' (' . $devise . ')';
+
+            $amount = $payment->getAmount();
+            $revenusParClient[$key] = ($revenusParClient[$key] ?? 0) + $amount;
+            $totauxParDevise[$devise] = ($totauxParDevise[$devise] ?? 0) + $amount;
+        }
+
+        $chart = null;
+        if ($revenusParClient) {
+            $chart = $chartBuilder->createChart(Chart::TYPE_PIE);
+            $chart->setData([
+                'labels' => array_keys($revenusParClient),
+                'datasets' => [[
+                    'label' => 'CA ' . $anneeSelectionnee,
+                    'backgroundColor' => ['#4ade80', '#60a5fa', '#facc15', '#f87171'],
+                    'data' => array_values($revenusParClient),
+                ]],
+            ]);
+            $chart->setOptions(['plugins' => ['legend' => ['position' => 'right']]]);
+        }
+
+        $fmt = new NumberFormatter('fr_FR', NumberFormatter::DECIMAL);
+        $fmt->setAttribute(NumberFormatter::FRACTION_DIGITS, 2);
+
+        $taxImpotRate = $settings->getFloat($company, CompanySettings::KEY_TAX_IMPOT_RATE, 0.01);
+        $taxImpotRatePercent = $taxImpotRate * 100;
+        $taxImpotRateLabel = rtrim(rtrim($fmt->format($taxImpotRatePercent), '0'), ',');
+
+        $impotsAffichage = [];
+        foreach ($totauxParDevise as $devise => $montant) {
+            $impotsAffichage[] = $fmt->format($montant * $taxImpotRate) . ' ' . $devise;
+        }
+        $impotsTexte = $impotsAffichage ? implode(' • ', $impotsAffichage) : '0';
+
+        $totauxParDeviseGlobal = [];
+        $totauxParDeviseGlobalExternes = [];
+        foreach ($payments as $payment) {
+            $paymentDate = $payment->getDate();
+            if (!$paymentDate) continue;
+
+            if ($paymentDate < $startDate) continue;
+
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
+
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue;
+
+            $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+
+            $totauxParDeviseGlobal[$devise] =
+                ($totauxParDeviseGlobal[$devise] ?? 0) + $payment->getAmount();
+
+            if ($salesDocument && $salesDocument->isExternalInvoice()) {
+                $totauxParDeviseGlobalExternes[$devise] =
+                    ($totauxParDeviseGlobalExternes[$devise] ?? 0) + $payment->getAmount();
+            }
+        }
+
+        $caGlobalAffichage = [];
+        foreach ($totauxParDeviseGlobal as $devise => $montant) {
+            $caGlobalAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+        $caGlobalTexte = $caGlobalAffichage ? implode(' • ', $caGlobalAffichage) : '0';
+
+        $caGlobalExternesAffichage = [];
+        foreach ($totauxParDeviseGlobalExternes as $devise => $montant) {
+            $caGlobalExternesAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+        $caGlobalExternesTexte =
+            $caGlobalExternesAffichage ? implode(' • ', $caGlobalExternesAffichage) : '0';
+
+        $caAnneeAffichage = [];
+        foreach ($totauxParDevise as $devise => $montant) {
+            $caAnneeAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+        $caAnneeTexte = $caAnneeAffichage ? implode(' • ', $caAnneeAffichage) : '0';
+
+        $anneePrecedente = (int) $anneeSelectionnee - 1;
+        $totauxParDeviseN1 = [];
+        foreach ($payments as $payment) {
+            $paymentDate = $payment->getDate();
+            if (!$paymentDate) continue;
+
+            if ($paymentDate < $startDate) continue;
+
+            $year = $paymentDate->format('Y');
+            if ($year != $anneePrecedente) continue;
+
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
+
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) continue;
+
+            $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+            $totauxParDeviseN1[$devise] =
+                ($totauxParDeviseN1[$devise] ?? 0) + $payment->getAmount();
+        }
+
+        $caAnneePrecedenteAffichage = [];
+        foreach ($totauxParDeviseN1 as $devise => $montant) {
+            $caAnneePrecedenteAffichage[] = $fmt->format($montant) . ' ' . $devise;
+        }
+        $caAnneePrecedenteTexte =
+            $caAnneePrecedenteAffichage ? implode(' • ', $caAnneePrecedenteAffichage) : '0';
+
+        return $this->render('stats/annuels.html.twig', [
+            'chart' => $chart,
+            'impotsTexte' => $impotsTexte,
+            'taxImpotRateLabel' => $taxImpotRateLabel,
+            'annees' => $anneesDisponibles,
+            'anneeSelectionnee' => $anneeSelectionnee,
+            'caAnneeTexte' => $caAnneeTexte,
+            'caGlobalTexte' => $caGlobalTexte,
+            'caGlobalExternesTexte' => $caGlobalExternesTexte,
+            'caAnneePrecedenteTexte' => $caAnneePrecedenteTexte,
+            'legalForm' => $company->getLegalForm(),
         ]);
     }
 }
