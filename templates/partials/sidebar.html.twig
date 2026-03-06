@@ -29,7 +29,8 @@
             {'route':'app_estimate_index', 'label':'Pré-Estimations', 'icon':'file-text'},
             {'route':'app_payment_index', 'label':'Paiements', 'icon':'credit-card'},
             {'route':'app_sales_document_index', 'label':'Documents de Vente', 'icon':'file'},
-            {'route':'app_client_index', 'label':'Clients', 'icon':'users'}
+            {'route':'app_client_index', 'label':'Clients', 'icon':'users'},
+            {'route':'app_collaborator_index', 'label':'Collaborateurs', 'icon':'users'}
         ] %}
 
         {% for item in menuItems %}
@@ -58,6 +59,15 @@
                 {{ item.label }}
             </a>
         {% endfor %}
+
+        <a href="{{ path('app_skill_index') }}"
+           class="group flex items-center ml-6 px-4 py-2 rounded-md transition-colors
+           {% if app.request.attributes.get('_route') starts with 'app_skill' %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
+            <svg class="w-4 h-4 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1m-7 4h10m-11 4h12m-12 0v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-5m-12 0h12"/>
+            </svg>
+            Compétences
+        </a>
 
         {# Section Entreprise #}
         <div class="mt-3 pt-3 border-t border-[#2A3747]">
