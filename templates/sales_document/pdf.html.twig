@@ -2,20 +2,85 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Document Commercial</title>
+    <title>Facture</title>
     <style>
-        body { font-family: Helvetica, sans-serif; }
-        h1 { color: #333; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 8px; }
+        body { font-family: Helvetica, sans-serif; color: #111827; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px; }
+        .brand { display: flex; gap: 16px; align-items: center; }
+        .logo { width: 90px; height: 90px; object-fit: contain; border-radius: 8px; border: 1px solid #e5e7eb; }
+        .title { font-size: 24px; font-weight: bold; margin: 0; }
+        .meta { text-align: right; font-size: 12px; color: #374151; }
+        .section { margin-top: 18px; display: flex; justify-content: space-between; gap: 24px; }
+        .box { width: 50%; }
+        .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #6b7280; margin-bottom: 6px; }
+        .value { font-size: 13px; color: #111827; }
+        table { width: 100%; border-collapse: collapse; margin-top: 18px; }
+        th, td { border: 1px solid #e5e7eb; padding: 8px; font-size: 12px; }
+        th { background: #f9fafb; text-align: left; }
+        td ul, td ol { margin: 0 0 0 16px; padding: 0; }
+        td li { margin: 2px 0; }
+        .totals { margin-top: 16px; text-align: right; font-size: 13px; }
+        .totals strong { font-size: 16px; }
+        .footer { margin-top: 24px; font-size: 11px; color: #6b7280; border-top: 1px solid #e5e7eb; padding-top: 8px; }
     </style>
 </head>
 <body>
-<h1>Document Commercial #{{ salesDocument.id }}</h1>
-<p>Référence : {{ salesDocument.reference }}</p>
-<p>Date : {{ salesDocument.createdAt|date('d/m/Y') }}</p>
+{% set company = salesDocument.company %}
+{% set client = salesDocument.getResolvedClient() %}
+{% set currency = salesDocument.getResolvedCurrency('EUR') %}
+{% set totalHT = salesDocument.getTotalHT() %}
+{% set totalTTC = salesDocument.getTotalTTC() %}
+{% set totalTVA = totalTTC - totalHT %}
 
-<h2>Lignes</h2>
+<div class="header">
+    <div class="brand">
+        {% if logoDataUri %}
+            <img src="{{ logoDataUri }}" alt="Logo" class="logo">
+        {% endif %}
+        <div>
+            <p class="title">{{ company.name ?? 'Entreprise' }}</p>
+            <div class="value">
+                {% if company.address %}{{ company.address|striptags }}{% endif %}
+                {% if company.city %} - {{ company.city }}{% endif %}
+                {% if company.country %}, {{ company.country }}{% endif %}
+            </div>
+            <div class="value">
+                {% if company.email %}{{ company.email }}{% endif %}
+                {% if company.phone %} | {{ company.phone }}{% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="meta">
+        <div><strong>Facture</strong></div>
+        <div>Référence: {{ salesDocument.reference }}</div>
+        <div>Date: {{ salesDocument.invoiceDate ? salesDocument.invoiceDate|date('d/m/Y') : salesDocument.createdAt|date('d/m/Y') }}</div>
+        {% if company.ice %}<div>ICE: {{ company.ice }}</div>{% endif %}
+        {% if company.fiscalId %}<div>IF: {{ company.fiscalId }}</div>{% endif %}
+        {% if company.rcNumber %}<div>RC: {{ company.rcNumber }}</div>{% endif %}
+    </div>
+</div>
+
+<div class="section">
+    <div class="box">
+        <div class="label">Facturé à</div>
+        <div class="value">
+            <strong>{{ client ? client.name : '—' }}</strong><br>
+            {% if client and client.email %}{{ client.email }}<br>{% endif %}
+            {% if client and client.phone %}{{ client.phone }}<br>{% endif %}
+            {% if client and client.address %}{{ client.address|striptags }}<br>{% endif %}
+            {% if client and client.country %}{{ client.country }}{% endif %}
+        </div>
+    </div>
+    <div class="box">
+        <div class="label">Informations</div>
+        <div class="value">
+            Type: {{ salesDocument.type|document_type_label }}<br>
+            Statut: {{ salesDocument.status|trans }}<br>
+            TVA: {{ salesDocument.taxApplied ? salesDocument.vatRate : '—' }}<br>
+        </div>
+    </div>
+</div>
+
 <table>
     <thead>
     <tr>
@@ -28,15 +93,33 @@
     <tbody>
     {% for item in salesDocument.salesDocumentItems %}
         <tr>
-            <td>{{ item.description }}</td>
+            <td>{{ item.description|sanitize_html }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.unitPrice|format_currency('EUR', app.request.locale ?: 'fr_FR') }}</td>
-            <td>{{ (item.quantity * item.unitPrice)|format_currency('EUR', app.request.locale ?: 'fr_FR') }}</td>
+            <td>{{ item.unitPrice|format_currency(currency, app.request.locale ?: 'fr_FR') }}</td>
+            <td>{{ (item.quantity * item.unitPrice)|format_currency(currency, app.request.locale ?: 'fr_FR') }}</td>
         </tr>
     {% endfor %}
     </tbody>
 </table>
 
-<h3>Total global : {{ salesDocument.getTotalTTC()|number_format(2, ',', ' ') }} €</h3>
+<div class="totals">
+    <div>Total HT: {{ totalHT|format_currency(currency, app.request.locale ?: 'fr_FR') }}</div>
+    {% if salesDocument.taxApplied %}
+        <div>TVA: {{ totalTVA|format_currency(currency, app.request.locale ?: 'fr_FR') }}</div>
+    {% endif %}
+    <div><strong>Total TTC: {{ totalTTC|format_currency(currency, app.request.locale ?: 'fr_FR') }}</strong></div>
+</div>
+
+{% if company.taxProfessional or company.ice or company.fiscalId or company.rcNumber %}
+    <div class="footer">
+        {% if company.taxProfessional %}Taxe pro: {{ company.taxProfessional }}{% endif %}
+        {% if company.taxProfessional and (company.ice or company.fiscalId or company.rcNumber) %} | {% endif %}
+        {% if company.ice %}ICE: {{ company.ice }}{% endif %}
+        {% if company.ice and (company.fiscalId or company.rcNumber) %} | {% endif %}
+        {% if company.fiscalId %}IF: {{ company.fiscalId }}{% endif %}
+        {% if company.fiscalId and company.rcNumber %} | {% endif %}
+        {% if company.rcNumber %}RC: {{ company.rcNumber }}{% endif %}
+    </div>
+{% endif %}
 </body>
 </html>

@@ -396,9 +396,20 @@ final class SalesDocumentController extends AbstractController
 
         $dompdf = new Dompdf($pdfOptions);
 
+        $logoDataUri = null;
+        $company = $salesDocument->getCompany();
+        if ($company && $company->getLogoPath()) {
+            $logoFile = $this->getParameter('kernel.project_dir') . '/public/' . $company->getLogoPath();
+            if (is_file($logoFile)) {
+                $mime = @mime_content_type($logoFile) ?: 'image/png';
+                $logoDataUri = 'data:' . $mime . ';base64,' . base64_encode((string) file_get_contents($logoFile));
+            }
+        }
+
         // 2. Rendu HTML via Twig
         $html = $this->renderView('sales_document/pdf.html.twig', [
             'salesDocument' => $salesDocument,
+            'logoDataUri' => $logoDataUri,
         ]);
 
         // 3. Charger le HTML
@@ -546,6 +557,7 @@ final class SalesDocumentController extends AbstractController
 
         $currency = $salesDocument->getResolvedCurrency('EUR');
         $formatMoney = fn (?string $amount) => $this->toolsHelper->formatCurrency($amount ?? 0, $currency);
+        $clean = fn (?string $value) => $this->toWordText((string) ($value ?? ''));
 
         $items = [];
         foreach ($salesDocument->getSalesDocumentItems() as $item) {
@@ -553,39 +565,52 @@ final class SalesDocumentController extends AbstractController
             $unit = $item->getUnitPrice() ?? 0;
             $total = (float) $qty * (float) $unit;
             $items[] = [
-                'description' => $item->getDescription() ?? '',
-                'quantity' => (string) $qty,
-                'unit_price' => $formatMoney((string) $unit),
-                'total' => $formatMoney((string) $total),
+                'description' => $clean($item->getDescription() ?? ''),
+                'quantity' => $clean((string) $qty),
+                'unit_price' => $clean($formatMoney((string) $unit)),
+                'total' => $clean($formatMoney((string) $total)),
             ];
         }
 
         return [
             'scalar' => [
-                'company_name' => $company?->getName() ?? '',
-                'company_ice' => $company?->getIce() ?? '',
-                'company_if' => $company?->getFiscalId() ?? '',
-                'company_tp' => $company?->getTaxProfessional() ?? '',
-                'company_address' => $company?->getAddress() ?? '',
-                'company_city' => $company?->getCity() ?? '',
-                'company_country' => $company?->getCountry() ?? '',
-                'company_phone' => $company?->getPhone() ?? '',
-                'company_email' => $company?->getEmail() ?? '',
+                'company_name' => $clean($company?->getName() ?? ''),
+                'company_ice' => $clean($company?->getIce() ?? ''),
+                'company_if' => $clean($company?->getFiscalId() ?? ''),
+                'company_tp' => $clean($company?->getTaxProfessional() ?? ''),
+                'company_rc' => $clean($company?->getRcNumber() ?? ''),
+                'company_address' => $clean($company?->getAddress() ?? ''),
+                'company_city' => $clean($company?->getCity() ?? ''),
+                'company_country' => $clean($company?->getCountry() ?? ''),
+                'company_phone' => $clean($company?->getPhone() ?? ''),
+                'company_email' => $clean($company?->getEmail() ?? ''),
                 'company_logo' => $company?->getLogoPath() ?? '',
-                'reference' => $salesDocument->getReference() ?? '',
-                'type' => $salesDocument->getType() ?? '',
-                'date' => ($salesDocument->getInvoiceDate() ?? $salesDocument->getCreatedAt())?->format('d/m/Y') ?? '',
-                'client_name' => $client?->getName() ?? '',
-                'client_email' => $client?->getEmail() ?? '',
-                'client_phone' => $client?->getPhone() ?? '',
-                'client_address' => $client?->getAddress() ?? '',
-                'client_country' => $client?->getCountry() ?? '',
-                'total_ht' => $formatMoney((string) $salesDocument->getTotalHT()),
-                'total_ttc' => $formatMoney((string) $salesDocument->getTotalTTC()),
-                'vat_rate' => (string) $salesDocument->getVatRate(),
+                'reference' => $clean($salesDocument->getReference() ?? ''),
+                'type' => $clean($salesDocument->getType() ?? ''),
+                'date' => $clean(($salesDocument->getInvoiceDate() ?? $salesDocument->getCreatedAt())?->format('d/m/Y') ?? ''),
+                'client_name' => $clean($client?->getName() ?? ''),
+                'client_email' => $clean($client?->getEmail() ?? ''),
+                'client_phone' => $clean($client?->getPhone() ?? ''),
+                'client_address' => $clean($client?->getAddress() ?? ''),
+                'client_country' => $clean($client?->getCountry() ?? ''),
+                'total_ht' => $clean($formatMoney((string) $salesDocument->getTotalHT())),
+                'total_ttc' => $clean($formatMoney((string) $salesDocument->getTotalTTC())),
+                'vat_rate' => $clean((string) $salesDocument->getVatRate()),
+                'notes' => $clean($salesDocument->getNotes() ?? ''),
             ],
             'items' => $items,
         ];
+    }
+
+    private function toWordText(string $value): string
+    {
+        $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $value = str_replace(['&nbsp;', '&#160;'], ' ', $value);
+        $value = str_replace("\xc2\xa0", ' ', $value); // nbsp
+        $value = strip_tags($value);
+        $value = preg_replace('/\s+/u', ' ', $value) ?? $value;
+        $value = trim($value);
+        return htmlspecialchars($value, ENT_QUOTES | ENT_XML1, 'UTF-8');
     }
 
     private function sanitizeFilename(string $name): string

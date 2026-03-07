@@ -29,6 +29,7 @@ class SkillForm extends AbstractType
         ->add('isCore', CheckboxType::class, [
             'label' => 'Compétence clé',
             'required' => false,
+            'label_attr' => ['class' => 'inline-flex items-center gap-2'],
         ]);
     }
 

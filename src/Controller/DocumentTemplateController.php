@@ -4,6 +4,7 @@
 namespace App\Controller;
 
 use App\Entity\DocumentTemplate;
+use App\Entity\SalesDocument;
 use App\Form\DocumentTemplateType;
 use Doctrine\ORM\EntityManagerInterface as EM;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -85,47 +86,201 @@ class DocumentTemplateController extends AbstractController
         return $this->downloadSampleWord('Devis', 'modele-devis.docx');
     }
 
+    #[Route('/preview', name: 'app_templates_preview')]
+    public function preview(EM $em): Response
+    {
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise liée.');
+        }
+
+        $salesDocument = $em->getRepository(SalesDocument::class)
+            ->createQueryBuilder('s')
+            ->andWhere('s.company = :company')
+            ->setParameter('company', $company)
+            ->orderBy('s.invoiceDate', 'DESC')
+            ->addOrderBy('s.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+
+        if (!$salesDocument) {
+            $this->addFlash('warning', 'Aucune facture/devis disponible pour aperçu.');
+            return $this->redirectToRoute('app_templates_index');
+        }
+
+        $logoDataUri = null;
+        if ($company->getLogoPath()) {
+            $logoFile = $this->getParameter('kernel.project_dir') . '/public/' . $company->getLogoPath();
+            if (is_file($logoFile)) {
+                $mime = @mime_content_type($logoFile) ?: 'image/png';
+                $logoDataUri = 'data:' . $mime . ';base64,' . base64_encode((string) file_get_contents($logoFile));
+            }
+        }
+
+        return $this->render('sales_document/pdf.html.twig', [
+            'salesDocument' => $salesDocument,
+            'logoDataUri' => $logoDataUri,
+        ]);
+    }
+
+    #[Route('/install-pro', name: 'app_templates_install_pro', methods: ['POST'])]
+    public function installProTemplates(Request $request, EM $em): Response
+    {
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise liée.');
+        }
+
+        if (!$this->isCsrfTokenValid('install_pro_templates', $request->getPayload()->getString('_token'))) {
+            throw $this->createAccessDeniedException('Jeton CSRF invalide.');
+        }
+
+        $templatesDir = $this->getParameter('templates_directory');
+        @mkdir($templatesDir, 0775, true);
+
+        $this->createProTemplate($em, $company, DocumentTemplate::TYPE_INVOICE, 'Modèle Pro Facture', $templatesDir);
+        $this->createProTemplate($em, $company, DocumentTemplate::TYPE_ESTIMATE, 'Modèle Pro Devis', $templatesDir);
+
+        $this->addFlash('success', 'Modèles pro installés et définis par défaut.');
+        return $this->redirectToRoute('app_templates_index');
+    }
+
     private function downloadSampleWord(string $label, string $filename): Response
     {
+        $tempFile = $this->buildSampleWordFile($label);
+
+        return $this->file($tempFile, $filename, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+    }
+
+    private function createProTemplate(EM $em, $company, string $type, string $name, string $templatesDir): void
+    {
+        $label = $type === DocumentTemplate::TYPE_ESTIMATE ? 'Devis' : 'Facture';
+        $tempFile = $this->buildSampleWordFile($label);
+
+        $filename = uniqid('tpl_', true) . '.docx';
+        $targetPath = rtrim($templatesDir, '/') . '/' . $filename;
+        @copy($tempFile, $targetPath);
+
+        $em->createQuery('UPDATE App\Entity\DocumentTemplate t SET t.isDefault = false WHERE t.type = :type AND t.format = :format AND t.company = :company')
+            ->setParameters(['type' => $type, 'format' => DocumentTemplate::FORMAT_WORD, 'company' => $company])
+            ->execute();
+
+        $template = new DocumentTemplate();
+        $template->setCompany($company);
+        $template->setName($name);
+        $template->setType($type);
+        $template->setFormat(DocumentTemplate::FORMAT_WORD);
+        $template->setFilePath('uploads/templates/' . $filename);
+        $template->setIsDefault(true);
+
+        $em->persist($template);
+        $em->flush();
+    }
+
+    private function buildSampleWordFile(string $label): string
+    {
         $phpWord = new PhpWord();
+        $phpWord->setDefaultFontName('Calibri');
+        $phpWord->setDefaultFontSize(11);
         $section = $phpWord->addSection();
 
-        // Placeholder logo (remplacé par l'image si company_logo est défini)
-        $section->addText('${company_logo}');
-        $section->addTitle($label . ' ${reference}', 1);
-        $section->addText('Entreprise : ${company_name}');
-        $section->addText('Client : ${client_name}');
-        $section->addText('Email : ${client_email}');
-        $section->addText('Téléphone : ${client_phone}');
-        $section->addText('Adresse : ${client_address}');
-        $section->addText('Pays : ${client_country}');
-        $section->addText('Date : ${date}');
+        $titleStyle = ['size' => 20, 'bold' => true, 'color' => 'FFFFFF'];
+        $mutedStyle = ['color' => '6B7280', 'size' => 9];
+        $labelStyle = ['bold' => true, 'size' => 10, 'color' => '374151'];
+        $sectionTitleStyle = ['bold' => true, 'size' => 12, 'color' => '111827'];
+
+        // Top band
+        $bandTable = $section->addTable(['borderSize' => 0, 'cellMargin' => 100]);
+        $bandTable->addRow();
+        $bandLeft = $bandTable->addCell(7000, ['bgColor' => '0F172A', 'valign' => 'center']);
+        $bandRight = $bandTable->addCell(3000, ['bgColor' => '0F172A', 'valign' => 'center']);
+        $bandLeft->addText(' ', ['size' => 4, 'color' => 'FFFFFF']);
+        $bandLeft->addText($label . ' ${reference}', $titleStyle);
+        $bandLeft->addText('Date: ${date}', ['color' => 'E2E8F0', 'size' => 9]);
+        $bandRight->addText(' ', ['size' => 4, 'color' => 'FFFFFF']);
+        $bandRight->addText('${company_logo}', ['color' => 'FFFFFF']);
 
         $section->addTextBreak(1);
-        $section->addText('Lignes :', ['bold' => true]);
 
-        $table = $section->addTable(['borderSize' => 6, 'borderColor' => '999999']);
-        $table->addRow();
-        $table->addCell(5000)->addText('Description');
-        $table->addCell(1500)->addText('Quantité');
-        $table->addCell(2000)->addText('Prix Unitaire');
-        $table->addCell(2000)->addText('Total');
+        $headerTable = $section->addTable(['borderSize' => 0, 'cellMargin' => 80]);
+        $headerTable->addRow();
+        $left = $headerTable->addCell(6000);
+        $right = $headerTable->addCell(4000);
 
-        $table->addRow();
-        $table->addCell(5000)->addText('${item_description}');
-        $table->addCell(1500)->addText('${item_qty}');
-        $table->addCell(2000)->addText('${item_unit_price}');
-        $table->addCell(2000)->addText('${item_total}');
+        $left->addText('${company_name}', ['bold' => true, 'size' => 12]);
+        $left->addText('${company_address}', $mutedStyle);
+        $left->addText('${company_city} ${company_country}', $mutedStyle);
+        $left->addText('${company_email} | ${company_phone}', $mutedStyle);
+        $left->addText('ICE: ${company_ice}  IF: ${company_if}  TP: ${company_tp}  RC: ${company_rc}', $mutedStyle);
+
+        $right->addText('Facturé à', $sectionTitleStyle);
+        $right->addText('${client_name}');
+        $right->addText('${client_email}');
+        $right->addText('${client_phone}');
+        $right->addText('${client_address}');
+        $right->addText('${client_country}');
 
         $section->addTextBreak(1);
-        $section->addText('Total HT : ${total_ht}');
-        $section->addText('TVA : ${vat_rate}');
-        $section->addText('Total TTC : ${total_ttc}', ['bold' => true]);
+
+        $infoTable = $section->addTable(['borderSize' => 0, 'cellMargin' => 80]);
+        $infoTable->addRow();
+        $billTo = $infoTable->addCell(5000);
+        $docInfo = $infoTable->addCell(5000);
+
+        $billTo->addText('Informations document', $sectionTitleStyle);
+        $billTo->addText('Référence: ${reference}');
+        $billTo->addText('Date: ${date}');
+        $billTo->addText('TVA: ${vat_rate}');
+
+        $docInfo->addText('Contact entreprise', $sectionTitleStyle);
+        $docInfo->addText('${company_email}');
+        $docInfo->addText('${company_phone}');
+        $docInfo->addText('${company_city} ${company_country}');
+
+        $section->addTextBreak(1);
+
+        $tableStyle = [
+            'borderSize' => 6,
+            'borderColor' => 'D1D5DB',
+            'cellMargin' => 60,
+        ];
+        $table = $section->addTable($tableStyle);
+        $table->addRow();
+        $headerCellStyle = ['bgColor' => 'F3F4F6', 'valign' => 'center'];
+        $table->addCell(5200, $headerCellStyle)->addText('Description', $labelStyle);
+        $table->addCell(1200, $headerCellStyle)->addText('Qté', $labelStyle);
+        $table->addCell(1600, $headerCellStyle)->addText('Prix Unitaire', $labelStyle);
+        $table->addCell(1600, $headerCellStyle)->addText('Total', $labelStyle);
+
+        $table->addRow();
+        $table->addCell(5200)->addText('${item_description}');
+        $table->addCell(1200)->addText('${item_qty}');
+        $table->addCell(1600)->addText('${item_unit_price}');
+        $table->addCell(1600)->addText('${item_total}');
+
+        $section->addTextBreak(1);
+        $totalsTable = $section->addTable(['borderSize' => 0, 'cellMargin' => 80]);
+        $totalsTable->addRow();
+        $totalsTable->addCell(6000)->addText(' ');
+        $totalsCell = $totalsTable->addCell(4000);
+        $totalsCell->addText('Total HT : ${total_ht}', $labelStyle);
+        $totalsCell->addText('TVA : ${vat_rate}', $labelStyle);
+        $totalsCell->addText('Total TTC : ${total_ttc}', ['bold' => true, 'size' => 12, 'color' => '111827']);
+
+        $section->addTextBreak(1);
+        $section->addTextBreak(1);
+        $section->addText('Notes / Conditions', $sectionTitleStyle);
+        $section->addText('${notes}');
+
+        $section->addTextBreak(1);
+        $section->addText('Merci pour votre confiance.', $mutedStyle);
+        $section->addText('ICE: ${company_ice}  IF: ${company_if}  TP: ${company_tp}  RC: ${company_rc}', $mutedStyle);
 
         $tempFile = tempnam(sys_get_temp_dir(), 'tpl_');
         IOFactory::createWriter($phpWord, 'Word2007')->save($tempFile);
 
-        return $this->file($tempFile, $filename, ResponseHeaderBag::DISPOSITION_ATTACHMENT);
+        return $tempFile;
     }
 
     #[Route('/{id}/default', name: 'app_templates_set_default')]
