@@ -56,7 +56,8 @@ class CollaboratorForm extends AbstractType
                     return $repo->createQueryBuilder('s')
                         ->andWhere('s.company = :company')
                         ->setParameter('company', $options['company'])
-                        ->orderBy('s.name', 'ASC');
+                        ->orderBy('s.isCore', 'DESC')
+                        ->addOrderBy('s.name', 'ASC');
                 },
                 'attr' => [
                     'class' => 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900',

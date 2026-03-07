@@ -23,24 +23,69 @@
             </div>
 
             <div class="bg-[#1F2732] border border-[#2A3747] rounded-2xl p-4">
-                <form method="get" class="flex flex-col md:flex-row gap-3 md:items-center">
+                <form method="get" class="flex flex-col gap-3">
+                    <div class="flex flex-col md:flex-row gap-3 md:items-center">
                     <input
                         type="text"
                         name="q"
                         value="{{ q }}"
                         placeholder="Rechercher par compétence, nom ou rôle..."
+                        list="skill-suggestions"
                         class="w-full md:flex-1 rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 placeholder-gray-500 px-4 py-2"
                     />
                     <div class="flex gap-2">
                         <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md btn-mobile">
                             Rechercher
                         </button>
-                        {% if q %}
+                        {% if q or type or skillId or sort != 'name_asc' %}
                             <a href="{{ path('app_collaborator_index') }}"
                                class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] text-white font-semibold rounded-md btn-mobile">
                                 Réinitialiser
                             </a>
                         {% endif %}
+                    </div>
+                    </div>
+                    <datalist id="skill-suggestions">
+                        {% for skill in skills %}
+                            <option value="{{ skill.name }}"></option>
+                        {% endfor %}
+                    </datalist>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                            <label class="text-xs uppercase tracking-wider text-gray-400">Type</label>
+                            <select name="type"
+                                    class="mt-1 w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-3 py-2">
+                                <option value="">Tous</option>
+                                <option value="salarie" {{ type == 'salarie' ? 'selected' : '' }}>Salarié</option>
+                                <option value="freelance" {{ type == 'freelance' ? 'selected' : '' }}>Freelance</option>
+                                <option value="collaborateur" {{ type == 'collaborateur' ? 'selected' : '' }}>Collaborateur</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs uppercase tracking-wider text-gray-400">Compétence</label>
+                            <select name="skill"
+                                    class="mt-1 w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-3 py-2">
+                                <option value="">Toutes</option>
+                                {% for skill in skills %}
+                                    <option value="{{ skill.id }}" {{ skillId == skill.id ? 'selected' : '' }}>
+                                        {{ skill.name }}{% if skill.isCore %} ★{% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs uppercase tracking-wider text-gray-400">Trier</label>
+                            <select name="sort"
+                                    class="mt-1 w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-3 py-2">
+                                <option value="name_asc" {{ sort == 'name_asc' ? 'selected' : '' }}>Nom A → Z</option>
+                                <option value="name_desc" {{ sort == 'name_desc' ? 'selected' : '' }}>Nom Z → A</option>
+                                <option value="role_asc" {{ sort == 'role_asc' ? 'selected' : '' }}>Rôle A → Z</option>
+                                <option value="role_desc" {{ sort == 'role_desc' ? 'selected' : '' }}>Rôle Z → A</option>
+                                <option value="cost_asc" {{ sort == 'cost_asc' ? 'selected' : '' }}>Coût ↑</option>
+                                <option value="cost_desc" {{ sort == 'cost_desc' ? 'selected' : '' }}>Coût ↓</option>
+                            </select>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -57,6 +102,35 @@
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
                     <div class="text-xs uppercase tracking-wider text-gray-400">Page</div>
                     <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">Salariés</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.salarie }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">Freelances</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.freelance }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">Collaborateurs</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.collaborateur }}</div>
+                </div>
+            </div>
+
+            <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                <div class="text-xs uppercase tracking-wider text-gray-400">Top compétences</div>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    {% if topSkills is not empty %}
+                        {% for s in topSkills %}
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#223044] text-gray-200">
+                                {{ s.name }} ({{ s.total }})
+                            </span>
+                        {% endfor %}
+                    {% else %}
+                        <span class="text-sm text-gray-400">Aucune compétence liée pour le moment.</span>
+                    {% endif %}
                 </div>
             </div>
 
@@ -107,7 +181,13 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
                                     {% if collaborator.skills is not empty %}
-                                        {{ collaborator.skills|map(s => s.name)|join(', ') }}
+                                        <div class="flex flex-wrap gap-1">
+                                            {% for skill in collaborator.skills %}
+                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-indigo-50 text-indigo-700">
+                                                    {{ skill.name }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
                                     {% else %}
                                         —
                                     {% endif %}
@@ -153,7 +233,7 @@
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
-                            <a href="?page={{ i }}{% if q %}&q={{ q|url_encode }}{% endif %}"
+                            <a href="?page={{ i }}{% if q %}&q={{ q|url_encode }}{% endif %}{% if type %}&type={{ type|url_encode }}{% endif %}{% if skillId %}&skill={{ skillId }}{% endif %}{% if sort %}&sort={{ sort|url_encode }}{% endif %}"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
                                 {{ i }}
                             </a>

@@ -18,6 +18,9 @@ class Skill
     #[ORM\Column(length: 120)]
     private ?string $name = null;
 
+    #[ORM\Column(type: 'boolean')]
+    private bool $isCore = false;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Company $company = null;
@@ -57,6 +60,17 @@ class Skill
     public function setCompany(?Company $company): static
     {
         $this->company = $company;
+        return $this;
+    }
+
+    public function isCore(): bool
+    {
+        return $this->isCore;
+    }
+
+    public function setIsCore(bool $isCore): static
+    {
+        $this->isCore = $isCore;
         return $this;
     }
 

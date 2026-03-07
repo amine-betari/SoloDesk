@@ -58,7 +58,14 @@
                         {% for skill in pagination.items %}
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4">
-                                    <div class="text-sm font-semibold text-gray-900">{{ skill.name }}</div>
+                                    <div class="flex items-center gap-2">
+                                        <div class="text-sm font-semibold text-gray-900">{{ skill.name }}</div>
+                                        {% if skill.isCore %}
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-700">
+                                                Clé
+                                            </span>
+                                        {% endif %}
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <div class="flex flex-wrap gap-2">
