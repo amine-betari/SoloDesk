@@ -39,14 +39,16 @@ class SalesDocumentForm extends AbstractType
 
 
         $builder
-            ->add('reference')
+            ->add('reference', null, [
+                'label' => 'sales_document.reference',
+            ])
             // Champs TVA
             ->add('taxApplied', CheckboxType::class, [
-                'label'    => 'TVA appliquée',
+                'label'    => 'sales_document.tax_applied',
                 'required' => false,
             ])
             ->add('vatRate', NumberType::class, [
-                'label'    => 'TVA (%)',
+                'label'    => 'sales_document.vat_rate',
                 'required' => false,
                 'scale'    => 2,
             ])
@@ -63,28 +65,29 @@ class SalesDocumentForm extends AbstractType
            $builder->add('client', ClientAutocompleteField::class, [
                 'required' => true,
                 'choice_label' => 'name',
+                'label' => 'sales_document.client',
             ])
             ->add('notes', TextareaType::class, [
-                'label' => 'Notes / Informations complémentaires',
+                'label' => 'sales_document.notes',
                 'required' => false,
                 'attr' => ['class' => 'form-control', 'rows' => 3],
             ])
 
             ->add('status', ChoiceType::class, [
-                'label' => 'Statut',
+                'label' => 'sales_document.status',
                 'choices' => $statusChoices
             ])
                ->add('invoiceDate', DateType::class, [
                    'required' => false,
                    'widget' => 'single_text',
-                   'label' => "Date d'émission",
+                   'label' => 'sales_document.issue_date',
                    'html5' => true, // active le datepicker natif
                ])
            ;
 
         if ($data instanceof SalesDocument && $data->isInvoice()) {
             $builder->add('externalInvoice', CheckboxType::class, [
-                'label' => 'Facture externe (pour un ami)',
+                'label' => 'sales_document.external_invoice',
                 'required' => false,
             ]);
         }

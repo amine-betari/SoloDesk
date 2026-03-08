@@ -21,25 +21,25 @@ class CollaboratorForm extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom',
+                'label' => 'collaborator.name',
                 'constraints' => [
                     new NotBlank(['message' => 'Veuillez entrer un nom']),
                 ],
             ])
             ->add('role', TextType::class, [
-                'label' => 'Rôle',
+                'label' => 'collaborator.role',
                 'required' => false,
             ])
             ->add('type', ChoiceType::class, [
-                'label' => 'Type',
+                'label' => 'collaborator.type',
                 'choices' => [
-                    'Salarié' => 'salarie',
-                    'Freelance' => 'freelance',
-                    'Collaborateur' => 'collaborateur',
+                    'collaborator.type_salarie' => 'salarie',
+                    'collaborator.type_freelance' => 'freelance',
+                    'collaborator.type_collaborateur' => 'collaborateur',
                 ],
             ])
             ->add('monthlyCost', NumberType::class, [
-                'label' => 'Coût mensuel',
+                'label' => 'collaborator.monthly_cost',
                 'required' => false,
                 'scale' => 2,
                 'html5' => true,
@@ -48,7 +48,7 @@ class CollaboratorForm extends AbstractType
             ->add('skills', EntityType::class, [
                 'class' => Skill::class,
                 'choice_label' => 'name',
-                'label' => 'Compétences',
+                'label' => 'collaborator.skills',
                 'required' => false,
                 'multiple' => true,
                 'expanded' => false,
@@ -64,7 +64,7 @@ class CollaboratorForm extends AbstractType
                 ],
             ])
             ->add('notes', TextareaType::class, [
-                'label' => 'Notes / Description',
+                'label' => 'collaborator.notes',
                 'required' => false,
                 'attr' => [
                     'rows' => 6,

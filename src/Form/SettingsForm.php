@@ -14,14 +14,14 @@ class SettingsForm extends AbstractType
     {
         $builder
             ->add('taxImpotRate', NumberType::class, [
-                'label' => 'Taux impôt trimestriel (%)',
+                'label' => 'settings.tax_rate',
                 'required' => true,
                 'scale' => 2,
                 'html5' => true,
                 'attr' => ['step' => '0.01'],
             ])
             ->add('activityStartDate', DateType::class, [
-                'label' => 'Date de début d’activité',
+                'label' => 'settings.activity_start_date',
                 'widget' => 'single_text',
                 'required' => true,
             ]);

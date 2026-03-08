@@ -31,20 +31,37 @@
     <main class="flex-1 p-0">
         {% if app.user %}
             <div class="bg-[#1F2732] border-b border-[#2A3747] px-6 py-4">
-                <form action="{{ path('app_search') }}" method="get" class="max-w-3xl">
-                    <div class="flex flex-col sm:flex-row gap-3">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                    <form action="{{ path('app_search') }}" method="get" class="max-w-3xl w-full">
+                        <div class="flex flex-col sm:flex-row gap-3">
                         <input
                             type="text"
                             name="q"
                             value="{{ app.request.query.get('q') }}"
-                            placeholder="Rechercher un client, projet, devis..."
+                            placeholder="{{ 'search.placeholder'|trans }}"
                             class="flex-1 px-3 py-2 rounded-md bg-[#16202A] border border-[#2A3747] text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                         <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-bold w-full sm:w-auto">
-                            Rechercher
+                            {{ 'search.button'|trans }}
                         </button>
+                        </div>
+                    </form>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400">{{ 'nav.language'|trans }}</span>
+                        <a href="{{ path('app_lang_switch', {'_locale':'fr'}) }}"
+                           class="px-2 py-1 rounded-md text-xs font-semibold {{ app.request.locale == 'fr' ? 'bg-blue-600 text-white' : 'bg-[#16202A] text-gray-300 hover:text-white' }}">
+                            FR
+                        </a>
+                        <a href="{{ path('app_lang_switch', {'_locale':'en'}) }}"
+                           class="px-2 py-1 rounded-md text-xs font-semibold {{ app.request.locale == 'en' ? 'bg-blue-600 text-white' : 'bg-[#16202A] text-gray-300 hover:text-white' }}">
+                            EN
+                        </a>
+                        <a href="{{ path('app_lang_switch', {'_locale':'ar'}) }}"
+                           class="px-2 py-1 rounded-md text-xs font-semibold {{ app.request.locale == 'ar' ? 'bg-blue-600 text-white' : 'bg-[#16202A] text-gray-300 hover:text-white' }}">
+                            AR
+                        </a>
                     </div>
-                </form>
+                </div>
             </div>
         {% endif %}
         {% include 'partials/_flash_messages.html.twig' %}
@@ -58,17 +75,17 @@
         <div class="md:flex md:justify-between items-center">
             <div class="flex flex-wrap gap-4">
                 {% if app.user %}
-                    <a href="{{ path('app_profile') }}" class="hover:text-[#6cc7cd] btn-mobile inline-block">Profile</a>
+                    <a href="{{ path('app_profile') }}" class="hover:text-[#6cc7cd] btn-mobile inline-block">{{ 'nav.profile'|trans }}</a>
                     <div>|</div>
                     <form method="post" action="{{ path('app_logout') }}" class="inline">
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
-                        <button type="submit" class="hover:text-[#6cc7cd] btn-mobile">Déconnexion</button>
+                        <button type="submit" class="hover:text-[#6cc7cd] btn-mobile">{{ 'nav.logout'|trans }}</button>
                     </form>
                     <div>|</div>
                 {% endif %}
-                <a href="{{ path('app_help_estimation') }}" class="hover:text-[#6cc7cd] btn-mobile inline-block">FAQ</a>
+                <a href="{{ path('app_help_estimation') }}" class="hover:text-[#6cc7cd] btn-mobile inline-block">{{ 'nav.faq'|trans }}</a>
                 <div>|</div>
-                <a href="#" class="hover:text-[#6cc7cd] btn-mobile inline-block">Support</a>
+                <a href="#" class="hover:text-[#6cc7cd] btn-mobile inline-block">{{ 'nav.support'|trans }}</a>
             </div>
             <div class="flex flex-wrap gap-4 mt-4 md:mt-0">
                 <a href="#" class="w-7 h-7 fill-white hover:fill-[#6cc7cd]">

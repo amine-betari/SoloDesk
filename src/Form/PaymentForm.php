@@ -23,7 +23,7 @@ class PaymentForm extends AbstractType
         $builder
             ->add('date', DateType::class, [
                 'widget' => 'single_text',
-                'label' => 'Date de paiement'
+                'label' => 'payment.date'
             ])
             ->add('amount', /*MoneyType::class, [
                 'currency' => 'EUR', // ou dynamique selon le projet
@@ -31,24 +31,24 @@ class PaymentForm extends AbstractType
             ]*/)
             ->add('method', ChoiceType::class, [
                 'choices' => [
-                    'Carte bancaire' => 'card',
-                    'Virement bancaire' => 'transfer',
-                    'Chèque' => 'check',
-                    'Espèces' => 'cash',
-                    'Paypal' => 'paypal',
-                    'Autre' => 'other',
+                    'payment.method_card' => 'card',
+                    'payment.method_transfer' => 'transfer',
+                    'payment.method_check' => 'check',
+                    'payment.method_cash' => 'cash',
+                    'payment.method_paypal' => 'paypal',
+                    'payment.method_other' => 'other',
                 ],
-                'placeholder' => 'Choisir une méthode',
+                'placeholder' => 'payment.method_placeholder',
                 'required' => false,
-                'label' => 'Méthode de paiement'
+                'label' => 'payment.method'
             ])
             ->add('label', TextType::class, [
                 'required' => false,
-                'label' => 'Libellé'
+                'label' => 'payment.label'
             ])
             ->add('invoiceReference', TextType::class, [
             'required' => false,
-            'label' => 'Référence facultative si pas de facture liée'
+            'label' => 'payment.invoice_reference_optional'
             ]);
 
         $builder
@@ -73,7 +73,7 @@ class PaymentForm extends AbstractType
     {
         if (!$payment->getSalesDocument()) {
             $context
-                ->buildViolation('Vous devez sélectionner soit un projet soit une facture.')
+                ->buildViolation('payment.validation_select_document')
                 ->atPath('project') // ou 'salesDocument', juste pour pointer sur un champ
                 ->addViolation();
         }

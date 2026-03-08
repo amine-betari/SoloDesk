@@ -1,72 +1,72 @@
 {% extends 'base.html.twig' %}
-{% block title %}Modèles de documents{% endblock %}
+{% block title %}{{ 'templates.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="w-full px-6 py-8">
         <div class="space-y-8">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h1 class="text-3xl sm:text-4xl font-bold text-white">Modèles de documents</h1>
-                    <p class="text-sm text-gray-400 mt-2">Personnalise tes factures et devis avec ton design.</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">{{ 'templates.title'|trans }}</h1>
+                    <p class="text-sm text-gray-400 mt-2">{{ 'templates.subtitle'|trans }}</p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
                     <form method="post" action="{{ path('app_templates_install_pro') }}" class="inline-flex">
                         <input type="hidden" name="_token" value="{{ csrf_token('install_pro_templates') }}">
                         <button class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
-                            Installer le modèle pro
+                            {{ 'templates.install_pro'|trans }}
                         </button>
                     </form>
                     <a href="{{ path('app_templates_preview') }}" class="inline-flex items-center justify-center px-5 py-3 bg-[#223044] hover:bg-[#2E415B] text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Aperçu facture réel
+                        {{ 'templates.preview_real'|trans }}
                     </a>
                     <a href="{{ path('app_templates_upload') }}" class="inline-flex items-center justify-center px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Uploader un modèle
+                        {{ 'templates.upload'|trans }}
                     </a>
                     <a href="{{ path('app_templates_sample_word_invoice') }}" class="inline-flex items-center justify-center px-5 py-3 bg-[#2A3747] hover:bg-[#314157] text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Modèle Facture (Word)
+                        {{ 'templates.sample_invoice'|trans }}
                     </a>
                     <a href="{{ path('app_templates_sample_word_estimate') }}" class="inline-flex items-center justify-center px-5 py-3 bg-[#2A3747] hover:bg-[#314157] text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Modèle Devis (Word)
+                        {{ 'templates.sample_estimate'|trans }}
                     </a>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Étape 1</div>
-                    <div class="mt-2 text-lg font-semibold text-white">Télécharge un modèle</div>
-                    <div class="text-sm text-gray-300 mt-2">Pars du modèle Word pour garder tous les placeholders.</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'templates.step1'|trans }}</div>
+                    <div class="mt-2 text-lg font-semibold text-white">{{ 'templates.step1_title'|trans }}</div>
+                    <div class="text-sm text-gray-300 mt-2">{{ 'templates.step1_desc'|trans }}</div>
                 </div>
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Étape 2</div>
-                    <div class="mt-2 text-lg font-semibold text-white">Personnalise le design</div>
-                    <div class="text-sm text-gray-300 mt-2">Couleurs, typographie, logo, mise en page.</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'templates.step2'|trans }}</div>
+                    <div class="mt-2 text-lg font-semibold text-white">{{ 'templates.step2_title'|trans }}</div>
+                    <div class="text-sm text-gray-300 mt-2">{{ 'templates.step2_desc'|trans }}</div>
                 </div>
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Étape 3</div>
-                    <div class="mt-2 text-lg font-semibold text-white">Upload & défaut</div>
-                    <div class="text-sm text-gray-300 mt-2">Uploade pour Facture puis Devis, coche “par défaut”.</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'templates.step3'|trans }}</div>
+                    <div class="mt-2 text-lg font-semibold text-white">{{ 'templates.step3_title'|trans }}</div>
+                    <div class="text-sm text-gray-300 mt-2">{{ 'templates.step3_desc'|trans }}</div>
                 </div>
             </div>
 
             <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5 text-gray-200">
-                <div class="text-lg font-semibold text-white">Logo (Word)</div>
-                <div class="text-sm text-gray-300 mt-2">Pour un logo automatique, place une image dans Word et mets son texte alternatif à <code>company_logo</code>.</div>
-                <div class="text-sm text-gray-400 mt-2">Tu peux aussi cliquer “Installer le modèle pro” et ne plus toucher aux placeholders.</div>
+                <div class="text-lg font-semibold text-white">{{ 'templates.logo_title'|trans }}</div>
+                <div class="text-sm text-gray-300 mt-2">{{ 'templates.logo_desc'|trans }}</div>
+                <div class="text-sm text-gray-400 mt-2">{{ 'templates.logo_hint'|trans }}</div>
             </div>
 
             <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
                 <details class="text-gray-300">
-                    <summary class="text-lg font-semibold text-white cursor-pointer">Placeholders disponibles (optionnel)</summary>
+                    <summary class="text-lg font-semibold text-white cursor-pointer">{{ 'templates.placeholders'|trans }}</summary>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mt-4">
                         <div>
-                            <div class="text-xs uppercase tracking-wider text-gray-400">Document</div>
+                            <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'templates.section_document'|trans }}</div>
                             <div class="mt-2">
                                 <code>${reference}</code>, <code>${date}</code>, <code>${total_ht}</code>, <code>${total_ttc}</code>, <code>${vat_rate}</code>, <code>${notes}</code>
                             </div>
                         </div>
                         <div>
-                            <div class="text-xs uppercase tracking-wider text-gray-400">Entreprise</div>
+                            <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'templates.section_company'|trans }}</div>
                             <div class="mt-2">
                                 <code>${company_name}</code>, <code>${company_ice}</code>, <code>${company_if}</code>, <code>${company_tp}</code>, <code>${company_rc}</code>
                             </div>
@@ -75,13 +75,13 @@
                             </div>
                         </div>
                         <div>
-                            <div class="text-xs uppercase tracking-wider text-gray-400">Client</div>
+                            <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'templates.section_client'|trans }}</div>
                             <div class="mt-2">
                                 <code>${client_name}</code>, <code>${client_email}</code>, <code>${client_phone}</code>, <code>${client_address}</code>, <code>${client_country}</code>
                             </div>
                         </div>
                         <div>
-                            <div class="text-xs uppercase tracking-wider text-gray-400">Lignes</div>
+                            <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'templates.section_items'|trans }}</div>
                             <div class="mt-2">
                                 <code>${item_description}</code>, <code>${item_qty}</code>, <code>${item_unit_price}</code>, <code>${item_total}</code>
                             </div>
@@ -94,12 +94,12 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Nom</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Type</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Format</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Fichier</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Défaut</th>
-                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.name'|trans }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.type'|trans }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.format'|trans }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.file'|trans }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.default'|trans }}</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -109,11 +109,11 @@
                             <td class="px-6 py-4 text-sm text-gray-700">{{ t.type }}</td>
                             <td class="px-6 py-4 text-sm text-gray-700">{{ t.format }}</td>
                             <td class="px-6 py-4 text-sm">
-                                <a class="text-blue-600 hover:underline btn-mobile inline-block" href="/{{ t.filePath }}" target="_blank">Voir</a>
+                                <a class="text-blue-600 hover:underline btn-mobile inline-block" href="/{{ t.filePath }}" target="_blank">{{ 'actions.view'|trans }}</a>
                             </td>
                             <td class="px-6 py-4 text-sm">
                                 {% if t.isDefault %}
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Oui</span>
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">{{ 'yes'|trans }}</span>
                                 {% else %}
                                     <span class="text-gray-500 text-xs">—</span>
                                 {% endif %}
@@ -122,19 +122,19 @@
                                 <div class="flex flex-wrap gap-3">
                                     {% if not t.isDefault %}
                                         <a href="{{ path('app_templates_set_default', {id: t.id}) }}"
-                                           class="text-indigo-600 hover:underline btn-mobile">Définir par défaut</a>
+                                           class="text-indigo-600 hover:underline btn-mobile">{{ 'templates.set_default'|trans }}</a>
                                     {% endif %}
                                     <form method="post" action="{{ path('app_templates_delete', {id: t.id}) }}"
                                           onsubmit="return confirm('Supprimer ce modèle ?');" class="btn-mobile">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete_template' ~ t.id) }}">
-                                        <button class="text-red-600 hover:underline">Supprimer</button>
+                                        <button class="text-red-600 hover:underline">{{ 'actions.delete'|trans }}</button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">Aucun modèle</td>
+                            <td colspan="6" class="px-6 py-10 text-center text-gray-500">{{ 'templates.none'|trans }}</td>
                         </tr>
                     {% endfor %}
                     </tbody>

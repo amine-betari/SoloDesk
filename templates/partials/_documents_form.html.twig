@@ -3,7 +3,7 @@
     data-documents-prototype-value="{{ form_widget(form.documents.vars.prototype)|e('html_attr') }}"
     data-documents-index-value="{{ form.documents|length }}"
 >
-    <label class="block text-sm font-medium mb-2">Ajouter des documents</label>
+    <label class="block text-sm font-medium mb-2">{{ 'documents.add'|trans }}</label>
 
     <div data-documents-target="container" class="space-y-2 mb-2">
         {% for documentField in form.documents %}
@@ -18,7 +18,7 @@
         data-action="documents#add"
         class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
     >
-        + Ajouter un document
+        {{ 'documents.add_one'|trans }}
     </button>
 
     {{ form_errors(form.documents) }}
@@ -26,14 +26,14 @@
 
 {% if relatedEntity.documents|length > 0 %}
     <div class="mb-4">
-        <label class="block font-medium mb-2">Documents existants</label>
+        <label class="block font-medium mb-2">{{ 'documents.existing'|trans }}</label>
         <ul>
             {% for document in relatedEntity.documents %}
                 <li class="flex flex-wrap items-center gap-2 mb-1">
                     <a href="{{ asset('uploads/documents/' ~ document.filename) }}" target="_blank" class="underline text-blue-600">{{ document.filename }}</a>
                     <label class="ml-4 text-sm text-red-600 cursor-pointer">
                         <input type="checkbox" name="documents_to_remove[]" value="{{ document.id }}">
-                        Supprimer
+                        {{ 'actions.delete'|trans }}
                     </label>
                 </li>
             {% endfor %}

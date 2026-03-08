@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -24,31 +25,31 @@ class EstimateForm extends AbstractType
     {
         $builder
             ->add('name', TextType::class, [
-                'label' => 'Nom de l’estimate',
+                'label' => 'estimate.name',
                 'required' => true,
             ])
             ->add('amount')
             ->add('estimateNumber', TextType::class, [
                 'required' => true,
-                'label' => 'Référence',
+                'label' => 'estimate.reference',
                 'disabled' => $options['data'] && $options['data']->getId() === null, // désactivé en création
             ])
             ->add('startDate', DateType::class, [
                 'widget' => 'single_text',
                 'required' => false,
-                'label' => 'Date de début',
+                'label' => 'estimate.start_date',
             ])
             ->add('endDate', DateType::class, [
                 'widget' => 'single_text',
                 'required' => false,
-                'label' => 'Date de fin',
+                'label' => 'estimate.end_date',
             ])
             ->add('status', ChoiceType::class, [
                 'choices' => EstimateStatuses::CHOICES,
-                'label' => 'Statut du devis'
+                'label' => 'estimate.status'
             ])
             ->add('vatRate', NumberType::class, [
-                'label' => 'TVA (%)',
+                'label' => 'estimate.vat_rate',
                 'required' => false,
                 'scale' => 2,
                 'html5' => true,
@@ -56,13 +57,17 @@ class EstimateForm extends AbstractType
             ])
             ->add('noVat', CheckboxType::class, [
                 'mapped' => false,
-                'label' => 'Pas de TVA',
+                'label' => 'estimate.no_vat',
                 'required' => false,
             ])
-            ->add('description')
+            ->add('description', TextareaType::class, [
+                'label' => 'estimate.description',
+                'required' => false,
+            ])
             ->add('client', ClientAutocompleteField::class, [
                 'required' => true,
                 'choice_label' => 'name',
+                'label' => 'estimate.client',
             ])
             ->add('documents', CollectionType::class, [
                 'entry_type' => FileType::class,
@@ -75,7 +80,7 @@ class EstimateForm extends AbstractType
                 'allow_add' => true,
                 'by_reference' => false,
                 'mapped' => false, // important ici aussi !
-                'label' => 'Documents',
+                'label' => 'estimate.documents',
             ])
         ;
     }

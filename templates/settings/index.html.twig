@@ -1,27 +1,27 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Paramètres{% endblock %}
+{% block title %}{{ 'settings.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="mt-12 p-8 bg-white text-gray-900 rounded-xl">
-        <h1 class="text-4xl font-extrabold mb-8">Paramètres</h1>
+        <h1 class="text-4xl font-extrabold mb-8">{{ 'settings.title'|trans }}</h1>
 
         {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
 
         <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6 border border-gray-200">
-            <legend class="text-2xl font-semibold text-gray-700">Général</legend>
+            <legend class="text-2xl font-semibold text-gray-700">{{ 'settings.general'|trans }}</legend>
 
             <div class="space-y-2">
-                {% set rateLabel = 'Taux impôt (%)' %}
+                {% set rateLabelKey = 'settings.rate_default' %}
                 {% if legalForm == 'AE' %}
-                    {% set rateLabel = 'Taux AE (%)' %}
+                    {% set rateLabelKey = 'settings.rate_ae' %}
                 {% elseif legalForm == 'SARL_AU' %}
-                    {% set rateLabel = 'Taux IS (%)' %}
+                    {% set rateLabelKey = 'settings.rate_sarl' %}
                 {% endif %}
-                {{ form_label(form.taxImpotRate, rateLabel, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.taxImpotRate, rateLabelKey|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.taxImpotRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.taxImpotRate) }}
-                <p class="text-xs text-gray-500">Exemple: 1.00 pour 1%</p>
+                <p class="text-xs text-gray-500">{{ 'settings.rate_help'|trans }}</p>
             </div>
 
             <div class="space-y-2">
@@ -32,7 +32,7 @@
         </fieldset>
 
         <div class="flex justify-end">
-            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors btn-mobile">Enregistrer</button>
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors btn-mobile">{{ 'actions.save'|trans }}</button>
         </div>
 
         {{ form_end(form) }}

@@ -4,15 +4,15 @@
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
-            {{ form_label(form.client, 'Client', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_label(form.client, 'project.client'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
             {{ form_widget(form.client, {'attr': {'class': 'w-full'}}) }}
         </div>
         <div>
-            {{ form_label(form.startDate, 'Date de début', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_label(form.startDate, 'project.start_date'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
             {{ form_widget(form.startDate, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div>
-            {{ form_label(form.endDate, 'Date de fin', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_label(form.endDate, 'project.end_date'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
             {{ form_widget(form.endDate, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div class="flex flex-col sm:flex-row sm:items-end gap-2">

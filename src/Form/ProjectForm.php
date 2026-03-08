@@ -30,35 +30,37 @@ class ProjectForm extends AbstractType
         $project = $options['data'] ?? null;
 
         $builder
-            ->add('name')
+            ->add('name', TextType::class, [
+                'label' => 'project.name',
+            ])
             ->add('projectNumber', TextType::class, [
                 'required' => true,
-                'label' => 'Référence',
+                'label' => 'project.reference',
                 'disabled' => $options['data'] && $options['data']->getId() === null, // désactivé en création
             ])
             ->add('status', ChoiceType::class, [
                     'choices' => ProjectStatuses::CHOICES,
-                    'label' => 'Statut du projet',
+                    'label' => 'project.status',
                 ])
             ->add('type', ChoiceType::class, [
-                'label' => 'Type de projet',
+                'label' => 'project.type',
                 'choices' => ProjectTypes::TYPES,
-                'placeholder' => 'Sélectionner un type',
+                'placeholder' => 'project.type_placeholder',
             ])
             ->add('typeDescription', TextType::class, [
-                'label' => 'Précisez le type',
+                'label' => 'project.type_description',
                 'required' => false,
             ])
             ->add('startDate', DateType::class, [
                 'required' => true,
                 'widget' => 'single_text',
-                'label' => 'Date de premier contact',
+                'label' => 'project.start_date',
                 'html5' => true, // active le datepicker natif
             ])
             ->add('endDate', DateType::class, [
                 'required' => false,
                 'widget' => 'single_text',
-                'label' => 'Date de premier contact',
+                'label' => 'project.end_date',
                 'html5' => true, // active le datepicker natif
             ])
             ->add('amount', /*MoneyType::class, [
@@ -68,7 +70,7 @@ class ProjectForm extends AbstractType
                 'attr' => ['class' => 'w-full text-black'],
             ]*/)
             ->add('vatRate', NumberType::class, [
-                'label' => 'TVA (%)',
+                'label' => 'project.vat_rate',
                 'required' => false,
                 'scale' => 2,
                 'html5' => true,
@@ -76,38 +78,39 @@ class ProjectForm extends AbstractType
             ])
             ->add('noVat', CheckboxType::class, [
                 'mapped' => false,
-                'label' => 'Pas de TVA',
+                'label' => 'project.no_vat',
                 'required' => false,
             ])
             ->add('client', ClientAutocompleteField::class, [
                   'required' => true,
                   'choice_label' => 'name',
+                  'label' => 'project.client',
               ])
             ->add('description', TextareaType::class, [
                 'required' => false,
-                'label' => 'Description',
+                'label' => 'project.description',
                 'attr' => [
                     'class' => 'mt-1 w-full rounded-md border-gray-300 text-black',
                 ],
             ])
             ->add('isRecurring', CheckboxType::class, [
-                'label' => 'Projet récurrent',
+                'label' => 'project.recurring',
                 'required' => false,
             ])
             ->add('recurringAmount', TextType::class, [
-                'label' => 'Montant récurrent',
+                'label' => 'project.recurring_amount',
                 'required' => false,
                 'row_attr' => ['class' => 'hidden'], // caché par défaut
             ])
             ->add('recurringPeriod', ChoiceType::class, [
-                'label' => 'Périodicité',
+                'label' => 'project.recurring_period',
                 'required' => false,
                 'choices' => [
-                    'Mensuel' => 'monthly',
-                    'Trimestriel' => 'quarterly',
-                    'Annuel' => 'yearly',
+                    'project.period_monthly' => 'monthly',
+                    'project.period_quarterly' => 'quarterly',
+                    'project.period_yearly' => 'yearly',
                 ],
-                'placeholder' => 'Choisir une période',
+                'placeholder' => 'project.period_placeholder',
                 'row_attr' => ['class' => 'hidden'], // caché par défaut
             ])
             ->add('documents', CollectionType::class, [
@@ -121,7 +124,7 @@ class ProjectForm extends AbstractType
                 'allow_add' => true,
                 'by_reference' => false,
                 'mapped' => false, // important ici aussi !
-                'label' => 'Documents',
+                'label' => 'project.documents',
             ])
         ;
 
@@ -130,7 +133,7 @@ class ProjectForm extends AbstractType
                 'required' => false,
                 'multiple' => true,
                 'by_reference' => false,
-                'label' => 'Factures liées',
+                'label' => 'project.linked_invoices',
                 'query_builder' => function (EntityRepository $er) use ($project) {
                     return $er->createQueryBuilder('s')
                         ->where('s.type = :type1 OR s.type = :type2')

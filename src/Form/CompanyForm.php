@@ -20,7 +20,7 @@ class CompanyForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('name', TextType::class, [
-            'label' => 'Nom de l’entreprise',
+            'label' => 'company.name',
             'constraints' => [
                 new NotBlank(['message' => 'Veuillez entrer le nom de l’entreprise']),
                 new Length([
@@ -32,54 +32,54 @@ class CompanyForm extends AbstractType
         ])
         ->add('legalForm', ChoiceType::class, [
             'required' => false,
-            'label' => 'Forme juridique',
-            'placeholder' => 'Choisir une forme',
+            'label' => 'company.legal_form',
+            'placeholder' => 'company.legal_form_placeholder',
             'choices' => [
-                'Auto-entrepreneur (AE)' => 'AE',
-                'SARL AU' => 'SARL_AU',
+                'company.legal_form_ae' => 'AE',
+                'company.legal_form_sarl' => 'SARL_AU',
             ],
         ])
         ->add('rcNumber', TextType::class, [
             'required' => false,
-            'label' => 'RC (Registre de commerce)',
+            'label' => 'company.rc',
         ])
         ->add('ice', TextType::class, [
             'required' => false,
-            'label' => 'ICE',
+            'label' => 'company.ice',
         ])
         ->add('fiscalId', TextType::class, [
             'required' => false,
-            'label' => 'Identifiant fiscal (IF)',
+            'label' => 'company.if',
         ])
         ->add('taxProfessional', TextType::class, [
             'required' => false,
-            'label' => 'Taxe professionnelle',
+            'label' => 'company.tp',
         ])
         ->add('address', TextareaType::class, [
             'required' => false,
-            'label' => 'Adresse',
+            'label' => 'company.address',
             'attr' => ['rows' => 3],
         ])
         ->add('city', TextType::class, [
             'required' => false,
-            'label' => 'Ville',
+            'label' => 'company.city',
         ])
         ->add('country', TextType::class, [
             'required' => false,
-            'label' => 'Pays',
+            'label' => 'company.country',
         ])
         ->add('phone', TextType::class, [
             'required' => false,
-            'label' => 'Téléphone',
+            'label' => 'company.phone',
         ])
         ->add('email', EmailType::class, [
             'required' => false,
-            'label' => 'Email',
+            'label' => 'company.email',
         ])
         ->add('logoFile', FileType::class, [
             'mapped' => false,
             'required' => false,
-            'label' => 'Logo',
+            'label' => 'company.logo',
             'constraints' => [
                 new File([
                     'maxSize' => '5M',

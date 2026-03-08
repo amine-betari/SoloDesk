@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier collaborateur{% endblock %}
+{% block title %}{{ 'collaborator.edit_title'|trans }}{% endblock %}
 
 {% block body %}
     {{ include('collaborator/_form.html.twig', {'button_label': 'Update'}) }}

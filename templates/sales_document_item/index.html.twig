@@ -1,20 +1,20 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SalesDocumentItem index{% endblock %}
+{% block title %}{{ 'sales_document_item.list_title'|trans }}{% endblock %}
 
 {% block body %}
-    <h1>SalesDocumentItem index</h1>
+    <h1>{{ 'sales_document_item.title'|trans }}</h1>
 
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
-                    <th>Id</th>
-                    <th>Description</th>
-                    <th>UnitPrice</th>
-                    <th>Quantity</th>
-                    <th>LineTotal</th>
-                    <th>actions</th>
+                    <th>ID</th>
+                    <th>{{ 'sales_document_item.description'|trans }}</th>
+                    <th>{{ 'sales_document_item.unit_price'|trans }}</th>
+                    <th>{{ 'sales_document_item.quantity'|trans }}</th>
+                    <th>{{ 'sales_document_item.line_total'|trans }}</th>
+                    <th>{{ 'table.actions'|trans }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -26,18 +26,18 @@
                     <td>{{ sales_document_item.quantity }}</td>
                     <td>{{ sales_document_item.lineTotal }}</td>
                     <td>
-                        <a href="{{ path('app_sales_document_item_show', {'id': sales_document_item.id}) }}">show</a>
-                        <a href="{{ path('app_sales_document_item_edit', {'id': sales_document_item.id}) }}">edit</a>
+                        <a href="{{ path('app_sales_document_item_show', {'id': sales_document_item.id}) }}">{{ 'actions.view'|trans }}</a>
+                        <a href="{{ path('app_sales_document_item_edit', {'id': sales_document_item.id}) }}">{{ 'actions.edit'|trans }}</a>
                     </td>
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="6">no records found</td>
+                    <td colspan="6">{{ 'sales_document_item.none'|trans }}</td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
 
-    <a href="{{ path('app_sales_document_item_new') }}">Create new</a>
+    <a href="{{ path('app_sales_document_item_new') }}">{{ 'sales_document_item.create_new'|trans }}</a>
 {% endblock %}

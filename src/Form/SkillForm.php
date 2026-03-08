@@ -16,7 +16,7 @@ class SkillForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->add('name', TextType::class, [
-            'label' => 'Compétence',
+            'label' => 'skill.name',
             'constraints' => [
                 new NotBlank(['message' => 'Veuillez entrer une compétence']),
                 new Length([
@@ -27,7 +27,7 @@ class SkillForm extends AbstractType
             ],
         ])
         ->add('isCore', CheckboxType::class, [
-            'label' => 'Compétence clé',
+            'label' => 'skill.is_core',
             'required' => false,
             'label_attr' => ['class' => 'inline-flex items-center gap-2'],
         ]);

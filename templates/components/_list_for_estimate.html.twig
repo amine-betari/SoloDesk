@@ -1,15 +1,15 @@
 {% if estimate.salesDocuments|length > 0 %}
     <div class="bg-gray-700 shadow rounded p-6 mb-6 text-white">
-        <h2 class="text-xl font-semibold mb-4">Documents générés</h2>
+        <h2 class="text-xl font-semibold mb-4">{{ 'documents.generated'|trans }}</h2>
 
         <div class="table-responsive">
             <table class="min-w-full text-sm text-left text-gray-100">
                 <thead class="bg-gray-800 text-xs uppercase">
                 <tr>
-                    <th class="px-4 py-2 border-b border-gray-600">Réf.</th>
-                    <th class="px-4 py-2 border-b border-gray-600">Type</th>
-                    <th class="px-4 py-2 border-b border-gray-600">Date</th>
-                    <th class="px-4 py-2 border-b border-gray-600">Actions</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'common.reference_short'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.type'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'common.date'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'table.actions'|trans }}</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-600">
@@ -17,13 +17,13 @@
                     <tr class="hover:bg-gray-600">
                         <td class="px-4 py-2">{{ doc.reference }}</td>
                         <td class="px-4 py-2">{{ doc.type }}</td>
-                        <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : '—' }}</td>
+                        <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : 'common.dash'|trans }}</td>
                         <td class="px-4 py-2">
                             <div class="flex flex-col sm:flex-row gap-2">
                                 <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
-                                   class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 btn-mobile">Voir</a>
+                                   class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 btn-mobile">{{ 'actions.view'|trans }}</a>
                                 <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
-                                   class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 btn-mobile">Modifier</a>
+                                   class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 btn-mobile">{{ 'actions.edit'|trans }}</a>
                             </div>
                         </td>
                     </tr>

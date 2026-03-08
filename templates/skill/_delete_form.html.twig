@@ -1,6 +1,6 @@
-<form method="post" action="{{ path('app_skill_delete', {'id': skill.id}) }}" onsubmit="return confirm('Supprimer cette compétence ?');" class="w-full sm:w-auto">
+<form method="post" action="{{ path('app_skill_delete', {'id': skill.id}) }}" onsubmit="return confirm('{{ 'skill.delete_confirm'|trans }}');" class="w-full sm:w-auto">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ skill.id) }}">
     <button class="px-3 py-1.5 rounded-md bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition">
-        Supprimer
+        {{ 'actions.delete'|trans }}
     </button>
 </form>

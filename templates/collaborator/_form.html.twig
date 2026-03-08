@@ -2,15 +2,15 @@
     <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-8">
 
         {% if button_label is defined  %}
-            <h1 class="text-3xl font-bold mb-6">Modifier le collaborateur</h1>
+            <h1 class="text-3xl font-bold mb-6">{{ 'collaborator.edit_title'|trans }}</h1>
         {% else %}
-            <h1 class="text-3xl font-bold mb-6">Nouveau collaborateur</h1>
+            <h1 class="text-3xl font-bold mb-6">{{ 'collaborator.new_title'|trans }}</h1>
         {% endif %}
 
         {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
         <fieldset class="space-y-4 p-6 bg-white rounded-lg shadow-inner border border-gray-200" data-controller="collaborator-type-badge">
-            <legend class="text-xl font-semibold mb-4 text-gray-900">Informations</legend>
+            <legend class="text-xl font-semibold mb-4 text-gray-900">{{ 'common.information'|trans }}</legend>
 
             <div>
                 {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
@@ -53,12 +53,12 @@
                     {{ form_label(form.skills, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                     {{ form_widget(form.skills) }}
                     {{ form_errors(form.skills, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
-                    <p class="text-xs text-gray-500 mt-1">Tu peux sélectionner plusieurs compétences.</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ 'collaborator.skills_help'|trans }}</p>
                 </div>
             </div>
 
             <div>
-                {{ form_label(form.notes, 'Compétences / Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.notes, 'collaborator.notes'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 <div
                     data-controller="ckeditor"
                     data-ckeditor-toolbar-value='["bold","italic","bulletedList","numberedList","undo","redo"]'
@@ -74,7 +74,7 @@
 
         <div class="flex justify-end mt-6">
             <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md btn-mobile">
-                Enregistrer
+                {{ 'actions.save'|trans }}
             </button>
         </div>
 
@@ -83,13 +83,13 @@
         {% if button_label is defined  %}
             <div class="flex flex-col sm:flex-row gap-3 mt-4">
                 <a href="{{ path('app_collaborator_index') }}"
-                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← Retour à la liste</a>
+                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>
 
                 {{ include('collaborator/_delete_form.html.twig') }}
             </div>
         {% else %}
             <a href="{{ path('app_collaborator_index') }}"
-               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← Retour à la liste</a>
+               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← {{ 'actions.back_to_list'|trans }}</a>
         {% endif %}
     </div>
 </div>

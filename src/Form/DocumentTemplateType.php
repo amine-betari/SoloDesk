@@ -15,21 +15,26 @@ class DocumentTemplateType extends AbstractType
     public function buildForm(FormBuilderInterface $b, array $options): void
     {
         $b
-            ->add('name', TextType::class)
+            ->add('name', TextType::class, [
+                'label' => 'templates.form.name',
+            ])
             ->add('type', ChoiceType::class, [
+                'label' => 'templates.form.type',
                 'choices' => [
-                    'Facture' => DocumentTemplate::TYPE_INVOICE,
-                    'Devis'   => DocumentTemplate::TYPE_ESTIMATE,
+                    'templates.type_invoice' => DocumentTemplate::TYPE_INVOICE,
+                    'templates.type_estimate' => DocumentTemplate::TYPE_ESTIMATE,
                 ],
             ])
             ->add('format', ChoiceType::class, [
+                'label' => 'templates.form.format',
                 'choices' => [
-                    'Word (.docx)'  => DocumentTemplate::FORMAT_WORD,
-                    'Excel (.xlsx)' => DocumentTemplate::FORMAT_EXCEL,
-                    'PDF (HTML->PDF)' => DocumentTemplate::FORMAT_PDF,
+                    'templates.format_word'  => DocumentTemplate::FORMAT_WORD,
+                    'templates.format_excel' => DocumentTemplate::FORMAT_EXCEL,
+                    'templates.format_pdf' => DocumentTemplate::FORMAT_PDF,
                 ],
             ])
             ->add('file', FileType::class, [
+                'label' => 'templates.form.file',
                 'mapped' => false,
                 'required' => true,
                 'constraints' => [
@@ -46,7 +51,7 @@ class DocumentTemplateType extends AbstractType
             ])
             ->add('isDefault', CheckboxType::class, [
                 'required' => false,
-                'label' => 'Définir comme modèle par défaut',
+                'label' => 'templates.form.is_default',
             ]);
     }
 

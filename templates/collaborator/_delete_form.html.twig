@@ -1,4 +1,4 @@
-<form method="post" action="{{ path('app_collaborator_delete', {'id': collaborator.id}) }}" onsubmit="return confirm('Supprimer ce collaborateur ?');" class="w-full sm:w-auto">
+<form method="post" action="{{ path('app_collaborator_delete', {'id': collaborator.id}) }}" onsubmit="return confirm('{{ 'collaborator.delete_confirm'|trans }}');" class="w-full sm:w-auto">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ collaborator.id) }}">
-    <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white btn-mobile">Supprimer</button>
+    <button class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white btn-mobile">{{ 'actions.delete'|trans }}</button>
 </form>

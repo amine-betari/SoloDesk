@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier compétence{% endblock %}
+{% block title %}{{ 'skill.edit_title'|trans }}{% endblock %}
 
 {% block body %}
     {{ include('skill/_form.html.twig', {'button_label': 'Update'}) }}

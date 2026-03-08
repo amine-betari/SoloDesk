@@ -24,7 +24,7 @@ class ClientForm extends AbstractType
         $builder
             ->add('name')
             ->add('email', EmailType::class, [
-                'label' => 'Email',
+                'label' => 'client.email',
                 'required' => false, // ou true si tu veux le rendre obligatoire
                 'constraints' => [
                     new Assert\Email([
@@ -33,7 +33,7 @@ class ClientForm extends AbstractType
                 ],
             ])
             ->add('phone', TelType::class, [
-                'label' => 'Téléphone',
+                'label' => 'client.phone',
                 'required' => false,
                 'constraints' => [
                     new Assert\Regex([
@@ -42,34 +42,36 @@ class ClientForm extends AbstractType
                     ]),
                 ],
             ])
-            ->add('address')
+            ->add('address', TextareaType::class, [
+                'label' => 'client.address',
+            ])
             ->add('country', CountryType::class, [
-                'label' => 'Pays',
-                'placeholder' => 'Choisissez un pays',
+                'label' => 'client.country',
+                'placeholder' => 'client.country_placeholder',
             ])
             ->add('notes', TextareaType::class, [
-                'label' => 'Informations complémentaires',
+                'label' => 'client.notes',
                 'required' => false,
                 'attr' => [
                     'rows' => 4,
                     'class' => 'w-full rounded-md border-gray-300 text-black d-none',
-                    'placeholder' => 'Adresse, détails spécifiques, historique client...'
+                    'placeholder' => 'client.notes_placeholder'
                 ],
             ])
             ->add('firstContactAt', DateType::class, [
                 'required' => false,
                 'widget' => 'single_text',
-                'label' => 'Date de premier contact',
+                'label' => 'client.first_contact',
                 'html5' => true, // active le datepicker natif
             ])
             ->add('currency', ChoiceType::class, [
-                'label' => 'Devise',
+                'label' => 'client.currency',
                 'choices' => [
-                    'Euro (€)' => 'EUR',
-                    'Dirham marocain (MAD)' => 'MAD',
-                    'Dollar américain ($)' => 'USD',
+                    'client.currency_eur' => 'EUR',
+                    'client.currency_mad' => 'MAD',
+                    'client.currency_usd' => 'USD',
                 ],
-                'placeholder' => 'Sélectionnez une devise',
+                'placeholder' => 'client.currency_placeholder',
             ]);
         ;
     }

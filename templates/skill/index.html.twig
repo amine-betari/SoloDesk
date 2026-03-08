@@ -1,23 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Compétences{% endblock %}
+{% block title %}{{ 'skill.title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="w-full px-6 py-8">
         <div class="space-y-6">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h1 class="text-3xl sm:text-4xl font-bold text-white">Compétences</h1>
-                    <p class="text-sm text-gray-400 mt-2">Gérez la liste des compétences disponibles.</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">{{ 'skill.title'|trans }}</h1>
+                    <p class="text-sm text-gray-400 mt-2">{{ 'skill.subtitle'|trans }}</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
-                        <span class="text-gray-500">Total</span>
+                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
                         <span class="text-white font-semibold">{{ pagination.total }}</span>
                     </div>
                     <a href="{{ path('app_skill_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Nouvelle compétence
+                        {{ 'skill.new'|trans }}
                     </a>
                 </div>
             </div>
@@ -28,17 +28,17 @@
                         type="text"
                         name="q"
                         value="{{ q }}"
-                        placeholder="Rechercher une compétence..."
+                        placeholder="{{ 'skill.search_placeholder'|trans }}"
                         class="w-full md:flex-1 rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 placeholder-gray-500 px-4 py-2"
                     />
                     <div class="flex gap-2">
                         <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md btn-mobile">
-                            Rechercher
+                            {{ 'actions.search'|trans }}
                         </button>
                         {% if q %}
                             <a href="{{ path('app_skill_index') }}"
                                class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] text-white font-semibold rounded-md btn-mobile">
-                                Réinitialiser
+                                {{ 'actions.reset'|trans }}
                             </a>
                         {% endif %}
                     </div>
@@ -50,8 +50,8 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Compétence</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'skill.name'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -62,7 +62,7 @@
                                         <div class="text-sm font-semibold text-gray-900">{{ skill.name }}</div>
                                         {% if skill.isCore %}
                                             <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-amber-100 text-amber-700">
-                                                Clé
+                                                {{ 'skill.core'|trans }}
                                             </span>
                                         {% endif %}
                                     </div>
@@ -71,7 +71,7 @@
                                     <div class="flex flex-wrap gap-2">
                                         <a href="{{ path('app_skill_edit', {'id': skill.id}) }}"
                                            class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            Modifier
+                                            {{ 'actions.edit'|trans }}
                                         </a>
                                         {{ include('skill/_delete_form.html.twig') }}
                                     </div>
@@ -79,7 +79,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="2" class="px-6 py-10 text-center text-gray-400">Aucune compétence trouvée</td>
+                                <td colspan="2" class="px-6 py-10 text-center text-gray-400">{{ 'skill.none'|trans }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -88,7 +88,7 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <p class="text-sm text-gray-400">
-                        Affichage de {{ pagination.items|length }} sur {{ pagination.total }} compétences
+                        {{ 'skill.pagination'|trans({'count': pagination.items|length, 'total': pagination.total}) }}
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
@@ -101,10 +101,10 @@
                 </div>
             {% else %}
                 <div class="rounded-2xl border border-dashed border-[#2A3747] bg-[#111922] p-10 text-center">
-                    <p class="text-gray-400 mb-4">Aucune compétence trouvée.</p>
+                    <p class="text-gray-400 mb-4">{{ 'skill.none'|trans }}</p>
                     <a href="{{ path('app_skill_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Créer votre première compétence
+                        {{ 'skill.create_first'|trans }}
                     </a>
                 </div>
             {% endif %}

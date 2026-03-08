@@ -8,10 +8,10 @@
                 <thead class="bg-gray-100 text-xs uppercase">
                 <tr>
                     <th scope="col" class="px-4 py-2">#</th>
-                    <th scope="col" class="px-4 py-2">Désignation</th>
-                    <th scope="col" class="px-4 py-2">Quantité</th>
-                    <th scope="col" class="px-4 py-2">Prix unitaire</th>
-                    <th scope="col" class="px-4 py-2">Total</th>
+                    <th scope="col" class="px-4 py-2">{{ 'sales_document_item.description'|trans }}</th>
+                    <th scope="col" class="px-4 py-2">{{ 'sales_document_item.quantity'|trans }}</th>
+                    <th scope="col" class="px-4 py-2">{{ 'sales_document_item.unit_price'|trans }}</th>
+                    <th scope="col" class="px-4 py-2">{{ 'common.total'|trans }}</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y">
@@ -19,7 +19,7 @@
                     {% set currency = item.salesDocument.estimate.currency ?? item.salesDocument.project.currency ?? item.salesDocument.client.currency ?? 'EUR' %}
                     <tr class="hover:bg-gray-50">
                         <td class="px-4 py-2">{{ loop.index }}</td>
-                        <td class="px-4 py-2">{{ item.description? item.description|sanitize_html : '-' }}</td>
+                        <td class="px-4 py-2">{{ item.description? item.description|sanitize_html : 'common.dash'|trans }}</td>
                         <td class="px-4 py-2">{{ item.quantity }}</td>
                         <td class="px-4 py-2">{{ item.unitPrice|format_currency(currency, app.request.locale ?: 'fr_FR') }}</td>
                         <td class="px-4 py-2">
@@ -32,5 +32,5 @@
         </div>
     </div>
 {% else %}
-    <p class="text-gray-500 italic">Aucune ligne d'article enregistrée.</p>
+    <p class="text-gray-500 italic">{{ 'sales_document.items_empty'|trans }}</p>
 {% endif %}

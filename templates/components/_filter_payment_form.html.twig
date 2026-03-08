@@ -3,11 +3,11 @@
 
     <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
         <div class="md:col-span-2">
-            {{ form_label(form.salesDocument, 'Référence', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_label(form.salesDocument, 'payment.reference'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
             {{ form_widget(form.salesDocument, {'attr': {'class': 'w-full'}}) }}
         </div>
         <div class="md:col-span-2">
-            {{ form_label(form.date, 'Date', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_label(form.date, 'payment.date'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
             {{ form_widget(form.date, {'attr': {'class': 'w-full rounded border border-gray-300 p-2 text-gray-900'}}) }}
         </div>
         <div class="md:col-span-2 flex flex-col sm:flex-row sm:justify-end sm:items-end gap-2">

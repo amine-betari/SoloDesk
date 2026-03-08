@@ -1,23 +1,23 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Liste des collaborateurs{% endblock %}
+{% block title %}{{ 'collaborator.list_title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="w-full px-6 py-8">
         <div class="space-y-6">
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>
-                    <h1 class="text-3xl sm:text-4xl font-bold text-white">Collaborateurs</h1>
-                    <p class="text-sm text-gray-400 mt-2">Gérez vos collaborateurs, salariés ou freelances.</p>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">{{ 'collaborator.title'|trans }}</h1>
+                    <p class="text-sm text-gray-400 mt-2">{{ 'collaborator.subtitle'|trans }}</p>
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
-                        <span class="text-gray-500">Total</span>
+                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
                         <span class="text-white font-semibold">{{ pagination.total }}</span>
                     </div>
                     <a href="{{ path('app_collaborator_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Nouveau collaborateur
+                        {{ 'collaborator.new'|trans }}
                     </a>
                 </div>
             </div>
@@ -29,18 +29,18 @@
                         type="text"
                         name="q"
                         value="{{ q }}"
-                        placeholder="Rechercher par compétence, nom ou rôle..."
+                        placeholder="{{ 'collaborator.search_placeholder'|trans }}"
                         list="skill-suggestions"
                         class="w-full md:flex-1 rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 placeholder-gray-500 px-4 py-2"
                     />
                     <div class="flex gap-2">
                         <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md btn-mobile">
-                            Rechercher
+                            {{ 'actions.search'|trans }}
                         </button>
                         {% if q or type or skillId or sort != 'name_asc' %}
                             <a href="{{ path('app_collaborator_index') }}"
                                class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] text-white font-semibold rounded-md btn-mobile">
-                                Réinitialiser
+                                {{ 'actions.reset'|trans }}
                             </a>
                         {% endif %}
                     </div>
@@ -53,20 +53,20 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
                         <div>
-                            <label class="text-xs uppercase tracking-wider text-gray-400">Type</label>
+                            <label class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.filter_type'|trans }}</label>
                             <select name="type"
                                     class="mt-1 w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-3 py-2">
-                                <option value="">Tous</option>
-                                <option value="salarie" {{ type == 'salarie' ? 'selected' : '' }}>Salarié</option>
-                                <option value="freelance" {{ type == 'freelance' ? 'selected' : '' }}>Freelance</option>
-                                <option value="collaborateur" {{ type == 'collaborateur' ? 'selected' : '' }}>Collaborateur</option>
+                                <option value="">{{ 'common.all'|trans }}</option>
+                                <option value="salarie" {{ type == 'salarie' ? 'selected' : '' }}>{{ 'collaborator.type_salarie'|trans }}</option>
+                                <option value="freelance" {{ type == 'freelance' ? 'selected' : '' }}>{{ 'collaborator.type_freelance'|trans }}</option>
+                                <option value="collaborateur" {{ type == 'collaborateur' ? 'selected' : '' }}>{{ 'collaborator.type_collaborateur'|trans }}</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-xs uppercase tracking-wider text-gray-400">Compétence</label>
+                            <label class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.filter_skill'|trans }}</label>
                             <select name="skill"
                                     class="mt-1 w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-3 py-2">
-                                <option value="">Toutes</option>
+                                <option value="">{{ 'common.all_f'|trans }}</option>
                                 {% for skill in skills %}
                                     <option value="{{ skill.id }}" {{ skillId == skill.id ? 'selected' : '' }}>
                                         {{ skill.name }}{% if skill.isCore %} ★{% endif %}
@@ -75,15 +75,15 @@
                             </select>
                         </div>
                         <div>
-                            <label class="text-xs uppercase tracking-wider text-gray-400">Trier</label>
+                            <label class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.sort'|trans }}</label>
                             <select name="sort"
                                     class="mt-1 w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-3 py-2">
-                                <option value="name_asc" {{ sort == 'name_asc' ? 'selected' : '' }}>Nom A → Z</option>
-                                <option value="name_desc" {{ sort == 'name_desc' ? 'selected' : '' }}>Nom Z → A</option>
-                                <option value="role_asc" {{ sort == 'role_asc' ? 'selected' : '' }}>Rôle A → Z</option>
-                                <option value="role_desc" {{ sort == 'role_desc' ? 'selected' : '' }}>Rôle Z → A</option>
-                                <option value="cost_asc" {{ sort == 'cost_asc' ? 'selected' : '' }}>Coût ↑</option>
-                                <option value="cost_desc" {{ sort == 'cost_desc' ? 'selected' : '' }}>Coût ↓</option>
+                                <option value="name_asc" {{ sort == 'name_asc' ? 'selected' : '' }}>{{ 'collaborator.sort_name_asc'|trans }}</option>
+                                <option value="name_desc" {{ sort == 'name_desc' ? 'selected' : '' }}>{{ 'collaborator.sort_name_desc'|trans }}</option>
+                                <option value="role_asc" {{ sort == 'role_asc' ? 'selected' : '' }}>{{ 'collaborator.sort_role_asc'|trans }}</option>
+                                <option value="role_desc" {{ sort == 'role_desc' ? 'selected' : '' }}>{{ 'collaborator.sort_role_desc'|trans }}</option>
+                                <option value="cost_asc" {{ sort == 'cost_asc' ? 'selected' : '' }}>{{ 'collaborator.sort_cost_asc'|trans }}</option>
+                                <option value="cost_desc" {{ sort == 'cost_desc' ? 'selected' : '' }}>{{ 'collaborator.sort_cost_desc'|trans }}</option>
                             </select>
                         </div>
                     </div>
@@ -92,35 +92,35 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Collaborateurs affichés</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.count_shown'|trans }}</div>
                     <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
                 </div>
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Collaborateurs au total</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.count_total'|trans }}</div>
                     <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
                 </div>
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Page</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
                     <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Salariés</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.type_salarie'|trans }}</div>
                     <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.salarie }}</div>
                 </div>
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Freelances</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.type_freelance'|trans }}</div>
                     <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.freelance }}</div>
                 </div>
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">Collaborateurs</div>
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.type_collaborateur'|trans }}</div>
                     <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.collaborateur }}</div>
                 </div>
             </div>
 
             <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                <div class="text-xs uppercase tracking-wider text-gray-400">Top compétences</div>
+                <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.top_skills'|trans }}</div>
                 <div class="mt-3 flex flex-wrap gap-2">
                     {% if topSkills is not empty %}
                         {% for s in topSkills %}
@@ -129,7 +129,7 @@
                             </span>
                         {% endfor %}
                     {% else %}
-                        <span class="text-sm text-gray-400">Aucune compétence liée pour le moment.</span>
+                        <span class="text-sm text-gray-400">{{ 'collaborator.no_skills'|trans }}</span>
                     {% endif %}
                 </div>
             </div>
@@ -139,10 +139,10 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Collaborateur</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">Type</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">Compétences</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'collaborator.table_name'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{{ 'collaborator.table_type'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'collaborator.table_skills'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -158,7 +158,7 @@
                                                class="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors">
                                                 {{ collaborator.name }}
                                             </a>
-                                            <div class="text-xs text-gray-500 truncate max-w-[260px]">{{ collaborator.role ?: 'Rôle non renseigné' }}</div>
+                                            <div class="text-xs text-gray-500 truncate max-w-[260px]">{{ collaborator.role ?: ('collaborator.role_empty'|trans) }}</div>
                                         </div>
                                     </div>
                                 </td>
@@ -166,13 +166,13 @@
                                     {% set typeLabel = collaborator.type ?: '—' %}
                                     {% set typeClass = 'bg-gray-100 text-gray-700' %}
                                     {% if collaborator.type == 'salarie' %}
-                                        {% set typeLabel = 'Salarié' %}
+                                        {% set typeLabel = 'collaborator.type_salarie'|trans %}
                                         {% set typeClass = 'bg-emerald-100 text-emerald-700' %}
                                     {% elseif collaborator.type == 'freelance' %}
-                                        {% set typeLabel = 'Freelance' %}
+                                        {% set typeLabel = 'collaborator.type_freelance'|trans %}
                                         {% set typeClass = 'bg-blue-100 text-blue-700' %}
                                     {% elseif collaborator.type == 'collaborateur' %}
-                                        {% set typeLabel = 'Collaborateur' %}
+                                        {% set typeLabel = 'collaborator.type_collaborateur'|trans %}
                                         {% set typeClass = 'bg-amber-100 text-amber-700' %}
                                     {% endif %}
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold {{ typeClass }}">
@@ -196,23 +196,23 @@
                                     <div class="hidden sm:flex flex-wrap gap-2">
                                         <a href="{{ path('app_collaborator_show', {'id': collaborator.id}) }}"
                                            class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
-                                            Voir
+                                            {{ 'actions.view'|trans }}
                                         </a>
                                         <a href="{{ path('app_collaborator_edit', {'id': collaborator.id}) }}"
                                            class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            Modifier
+                                            {{ 'actions.edit'|trans }}
                                         </a>
                                     </div>
                                     <div class="sm:hidden">
                                         <details class="relative">
                                             <summary class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700">
-                                                Actions
+                                                {{ 'table.actions'|trans }}
                                             </summary>
                                             <div class="mt-2 flex flex-col gap-2">
                                                 <a href="{{ path('app_collaborator_show', {'id': collaborator.id}) }}"
-                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">Voir</a>
+                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
                                                 <a href="{{ path('app_collaborator_edit', {'id': collaborator.id}) }}"
-                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">Modifier</a>
+                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
                                             </div>
                                         </details>
                                     </div>
@@ -220,7 +220,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="4" class="px-6 py-10 text-center text-gray-400">Aucun collaborateur trouvé</td>
+                                <td colspan="4" class="px-6 py-10 text-center text-gray-400">{{ 'collaborator.none'|trans }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -229,7 +229,7 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <p class="text-sm text-gray-400">
-                        Affichage de {{ pagination.items|length }} sur {{ pagination.total }} collaborateurs
+                        {{ 'collaborator.pagination'|trans({'count': pagination.items|length, 'total': pagination.total}) }}
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
@@ -242,10 +242,10 @@
                 </div>
             {% else %}
                 <div class="rounded-2xl border border-dashed border-[#2A3747] bg-[#111922] p-10 text-center">
-                    <p class="text-gray-400 mb-4">Aucun collaborateur trouvé.</p>
+                    <p class="text-gray-400 mb-4">{{ 'collaborator.none'|trans }}</p>
                     <a href="{{ path('app_collaborator_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
-                        Créer votre premier collaborateur
+                        {{ 'collaborator.create_first'|trans }}
                     </a>
                 </div>
             {% endif %}

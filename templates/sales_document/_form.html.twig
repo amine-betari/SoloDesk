@@ -19,7 +19,7 @@
 <div class="w-full px-6 py-8">
     <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-8">
         <h1 class="text-3xl font-bold mb-8 text-gray-900">
-            {% if button_label is defined %}Modifier le document{% else %}Nouveau document{% endif %}
+            {% if button_label is defined %}{{ 'sales_document.edit_title'|trans }}{% else %}{{ 'sales_document.new_title'|trans }}{% endif %}
         </h1>
 
         {{ form_start(form, {
@@ -28,29 +28,29 @@
 
         <!-- Informations générales -->
         <fieldset class="bg-gray-50 shadow rounded-lg p-8 space-y-6">
-            <legend class="text-xl font-semibold text-gray-900 mb-4">Informations générales</legend>
+            <legend class="text-xl font-semibold text-gray-900 mb-4">{{ 'common.general_info'|trans }}</legend>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    {{ f.field_row(form.reference, 'Référence', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
+                    {{ f.field_row(form.reference, 'sales_document.reference'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
                 </div>
 
                 <div>
-                    {{ f.field_row(form.status, 'Statut', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
+                    {{ f.field_row(form.status, 'sales_document.status'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
                 </div
 
                 ><div>
-                    {{ f.field_row(form.invoiceDate, "Date d'emission", 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
+                    {{ f.field_row(form.invoiceDate, 'sales_document.issue_date'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
                 </div>
 
                 {% if salesDocument.isInvoice() and form.externalInvoice is defined %}
                     <div class="md:col-span-2">
-                        {{ f.field_row(form.externalInvoice, 'Facture externe (pour un ami)', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
+                        {{ f.field_row(form.externalInvoice, 'sales_document.external_invoice'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
                     </div>
                 {% endif %}
 
                 <div class="md:col-span-2">
-                    {{ form_label(form.notes, 'Notes', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_label(form.notes, 'sales_document.notes'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                     {# {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900 px-3 py-2'}}) }}  #}
                     <div
                         data-controller="ckeditor"
@@ -72,7 +72,7 @@
                      data-has-project-select="false"
                      data-has-estimate-select="false">
                     <div data-sales-document-target="clientField">
-                        {{ form_label(form.client, 'Client', {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                        {{ form_label(form.client, 'sales_document.client'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                         {{ form_widget(form.client, {
                             'attr': {
                                 'class': 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2 ' ~ (form.client.vars.errors|length ? 'border-red-500' : 'border-gray-300'),
@@ -81,34 +81,34 @@
                         }) }}
                         {{ f.field_errors(form.client) }}
                         <div class="flex flex-wrap gap-3 text-sm mt-2">
-                            <button type="button" class="text-blue-600 hover:text-blue-700" data-action="click->client-modal#openModal touchstart->client-modal#openModal">+ Ajouter un nouveau client</button>
-                            <a href="{{ path('app_client_new') }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-700">Ouvrir dans un nouvel onglet</a>
+                            <button type="button" class="text-blue-600 hover:text-blue-700" data-action="click->client-modal#openModal touchstart->client-modal#openModal">{{ 'client.add_new'|trans }}</button>
+                            <a href="{{ path('app_client_new') }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-700">{{ 'common.open_new_tab'|trans }}</a>
                         </div>
 
                         <div data-client-modal-target="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
                             <div class="w-full max-w-md rounded-lg bg-white p-6 text-gray-900 shadow-xl">
                                 <div class="flex items-center justify-between mb-4">
-                                    <h2 class="text-lg font-semibold">Créer un client</h2>
+                                    <h2 class="text-lg font-semibold">{{ 'client.create_title'|trans }}</h2>
                                     <button type="button" class="text-gray-500 hover:text-gray-700" data-action="click->client-modal#closeModal touchstart->client-modal#closeModal">X</button>
                                 </div>
                                 <div class="space-y-4">
                                     <div class="space-y-1">
-                                        <label class="block text-sm font-medium text-gray-700">Nom</label>
+                                        <label class="block text-sm font-medium text-gray-700">{{ 'client.name'|trans }}</label>
                                         <input type="text" class="w-full rounded-md border border-gray-300 px-3 py-2" data-client-modal-target="nameInput" data-action="keydown.enter->client-modal#createClient" />
                                     </div>
                                     <div class="space-y-1">
-                                        <label class="block text-sm font-medium text-gray-700">Devise</label>
+                                        <label class="block text-sm font-medium text-gray-700">{{ 'client.currency'|trans }}</label>
                                         <select class="w-full rounded-md border border-gray-300 px-3 py-2" data-client-modal-target="currencySelect">
-                                            <option value="">Sélectionnez une devise</option>
-                                            <option value="EUR">Euro (€)</option>
-                                            <option value="MAD">Dirham marocain (MAD)</option>
-                                            <option value="USD">Dollar américain ($)</option>
+                                            <option value="">{{ 'client.currency_placeholder'|trans }}</option>
+                                            <option value="EUR">{{ 'client.currency_eur'|trans }}</option>
+                                            <option value="MAD">{{ 'client.currency_mad'|trans }}</option>
+                                            <option value="USD">{{ 'client.currency_usd'|trans }}</option>
                                         </select>
                                     </div>
                                     <div data-client-modal-target="error" class="hidden text-sm text-red-700 bg-red-50 border border-red-200 rounded-md px-3 py-2"></div>
                                     <div class="flex justify-end gap-2">
-                                        <button type="button" class="px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800" data-action="click->client-modal#closeModal touchstart->client-modal#closeModal">Annuler</button>
-                                        <button type="button" class="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white" data-action="click->client-modal#createClient touchstart->client-modal#createClient">Créer</button>
+                                        <button type="button" class="px-3 py-2 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-800" data-action="click->client-modal#closeModal touchstart->client-modal#closeModal">{{ 'actions.cancel'|trans }}</button>
+                                        <button type="button" class="px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700 text-white" data-action="click->client-modal#createClient touchstart->client-modal#createClient">{{ 'actions.create'|trans }}</button>
                                     </div>
                                 </div>
                             </div>
@@ -119,17 +119,17 @@
                 <!-- TVA fields -->
                 <div>
                     {% if salesDocument.isInvoice() %}
-                        {{ f.field_row(form.taxApplied, 'TVA appliquée', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
+                        {{ f.field_row(form.taxApplied, 'sales_document.tax_applied'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
                     {% else %}
-                        {{ f.field_row(form.taxApplied, 'TVA appliquée', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2', {'disabled': false }) }}
+                        {{ f.field_row(form.taxApplied, 'sales_document.tax_applied'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2', {'disabled': false }) }}
                     {% endif %}
                 </div>
 
                 <div>
                     {% if salesDocument.isInvoice() %}
-                        {{ f.field_row(form.vatRate, 'Taux TVA (%)', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
+                        {{ f.field_row(form.vatRate, 'sales_document.vat_rate'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2') }}
                     {% else %}
-                        {{ f.field_row(form.vatRate, 'Taux TVA (%)', 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2', {'readonly': 'readonly'}) }}
+                        {{ f.field_row(form.vatRate, 'sales_document.vat_rate'|trans, 'mt-1 w-full rounded-md bg-white text-gray-900 px-3 py-2', {'readonly': 'readonly'}) }}
                     {% endif %}
                 </div>
             </div>
@@ -141,7 +141,7 @@
         <!-- Bouton Enregistrer -->
         <div class="flex justify-end mt-8">
             <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded btn-mobile">
-                Enregistrer
+                {{ 'actions.save'|trans }}
             </button>
         </div>
 
@@ -151,13 +151,13 @@
         {% if button_label is defined %}
             <div class="flex flex-col sm:flex-row gap-3 mt-4">
                 <a href="{{ path('app_sales_document_index') }}"
-                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← Retour à la liste</a>
+                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>
 
                 {{ include('sales_document/_delete_form.html.twig') }}
             </div>
         {% else %}
             <a href="{{ path('app_sales_document_index') }}"
-               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← Retour à la liste</a>
+               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← {{ 'actions.back_to_list'|trans }}</a>
         {% endif %}
     </div>
 </div>

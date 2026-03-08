@@ -1,9 +1,9 @@
 {% extends 'base.html.twig' %}
-{% block title %}Uploader un modèle{% endblock %}
+{% block title %}{{ 'templates.upload_title'|trans }}{% endblock %}
 
 {% block body %}
     <div class="mt-12 p-8 bg-white text-gray-900 rounded-xl">
-        <h1 class="text-4xl font-extrabold mb-8">Uploader un modèle</h1>
+        <h1 class="text-4xl font-extrabold mb-8">{{ 'templates.upload_title'|trans }}</h1>
 
         {{ form_start(form, {
             'attr': {
@@ -13,7 +13,7 @@
         }) }}
 
         <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6">
-            <legend class="text-lg font-semibold text-gray-900">Informations générales</legend>
+            <legend class="text-lg font-semibold text-gray-900">{{ 'common.general_info'|trans }}</legend>
 
             <div class="space-y-2">
                 {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
@@ -46,7 +46,7 @@
             </div>
 
             <div class="flex justify-end items-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded btn-mobile">Enregistrer</button>
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded btn-mobile">{{ 'actions.save'|trans }}</button>
             </div>
         </fieldset>
 

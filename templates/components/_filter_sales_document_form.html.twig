@@ -8,7 +8,7 @@
         <!-- Type + Status -->
         <div data-controller="status-filter" class="flex gap-4 md:col-span-3">
             <div class="flex-1">
-                {{ form_label(form.type, 'Type', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+                {{ form_label(form.type, 'sales_document.type'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
                 {{ form_widget(form.type, {
                     'attr': {
                         'class': 'w-full rounded border border-gray-300 p-2 text-gray-900',
@@ -18,7 +18,7 @@
             </div>
 
             <div class="flex-1">
-                {{ form_label(form.status, 'Statut', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+                {{ form_label(form.status, 'sales_document.status'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
                 {{ form_widget(form.status, {
                     'attr': {
                         'class': 'w-full rounded border border-gray-300 p-2 text-gray-900',
@@ -27,7 +27,7 @@
                 }) }}
             </div>
             <div class="flex-1">
-                {{ form_label(form.client, 'Client', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+                {{ form_label(form.client, 'sales_document.client'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
                 {{ form_widget(form.client, {
                     'attr': {
                         'class': 'w-full',
@@ -36,7 +36,7 @@
                 }) }}
             </div>
             <div class="flex-1">
-                {{ form_label(form.externalInvoice, 'Facture externe', {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+                {{ form_label(form.externalInvoice, 'sales_document.external_invoice'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
                 {{ form_widget(form.externalInvoice, {
                     'attr': {
                         'class': 'w-full rounded border border-gray-300 p-2 text-gray-900',

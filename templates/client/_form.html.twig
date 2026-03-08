@@ -2,15 +2,15 @@
     <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-8">
 
         {% if button_label is defined  %}
-            <h1 class="text-3xl font-bold mb-6">Modifier le client</h1>
+            <h1 class="text-3xl font-bold mb-6">{{ 'client.edit_title'|trans }}</h1>
         {% else %}
-            <h1 class="text-3xl font-bold mb-6">Nouveau client</h1>
+            <h1 class="text-3xl font-bold mb-6">{{ 'client.new_title'|trans }}</h1>
         {% endif %}
 
         {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
         <fieldset class="space-y-4 p-6 bg-white rounded-lg shadow-inner border border-gray-200">
-            <legend class="text-xl font-semibold mb-4 text-gray-900">Informations du client</legend>
+            <legend class="text-xl font-semibold mb-4 text-gray-900">{{ 'client.information'|trans }}</legend>
 
             <div>
                 {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
@@ -53,20 +53,20 @@
                 </div>
 
                 <div>
-                    {{ form_label(form.currency, 'Devise', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.currency, 'client.currency'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                     {{ form_widget(form.currency, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
                     {{ form_errors(form.currency, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
                 </div>
             </div>
 
             <div>
-                {{ form_label(form.firstContactAt, 'Premier Contact', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.firstContactAt, 'client.first_contact'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.firstContactAt, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
                 {{ form_errors(form.firstContactAt, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
             </div>
 
             <div>
-                {{ form_label(form.notes, 'Description', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.notes, 'client.notes'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {#  { form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }} #}
                 <div
                     data-controller="ckeditor"
@@ -83,7 +83,7 @@
 
         <div class="flex justify-end mt-6">
             <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md btn-mobile">
-                Enregistrer
+                {{ 'actions.save'|trans }}
             </button>
         </div>
 
@@ -92,13 +92,13 @@
         {% if button_label is defined  %}
             <div class="flex flex-col sm:flex-row gap-3 mt-4">
                 <a href="{{ path('app_client_index') }}"
-                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← Retour à la liste</a>
+                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>
 
                 {{ include('client/_delete_form.html.twig') }}
             </div>
         {% else %}
             <a href="{{ path('app_client_index') }}"
-               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← Retour à la liste</a>
+               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← {{ 'actions.back_to_list'|trans }}</a>
         {% endif %}
     </div>
 </div>

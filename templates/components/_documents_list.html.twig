@@ -1,6 +1,6 @@
 {% if documents|length > 0 %}
     <div class="bg-gray-700 shadow rounded p-6 mb-6 text-white">
-        <h2 class="text-xl font-semibold mb-4">Documents liés</h2>
+        <h2 class="text-xl font-semibold mb-4">{{ 'documents.linked_title'|trans }}</h2>
         <ul class="space-y-2">
             {% for document in documents %}
                 <li class="flex justify-between items-center border-b border-gray-600 pb-2">
@@ -10,12 +10,12 @@
                         target="_blank"
                         class="text-blue-400 hover:text-blue-500"
                     >
-                        Télécharger
+                        {{ 'documents.download'|trans }}
                     </a>
                 </li>
             {% endfor %}
         </ul>
     </div>
 {% else %}
-    <div class="text-gray-500 italic mb-6">Aucun document lié.</div>
+    <div class="text-gray-500 italic mb-6">{{ 'documents.none'|trans }}</div>
 {% endif %}
