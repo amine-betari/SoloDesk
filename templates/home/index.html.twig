@@ -1,34 +1,34 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Tableau de bord - SoloDesk{% endblock %}
+{% block title %}{{ 'home.title'|trans }}{% endblock %}
 
 {% block body %}
 
     <div class="bg-[#1F2732] border border-[#2A3747] rounded-xl p-6 mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-                <h2 class="text-xl font-bold text-white">Démarrage rapide</h2>
-                <p class="text-sm text-gray-400 mt-1">Complète ces 3 étapes pour générer ta première facture.</p>
+                <h2 class="text-xl font-bold text-white">{{ 'home.quick_start'|trans }}</h2>
+                <p class="text-sm text-gray-400 mt-1">{{ 'home.quick_start_subtitle'|trans }}</p>
             </div>
             <a href="{{ path('app_settings') }}" class="px-4 py-2 bg-blue-600 text-white rounded font-semibold text-sm hover:bg-blue-700 btn-mobile">
-                Paramètres
+                {{ 'nav.settings'|trans }}
             </a>
         </div>
         <div class="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
             <a href="{{ path('app_company_edit') }}" class="group bg-[#16202A] border border-[#2A3747] rounded-lg p-4 hover:border-blue-500 transition">
-                <div class="text-xs uppercase text-gray-500">Étape 1</div>
-                <div class="text-white font-semibold mt-1">Configurer l’entreprise</div>
-                <div class="text-sm text-gray-400 mt-2">Nom, logo, infos légales</div>
+                <div class="text-xs uppercase text-gray-500">{{ 'home.step_1'|trans }}</div>
+                <div class="text-white font-semibold mt-1">{{ 'home.step_company_title'|trans }}</div>
+                <div class="text-sm text-gray-400 mt-2">{{ 'home.step_company_desc'|trans }}</div>
             </a>
             <a href="{{ path('app_client_new') }}" class="group bg-[#16202A] border border-[#2A3747] rounded-lg p-4 hover:border-blue-500 transition">
-                <div class="text-xs uppercase text-gray-500">Étape 2</div>
-                <div class="text-white font-semibold mt-1">Créer un client</div>
-                <div class="text-sm text-gray-400 mt-2">Contact + devise</div>
+                <div class="text-xs uppercase text-gray-500">{{ 'home.step_2'|trans }}</div>
+                <div class="text-white font-semibold mt-1">{{ 'home.step_client_title'|trans }}</div>
+                <div class="text-sm text-gray-400 mt-2">{{ 'home.step_client_desc'|trans }}</div>
             </a>
             <a href="{{ path('app_invoice_new') }}" class="group bg-[#16202A] border border-[#2A3747] rounded-lg p-4 hover:border-blue-500 transition">
-                <div class="text-xs uppercase text-gray-500">Étape 3</div>
-                <div class="text-white font-semibold mt-1">Créer une facture</div>
-                <div class="text-sm text-gray-400 mt-2">Générer et envoyer</div>
+                <div class="text-xs uppercase text-gray-500">{{ 'home.step_3'|trans }}</div>
+                <div class="text-white font-semibold mt-1">{{ 'home.step_invoice_title'|trans }}</div>
+                <div class="text-sm text-gray-400 mt-2">{{ 'home.step_invoice_desc'|trans }}</div>
             </a>
         </div>
     </div>
@@ -38,7 +38,7 @@
         <!-- Clients -->
         <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
-                Nouveaux clients par année
+                {{ 'home.card_clients'|trans }}
             </h3>
             {{ render_chart(clientDataChart) }}
         </div>
@@ -46,34 +46,34 @@
         <!-- Devis -->
         <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
-                Suivi des devis
+                {{ 'home.card_estimates'|trans }}
             </h3>
             {{ render_chart(estimateChart) }}
-            <p class="text-sm text-gray-500 mt-2">Taux de conversion : Accepté / Envoyé / Refusé</p>
+            <p class="text-sm text-gray-500 mt-2">{{ 'home.card_estimates_note'|trans }}</p>
         </div>
 
         <!-- Factures -->
         <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
-                Factures par année
+                {{ 'home.card_invoices'|trans }}
             </h3>
             {{ render_chart(invoiceChart) }}
             <p class="text-sm text-gray-500 mt-2">
-                Nombre total de factures émises par année — externes : {{ totalExternalInvoices }}
+                {{ 'home.card_invoices_note'|trans({'%count%': totalExternalInvoices}) }}
             </p>
         </div>
 
         <!-- CA par client -->
         <div class="bg-gray-50 p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
-                Répartition du CA par client
+                {{ 'home.card_revenue'|trans }}
             </h3>
             {{ render_chart(paymentsChart) }}
             <div class="mt-4">
                 {% if hasPaymentsStats %}
                     <a href="{{ path('stats_ca_trimestre') }}"
                        class="text-blue-600 hover:underline text-sm font-medium btn-mobile inline-block">
-                        Voir le CA par trimestre →
+                        {{ 'home.view_quarterly'|trans }}
                     </a>
                 {% endif %}
 

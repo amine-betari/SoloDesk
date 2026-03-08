@@ -139,10 +139,10 @@
 
     <!-- TVA -->
     <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200" data-controller="toggle-vat">
-        <legend class="text-2xl font-semibold text-gray-700">TVA</legend>
+        <legend class="text-2xl font-semibold text-gray-700">{{ 'project.vat_section'|trans }}</legend>
 
         <div>
-            {{ form_label(form.amount, 'Montant HT', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_label(form.amount, 'project.amount_ht'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
             {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
             {{ form_errors(form.amount) }}
         </div>
@@ -154,11 +154,11 @@
                     'data-action': 'toggle-vat#toggle'
                 }
             }) }}
-            {{ form_label(form.noVat, 'Pas de TVA', {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
+            {{ form_label(form.noVat, 'project.no_vat'|trans, {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
         </div>
 
         <div data-toggle-vat-target="vat" class="mt-2">
-            {{ form_label(form.vatRate, 'TVA (%)', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+            {{ form_label(form.vatRate, 'project.vat_rate'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
             {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900', 'step': '0.01'}}) }}
             {{ form_errors(form.vatRate) }}
         </div>
@@ -166,7 +166,7 @@
 
     <!-- Récurrence -->
     <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200" data-controller="toggle-visibility">
-        <legend class="text-2xl font-semibold text-gray-700">Récurrence</legend>
+        <legend class="text-2xl font-semibold text-gray-700">{{ 'project.recurrence_section'|trans }}</legend>
 
         <div class="flex flex-col sm:flex-row sm:items-center gap-3">
             {{ form_widget(form.isRecurring, {
@@ -175,18 +175,18 @@
                     'data-action': 'toggle-visibility#toggle'
                 }
             }) }}
-            {{ form_label(form.isRecurring, 'Projet récurrent', {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
+            {{ form_label(form.isRecurring, 'project.recurring'|trans, {'label_attr': {'class': 'text-sm text-gray-700'}}) }}
         </div>
 
         <div data-toggle-visibility-target="toggleField" class="space-y-4 hidden mt-2">
             <div>
-                {{ form_label(form.recurringAmount, 'Montant récurrent', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.recurringAmount, 'project.recurring_amount'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.recurringAmount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.recurringAmount) }}
             </div>
 
             <div>
-                {{ form_label(form.recurringPeriod, 'Périodicité', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.recurringPeriod, 'project.recurring_period'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.recurringPeriod, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.recurringPeriod) }}
             </div>
@@ -195,38 +195,38 @@
 
     <!-- Documents -->
     <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200">
-        <legend class="text-2xl font-semibold text-gray-700">Documents</legend>
+        <legend class="text-2xl font-semibold text-gray-700">{{ 'project.documents'|trans }}</legend>
         {% include 'partials/_documents_form.html.twig' with { form: form, relatedEntity: project } %}
     </fieldset>
 
     {% if form.salesDocuments is defined %}
         <!-- Factures liées -->
         <fieldset class="bg-gray-50 p-6 rounded-lg space-y-4 border border-gray-200">
-            <legend class="text-2xl font-semibold text-gray-700">Factures liées</legend>
+            <legend class="text-2xl font-semibold text-gray-700">{{ 'project.linked_invoices'|trans }}</legend>
             <div class="space-y-2">
-                {{ form_label(form.salesDocuments, 'Sélectionner des factures', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.salesDocuments, 'project.select_invoices'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.salesDocuments, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.salesDocuments) }}
             </div>
             {% if project.salesDocuments|length > 0 %}
                 <div class="pt-4">
-                    <h3 class="text-lg font-semibold text-gray-700 mb-2">Factures déjà liées</h3>
+                    <h3 class="text-lg font-semibold text-gray-700 mb-2">{{ 'project.linked_invoices_existing'|trans }}</h3>
                     <div class="space-y-3 sm:hidden">
                         {% for doc in project.salesDocuments %}
                             <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-                                <div class="text-sm text-gray-500">Réf.</div>
+                                <div class="text-sm text-gray-500">{{ 'common.reference_short'|trans }}</div>
                                 <div class="font-semibold text-gray-900">{{ doc.reference }}</div>
                                 <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                     <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-700">{{ doc.type }}</span>
                                     <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-700">
-                                        {{ doc.createdAt ? doc.createdAt|date('d/m/Y') : '—' }}
+                                        {{ doc.createdAt ? doc.createdAt|date('d/m/Y') : 'common.dash'|trans }}
                                     </span>
                                 </div>
                                 <div class="mt-3 flex gap-2">
                                     <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
-                                       class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">Voir</a>
+                                       class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
                                     <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
-                                       class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">Modifier</a>
+                                       class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
                                 </div>
                             </div>
                         {% endfor %}
@@ -236,10 +236,10 @@
                         <table class="min-w-full text-sm text-left text-gray-700">
                             <thead class="bg-gray-100 text-xs uppercase">
                             <tr>
-                                <th class="px-4 py-2 border-b">Réf.</th>
-                                <th class="px-4 py-2 border-b">Type</th>
-                                <th class="px-4 py-2 border-b">Date</th>
-                                <th class="px-4 py-2 border-b">Actions</th>
+                                <th class="px-4 py-2 border-b">{{ 'common.reference_short'|trans }}</th>
+                                <th class="px-4 py-2 border-b">{{ 'sales_document.type'|trans }}</th>
+                                <th class="px-4 py-2 border-b">{{ 'common.date'|trans }}</th>
+                                <th class="px-4 py-2 border-b">{{ 'table.actions'|trans }}</th>
                             </tr>
                             </thead>
                             <tbody class="divide-y">
@@ -247,12 +247,12 @@
                                 <tr class="hover:bg-gray-50">
                                     <td class="px-4 py-2">{{ doc.reference }}</td>
                                     <td class="px-4 py-2">{{ doc.type }}</td>
-                                    <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : '—' }}</td>
+                                    <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : 'common.dash'|trans }}</td>
                                     <td class="px-4 py-2">
                                         <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
-                                           class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 btn-mobile">Voir</a>
+                                           class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 btn-mobile">{{ 'actions.view'|trans }}</a>
                                         <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
-                                           class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 btn-mobile">Modifier</a>
+                                           class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 btn-mobile">{{ 'actions.edit'|trans }}</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -266,7 +266,7 @@
 
     <!-- Bouton -->
     <div class="flex justify-end mt-6">
-        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors btn-mobile">Enregistrer</button>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors btn-mobile">{{ 'actions.save'|trans }}</button>
     </div>
 
     {{ form_end(form) }}
@@ -274,13 +274,13 @@
     {% if button_label is defined %}
         <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <a href="{{ path('app_project_index') }}"
-               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← Retour à la liste</a>
+               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>
 
             {{ include('project/_delete_form.html.twig') }}
         </div>
     {% else %}
         <a href="{{ path('app_project_index') }}"
-           class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← Retour à la liste</a>
+           class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← {{ 'actions.back_to_list'|trans }}</a>
     {% endif %}
     </div>
 </div>

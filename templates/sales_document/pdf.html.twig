@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Facture</title>
+    <title>{{ 'invoice.title'|trans }}</title>
     <style>
         body { font-family: Helvetica, sans-serif; color: #111827; }
         .header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px; }
@@ -38,7 +38,7 @@
             <img src="{{ logoDataUri }}" alt="Logo" class="logo">
         {% endif %}
         <div>
-            <p class="title">{{ company.name ?? 'Entreprise' }}</p>
+            <p class="title">{{ company.name ?? 'company.name_fallback'|trans }}</p>
             <div class="value">
                 {% if company.address %}{{ company.address|striptags }}{% endif %}
                 {% if company.city %} - {{ company.city }}{% endif %}
@@ -51,9 +51,9 @@
         </div>
     </div>
     <div class="meta">
-        <div><strong>Facture</strong></div>
-        <div>Référence: {{ salesDocument.reference }}</div>
-        <div>Date: {{ salesDocument.invoiceDate ? salesDocument.invoiceDate|date('d/m/Y') : salesDocument.createdAt|date('d/m/Y') }}</div>
+        <div><strong>{{ 'invoice.title'|trans }}</strong></div>
+        <div>{{ 'common.reference'|trans }}: {{ salesDocument.reference }}</div>
+        <div>{{ 'common.date'|trans }}: {{ salesDocument.invoiceDate ? salesDocument.invoiceDate|date('d/m/Y') : salesDocument.createdAt|date('d/m/Y') }}</div>
         {% if company.ice %}<div>ICE: {{ company.ice }}</div>{% endif %}
         {% if company.fiscalId %}<div>IF: {{ company.fiscalId }}</div>{% endif %}
         {% if company.rcNumber %}<div>RC: {{ company.rcNumber }}</div>{% endif %}
@@ -62,9 +62,9 @@
 
 <div class="section">
     <div class="box">
-        <div class="label">Facturé à</div>
+        <div class="label">{{ 'invoice.billed_to'|trans }}</div>
         <div class="value">
-            <strong>{{ client ? client.name : '—' }}</strong><br>
+            <strong>{{ client ? client.name : 'common.dash'|trans }}</strong><br>
             {% if client and client.email %}{{ client.email }}<br>{% endif %}
             {% if client and client.phone %}{{ client.phone }}<br>{% endif %}
             {% if client and client.address %}{{ client.address|striptags }}<br>{% endif %}
@@ -72,11 +72,11 @@
         </div>
     </div>
     <div class="box">
-        <div class="label">Informations</div>
+        <div class="label">{{ 'common.information'|trans }}</div>
         <div class="value">
-            Type: {{ salesDocument.type|document_type_label }}<br>
-            Statut: {{ salesDocument.status|trans }}<br>
-            TVA: {{ salesDocument.taxApplied ? salesDocument.vatRate : '—' }}<br>
+            {{ 'sales_document.type'|trans }}: {{ salesDocument.type|document_type_label }}<br>
+            {{ 'sales_document.status'|trans }}: {{ salesDocument.status|trans }}<br>
+            {{ 'sales_document.vat_rate'|trans }}: {{ salesDocument.taxApplied ? salesDocument.vatRate : 'common.dash'|trans }}<br>
         </div>
     </div>
 </div>
@@ -84,10 +84,10 @@
 <table>
     <thead>
     <tr>
-        <th>Article</th>
-        <th>Quantité</th>
-        <th>Prix unitaire</th>
-        <th>Total</th>
+        <th>{{ 'invoice.item'|trans }}</th>
+        <th>{{ 'sales_document_item.quantity'|trans }}</th>
+        <th>{{ 'sales_document_item.unit_price'|trans }}</th>
+        <th>{{ 'common.total'|trans }}</th>
     </tr>
     </thead>
     <tbody>
@@ -103,16 +103,16 @@
 </table>
 
 <div class="totals">
-    <div>Total HT: {{ totalHT|format_currency(currency, app.request.locale ?: 'fr_FR') }}</div>
+    <div>{{ 'invoice.total_ht'|trans }}: {{ totalHT|format_currency(currency, app.request.locale ?: 'fr_FR') }}</div>
     {% if salesDocument.taxApplied %}
-        <div>TVA: {{ totalTVA|format_currency(currency, app.request.locale ?: 'fr_FR') }}</div>
+        <div>{{ 'sales_document.vat_rate'|trans }}: {{ totalTVA|format_currency(currency, app.request.locale ?: 'fr_FR') }}</div>
     {% endif %}
-    <div><strong>Total TTC: {{ totalTTC|format_currency(currency, app.request.locale ?: 'fr_FR') }}</strong></div>
+    <div><strong>{{ 'invoice.total_ttc'|trans }}: {{ totalTTC|format_currency(currency, app.request.locale ?: 'fr_FR') }}</strong></div>
 </div>
 
 {% if company.taxProfessional or company.ice or company.fiscalId or company.rcNumber %}
     <div class="footer">
-        {% if company.taxProfessional %}Taxe pro: {{ company.taxProfessional }}{% endif %}
+        {% if company.taxProfessional %}{{ 'company.tax_professional'|trans }}: {{ company.taxProfessional }}{% endif %}
         {% if company.taxProfessional and (company.ice or company.fiscalId or company.rcNumber) %} | {% endif %}
         {% if company.ice %}ICE: {{ company.ice }}{% endif %}
         {% if company.ice and (company.fiscalId or company.rcNumber) %} | {% endif %}

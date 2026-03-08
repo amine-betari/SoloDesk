@@ -163,7 +163,7 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-sm hidden md:table-cell">
-                                    {% set typeLabel = collaborator.type ?: '—' %}
+                                    {% set typeLabel = collaborator.type ?: ('common.dash'|trans) %}
                                     {% set typeClass = 'bg-gray-100 text-gray-700' %}
                                     {% if collaborator.type == 'salarie' %}
                                         {% set typeLabel = 'collaborator.type_salarie'|trans %}
@@ -189,7 +189,7 @@
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        —
+                                        {{ 'common.dash'|trans }}
                                     {% endif %}
                                 </td>
                                 <td class="px-6 py-4 text-sm">

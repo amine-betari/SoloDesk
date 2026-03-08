@@ -65,9 +65,9 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">{{ client.country ?: '—' }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">{{ client.country ?: 'common.dash'|trans }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
-                                    {{ client.firstContactAt ? client.firstContactAt|date('d/m/Y') : '—' }}
+                                    {{ client.firstContactAt ? client.firstContactAt|date('d/m/Y') : 'common.dash'|trans }}
                                 </td>
                                 <td class="px-6 py-4 text-sm">
                                     <div class="hidden sm:flex flex-wrap gap-2">

@@ -115,7 +115,7 @@
                                 {% if t.isDefault %}
                                     <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">{{ 'yes'|trans }}</span>
                                 {% else %}
-                                    <span class="text-gray-500 text-xs">—</span>
+                                    <span class="text-gray-500 text-xs">{{ 'common.dash'|trans }}</span>
                                 {% endif %}
                             </td>
                             <td class="px-6 py-4 text-sm">
@@ -125,7 +125,7 @@
                                            class="text-indigo-600 hover:underline btn-mobile">{{ 'templates.set_default'|trans }}</a>
                                     {% endif %}
                                     <form method="post" action="{{ path('app_templates_delete', {id: t.id}) }}"
-                                          onsubmit="return confirm('Supprimer ce modèle ?');" class="btn-mobile">
+                                          onsubmit="return confirm('{{ 'templates.delete_confirm'|trans }}');" class="btn-mobile">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete_template' ~ t.id) }}">
                                         <button class="text-red-600 hover:underline">{{ 'actions.delete'|trans }}</button>
                                     </form>

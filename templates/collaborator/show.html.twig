@@ -11,7 +11,7 @@
                     <p class="text-sm text-gray-500 mt-2">{{ collaborator.role ?: ('collaborator.role_empty'|trans) }}</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    {% set typeLabel = collaborator.type ?: '—' %}
+                    {% set typeLabel = collaborator.type ?: ('common.dash'|trans) %}
                     {% set typeClass = 'bg-gray-100 text-gray-700' %}
                     {% if collaborator.type == 'salarie' %}
                         {% set typeLabel = 'collaborator.type_salarie'|trans %}
@@ -39,12 +39,12 @@
             <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
                     <div class="text-xs uppercase tracking-wider text-gray-500">{{ 'collaborator.table_type'|trans }}</div>
-                    <div class="mt-2 text-lg font-semibold text-gray-900">{{ collaborator.type ?: '—' }}</div>
+                    <div class="mt-2 text-lg font-semibold text-gray-900">{{ collaborator.type ?: ('common.dash'|trans) }}</div>
                 </div>
                 <div class="bg-gray-50 rounded-xl p-5 border border-gray-200">
                     <div class="text-xs uppercase tracking-wider text-gray-500">{{ 'collaborator.monthly_cost'|trans }}</div>
                     <div class="mt-2 text-lg font-semibold text-gray-900">
-                        {{ collaborator.monthlyCost is not null ? collaborator.monthlyCost|number_format(2, '.', ' ') : '—' }}
+                        {{ collaborator.monthlyCost is not null ? collaborator.monthlyCost|number_format(2, '.', ' ') : ('common.dash'|trans) }}
                     </div>
                 </div>
                 <div class="bg-gray-50 rounded-xl p-5 border border-gray-200 md:col-span-2">
@@ -59,7 +59,7 @@
                                 {% endfor %}
                             </div>
                         {% else %}
-                            —
+                            {{ 'common.dash'|trans }}
                         {% endif %}
                     </div>
                 </div>

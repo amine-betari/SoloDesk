@@ -1,10 +1,10 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Client{% endblock %}
+{% block title %}{{ 'client.edit_title'|trans }}{% endblock %}
 
 {% block body %}
 
-    {{ include('client/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('client/_form.html.twig', {'button_label': 'actions.save'|trans}) }}
 
 
 {% endblock %}

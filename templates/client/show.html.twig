@@ -22,11 +22,11 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="bg-white rounded-2xl p-6 shadow-md">
                     <h2 class="text-sm font-semibold text-gray-500 mb-2">{{ 'client.email'|trans }}</h2>
-                    <p class="text-gray-900 text-xl">{{ client.email ?: '—' }}</p>
+                    <p class="text-gray-900 text-xl">{{ client.email ?: 'common.dash'|trans }}</p>
                 </div>
                 <div class="bg-white rounded-2xl p-6 shadow-md">
                     <h2 class="text-sm font-semibold text-gray-500 mb-2">{{ 'client.country'|trans }}</h2>
-                    <p class="text-gray-900 text-xl">{{ client.country ?: '–' }}</p>
+                    <p class="text-gray-900 text-xl">{{ client.country ?: 'common.dash'|trans }}</p>
                 </div>
                 <div class="bg-white rounded-2xl p-6 shadow-md">
                     <h2 class="text-sm font-semibold text-gray-500 mb-2">{{ 'client.projects_count'|trans }}</h2>
@@ -62,13 +62,13 @@
                                 <tr class="hover:bg-gray-50 transition-colors cursor-pointer">
                                     <td class="px-6 py-4 text-sm text-gray-900">{{ project.id }}</td>
                                     <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ project.name }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-700">{{ project.startDate ? project.startDate|date('d/m/Y') : '–' }}</td>
-                                    <td class="px-6 py-4 text-sm text-gray-700">{{ project.endDate ? project.endDate|date('d/m/Y') : '–' }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">{{ project.startDate ? project.startDate|date('d/m/Y') : 'common.dash'|trans }}</td>
+                                    <td class="px-6 py-4 text-sm text-gray-700">{{ project.endDate ? project.endDate|date('d/m/Y') : 'common.dash'|trans }}</td>
                                     <td class="px-6 py-4">
                                         {% set statusColors = {
-                                            'En cours': 'bg-yellow-100 text-yellow-800',
-                                            'Terminé': 'bg-green-100 text-green-800',
-                                            'Annulé': 'bg-red-100 text-red-800'
+                                            'in_progress': 'bg-yellow-100 text-yellow-800',
+                                            'completed': 'bg-green-100 text-green-800',
+                                            'cancelled': 'bg-red-100 text-red-800'
                                         } %}
                                         <span class="px-3 py-1 rounded-full text-xs font-semibold {{ statusColors[project.status]|default('bg-gray-100 text-gray-800') }}">
                                             {{ project.status|trans }}

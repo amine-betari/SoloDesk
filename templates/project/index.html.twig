@@ -66,9 +66,9 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">
-                                    {{ project.startDate ? project.startDate|date('d/m/Y') : '—' }}
+                                    {{ project.startDate ? project.startDate|date('d/m/Y') : 'common.dash'|trans }}
                                     <span class="text-gray-400">→</span>
-                                    {{ project.endDate ? project.endDate|date('d/m/Y') : '—' }}
+                                    {{ project.endDate ? project.endDate|date('d/m/Y') : 'common.dash'|trans }}
                                 </td>
                                 <td class="px-6 py-4">
                                     {% set statusColors = {
