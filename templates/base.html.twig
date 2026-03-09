@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{ app.request.locale }}" dir="{{ app.request.locale == 'ar' ? 'rtl' : 'ltr' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,7 +7,7 @@
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Playfair:ital,opsz,wght@1,5..1200,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300..700&family=DM+Sans:opsz,wght@9..40,100..1000&family=Playfair:ital,opsz,wght@1,5..1200,600&display=swap" rel="stylesheet">
 
     {% block stylesheets %}
         <style>
@@ -25,8 +25,8 @@
 
     {% endblock %}
 </head>
-<body class="bg-[#16202A] text-white" style="font-family: DM Sans, sans-serif;">
-<div class="flex flex-col md:flex-row min-h-screen">
+<body class="bg-[#16202A] text-white">
+<div class="flex flex-col md:flex-row min-h-screen layout-root">
     {% include 'partials/sidebar.html.twig' %}
     <main class="flex-1 p-0">
         {% if app.user %}

@@ -68,12 +68,64 @@ main form input[type="checkbox"]:focus {
     -webkit-overflow-scrolling: touch;
 }
 
+/* RTL support */
+body {
+    font-family: "DM Sans", sans-serif;
+}
+
+[dir="rtl"] body {
+    direction: rtl;
+    font-family: "Cairo", "DM Sans", sans-serif;
+}
+
+@media (min-width: 768px) {
+    [dir="rtl"] .layout-root {
+        flex-direction: row-reverse;
+    }
+}
+
+[dir="rtl"] .text-left { text-align: right; }
+[dir="rtl"] .text-right { text-align: left; }
+
+/* Tom Select: RTL alignment and caret */
+[dir="rtl"] .ts-control,
+[dir="rtl"] .ts-dropdown {
+    direction: rtl;
+    text-align: right;
+}
+
+[dir="rtl"] .ts-control {
+    padding-left: max(var(--ts-pr-min), var(--ts-pr-clear-button) + var(--ts-pr-caret)) !important;
+    padding-right: 0 !important;
+}
+
+[dir="rtl"] .ts-wrapper.single .ts-control::after {
+    left: 15px;
+    right: auto;
+}
+
+[dir="rtl"] .plugin-checkbox_options .option input {
+    margin-left: 0.5rem;
+    margin-right: 0;
+}
+
+/* Logical spacing utilities (RTL-safe) */
+.ms-1 { margin-inline-start: 0.25rem; }
+.ms-2 { margin-inline-start: 0.5rem; }
+.ms-3 { margin-inline-start: 0.75rem; }
+.ms-4 { margin-inline-start: 1rem; }
+.ms-6 { margin-inline-start: 1.5rem; }
+
+.me-1 { margin-inline-end: 0.25rem; }
+.me-2 { margin-inline-end: 0.5rem; }
+.me-3 { margin-inline-end: 0.75rem; }
+.me-4 { margin-inline-end: 1rem; }
+.me-6 { margin-inline-end: 1.5rem; }
+
 @media (max-width: 640px) {
     .table-responsive {
-        margin-left: -1rem;
-        margin-right: -1rem;
-        padding-left: 1rem;
-        padding-right: 1rem;
+        margin-inline: -1rem;
+        padding-inline: 1rem;
     }
 
     .table-responsive table {
@@ -99,11 +151,11 @@ main form input[type="checkbox"]:focus {
 .ck-content ul {
     list-style: disc !important;
     margin: .5rem 0;
-    padding-left: 1.5rem;      /* <- l’indentation qui manque */
+    padding-inline-start: 1.5rem;      /* <- l’indentation qui manque */
 }
 .ck-content ol {
     list-style: decimal !important;
     margin: .5rem 0;
-    padding-left: 1.5rem;      /* <- l’indentation qui manque */
+    padding-inline-start: 1.5rem;      /* <- l’indentation qui manque */
 }
 .ck-content li { margin: .125rem 0; }

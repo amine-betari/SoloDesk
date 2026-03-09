@@ -31,7 +31,7 @@
             {% for document in relatedEntity.documents %}
                 <li class="flex flex-wrap items-center gap-2 mb-1">
                     <a href="{{ asset('uploads/documents/' ~ document.filename) }}" target="_blank" class="underline text-blue-600">{{ document.filename }}</a>
-                    <label class="ml-4 text-sm text-red-600 cursor-pointer">
+                    <label class="ms-4 text-sm text-red-600 cursor-pointer">
                         <input type="checkbox" name="documents_to_remove[]" value="{{ document.id }}">
                         {{ 'actions.delete'|trans }}
                     </label>

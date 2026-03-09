@@ -1,5 +1,5 @@
 {# templates/partials/sidebar.html.twig #}
-<aside class="w-full md:w-64 bg-[#1F2732] md:min-h-screen flex flex-col" data-controller="mobile-menu">
+<aside class="w-full md:w-64 bg-[#1F2732] md:min-h-screen flex flex-col sidebar" data-controller="mobile-menu">
     <div class="px-6 py-4 flex items-center justify-between md:block">
         <div>
             <div class="text-white text-2xl font-bold">SoloDesk</div>
@@ -37,7 +37,7 @@
                class="group flex items-center px-4 py-3 rounded-md transition-colors
                {% if app.request.attributes.get('_route') starts with item.route %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
                 {# Icône simple avec Heroicons #}
-                <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 me-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     {% if item.icon == 'home' %}
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-4H9v4a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V9z"/>
                     {% elseif item.icon == 'folder' %}
@@ -63,16 +63,16 @@
             <a href="{{ path('app_collaborator_index') }}"
                class="group flex items-center px-4 py-3 rounded-md transition-colors
                {% if app.request.attributes.get('_route') starts with 'app_collaborator' %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
-                <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 me-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 0 0-4-4h-1M9 20h5v-2a4 4 0 0 0-4-4H9M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/>
                 </svg>
                 {{ 'nav.collaborators'|trans }}
             </a>
 
             <a href="{{ path('app_skill_index') }}"
-               class="group flex items-center ml-6 px-4 py-2 rounded-md transition-colors
+               class="group flex items-center ms-6 px-4 py-2 rounded-md transition-colors
                {% if app.request.attributes.get('_route') starts with 'app_skill' %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
-                <svg class="w-4 h-4 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 me-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1m-7 4h10m-11 4h12m-12 0v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-5m-12 0h12"/>
                 </svg>
                 {{ 'nav.skills'|trans }}
@@ -84,25 +84,25 @@
             <a href="{{ path('app_company_edit') }}"
                class="group flex items-center px-4 py-3 rounded-md transition-colors
                {% if app.request.attributes.get('_route') starts with 'app_company_edit' %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
-                <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 me-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M10 6V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v1m-7 4h10m-11 4h12m-12 0v5a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-5m-12 0h12"/>
                 </svg>
                 {{ 'nav.company'|trans }}
             </a>
 
             <a href="{{ path('app_templates_index') }}"
-               class="group flex items-center ml-6 px-4 py-2 rounded-md transition-colors
+               class="group flex items-center ms-6 px-4 py-2 rounded-md transition-colors
                {% if app.request.attributes.get('_route') starts with 'app_templates' %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
-                <svg class="w-4 h-4 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 me-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM14 2v6h6"/>
                 </svg>
                 {{ 'nav.templates'|trans }}
             </a>
 
             <a href="{{ path('app_settings') }}"
-               class="group flex items-center ml-6 px-4 py-2 rounded-md transition-colors
+               class="group flex items-center ms-6 px-4 py-2 rounded-md transition-colors
                {% if app.request.attributes.get('_route') starts with 'app_settings' %}bg-[#2A3747] text-white font-semibold{% else %}text-gray-400 hover:bg-[#2A3747] hover:text-white{% endif %}">
-                <svg class="w-4 h-4 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 me-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
                 </svg>
                 {{ 'nav.settings'|trans }}
@@ -114,7 +114,7 @@
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('logout') }}">
                 <button type="submit"
                         class="group flex items-center w-full px-4 py-3 rounded-md transition-colors text-gray-400 hover:bg-[#2A3747] hover:text-white">
-                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="w-5 h-5 me-3 text-gray-400 group-hover:text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1"/>
                     </svg>
                     {{ 'nav.logout'|trans }}
