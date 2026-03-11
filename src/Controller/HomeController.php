@@ -273,6 +273,7 @@ class HomeController extends AbstractController
     #[Route('/stats/ca/trimestre', name: 'stats_ca_trimestre')]
     public function caParTrimestre(
         PaymentRepository $paymentRepository,
+        \App\Repository\PrestationRepository $prestationRepository,
         ChartBuilderInterface $chartBuilder,
         Request $request,
         CompanySettings $settings
@@ -364,6 +365,7 @@ class HomeController extends AbstractController
         // CA N Current
 
         $totauxParDevise = [];
+        $totauxParDeviseExternesAnnee = [];
 
         foreach ($payments as $payment) {
             $paymentDate = $payment->getDate();
@@ -385,6 +387,11 @@ class HomeController extends AbstractController
             $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
 
             $totauxParDevise[$devise] = ($totauxParDevise[$devise] ?? 0) + $payment->getAmount();
+
+            if ($salesDocument && $salesDocument->isExternalInvoice()) {
+                $totauxParDeviseExternesAnnee[$devise] =
+                    ($totauxParDeviseExternesAnnee[$devise] ?? 0) + $payment->getAmount();
+            }
         }
 
         // formatage propre "fr"
@@ -434,6 +441,46 @@ class HomeController extends AbstractController
         }
         $caGlobalExternesTexte =
             $caGlobalExternesAffichage ? implode(' • ', $caGlobalExternesAffichage) : '0';
+
+        $gainGlobalTexte = null;
+        if ($company->getLegalForm() === 'AE') {
+            $prestationsGlobal = $prestationRepository->createQueryBuilder('p')
+                ->innerJoin('p.salesDocument', 'sd')
+                ->andWhere('p.company = :company')
+                ->andWhere('sd.company = :company')
+                ->andWhere('COALESCE(sd.invoiceDate, sd.createdAt) >= :start')
+                ->setParameter('company', $company)
+                ->setParameter('start', $startDate)
+                ->getQuery()
+                ->getResult();
+
+            $prestationsGlobalParDevise = [];
+            foreach ($prestationsGlobal as $prestation) {
+                $salesDocument = $prestation->getSalesDocument();
+                if (!$salesDocument) {
+                    continue;
+                }
+                $devise = $salesDocument->getResolvedCurrency();
+                $prestationsGlobalParDevise[$devise] =
+                    ($prestationsGlobalParDevise[$devise] ?? 0) + $prestation->getTotal();
+            }
+
+            $allDevisesGlobal = array_unique(array_merge(
+                array_keys($totauxParDeviseGlobal),
+                array_keys($totauxParDeviseGlobalExternes),
+                array_keys($prestationsGlobalParDevise)
+            ));
+
+            $gainGlobalAffichage = [];
+            foreach ($allDevisesGlobal as $devise) {
+                $gain = ($totauxParDeviseGlobal[$devise] ?? 0)
+                    - ($totauxParDeviseGlobalExternes[$devise] ?? 0)
+                    - ($prestationsGlobalParDevise[$devise] ?? 0);
+                $gainGlobalAffichage[] = $fmt->format($gain) . ' ' . $devise;
+            }
+
+            $gainGlobalTexte = $gainGlobalAffichage ? implode(' • ', $gainGlobalAffichage) : '0';
+        }
 
         // Ratios par trimestre (impôts)
         $ratiosParTrimestre = [];
@@ -492,6 +539,70 @@ class HomeController extends AbstractController
         // CA N-1
 
 
+        $gainAnneeTexte = null;
+        $gainDetails = null;
+        if ($company->getLegalForm() === 'AE') {
+            $yearStart = new \DateTimeImmutable($anneeSelectionnee . '-01-01 00:00:00');
+            $yearEnd = new \DateTimeImmutable($anneeSelectionnee . '-12-31 23:59:59');
+            $effectiveStart = $startDate > $yearStart ? $startDate : $yearStart;
+
+            $prestations = $prestationRepository->createQueryBuilder('p')
+                ->innerJoin('p.salesDocument', 'sd')
+                ->andWhere('p.company = :company')
+                ->andWhere('sd.company = :company')
+                ->andWhere('COALESCE(sd.invoiceDate, sd.createdAt) >= :start')
+                ->andWhere('COALESCE(sd.invoiceDate, sd.createdAt) <= :end')
+                ->setParameter('company', $company)
+                ->setParameter('start', $effectiveStart)
+                ->setParameter('end', $yearEnd)
+                ->getQuery()
+                ->getResult();
+
+            $prestationsParDevise = [];
+            foreach ($prestations as $prestation) {
+                $salesDocument = $prestation->getSalesDocument();
+                if (!$salesDocument) {
+                    continue;
+                }
+                $devise = $salesDocument->getResolvedCurrency();
+                $prestationsParDevise[$devise] =
+                    ($prestationsParDevise[$devise] ?? 0) + $prestation->getTotal();
+            }
+
+            $allDevises = array_unique(array_merge(
+                array_keys($totauxParDevise),
+                array_keys($totauxParDeviseExternesAnnee),
+                array_keys($prestationsParDevise)
+            ));
+
+            $gainAffichage = [];
+            foreach ($allDevises as $devise) {
+                $gain = ($totauxParDevise[$devise] ?? 0)
+                    - ($totauxParDeviseExternesAnnee[$devise] ?? 0)
+                    - ($prestationsParDevise[$devise] ?? 0);
+                $gainAffichage[] = $fmt->format($gain) . ' ' . $devise;
+            }
+
+            $gainAnneeTexte = $gainAffichage ? implode(' • ', $gainAffichage) : '0';
+
+            $externesAffichage = [];
+            foreach ($totauxParDeviseExternesAnnee as $devise => $montant) {
+                $externesAffichage[] = $fmt->format($montant) . ' ' . $devise;
+            }
+            $externesTexte = $externesAffichage ? implode(' • ', $externesAffichage) : '0';
+
+            $prestationsAffichage = [];
+            foreach ($prestationsParDevise as $devise => $montant) {
+                $prestationsAffichage[] = $fmt->format($montant) . ' ' . $devise;
+            }
+            $prestationsTexte = $prestationsAffichage ? implode(' • ', $prestationsAffichage) : '0';
+
+            $gainDetails = [
+                'externes' => $externesTexte,
+                'prestations' => $prestationsTexte,
+            ];
+        }
+
         return $this->render('stats/trimestriels.html.twig', [
             'charts' => $charts,
             'ratiosParTrimestre' => $ratiosParTrimestre,
@@ -501,7 +612,10 @@ class HomeController extends AbstractController
             'caAnneeTexte' => $caAnneeTexte,
             'caGlobalTexte' => $caGlobalTexte,
             'caGlobalExternesTexte' => $caGlobalExternesTexte,
+            'gainGlobalTexte' => $gainGlobalTexte,
             'caAnneePrecedenteTexte' => $caAnneePrecedenteTexte,
+            'gainAnneeTexte' => $gainAnneeTexte,
+            'gainDetails' => $gainDetails,
             'legalForm' => $company->getLegalForm(),
         ]);
     }

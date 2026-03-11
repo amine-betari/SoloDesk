@@ -383,12 +383,17 @@ stats:
   quarter_title: "الإيراد الفصلي – %year%"
   ca_total: "إجمالي الإيراد (منذ البداية):"
   ca_external: "خارجي:"
+  gain_total: "إجمالي الربح (منذ البداية):"
   ca_year: "إيراد %year%:"
+  gain_year: "الربح %year%:"
+  gain_before_tax_year: "الربح قبل الضريبة %year%:"
   ca_prev_year: "إيراد %year%:"
   year: "السنة"
   no_data: "لا توجد بيانات لعام %year%."
   revenue_by_client: "توزيع الإيراد حسب العميل"
   taxes: "%rate% ضرائب"
+  gain_externals: "الفواتير الخارجية:"
+  gain_prestations: "الخدمات:"
 
 home:
   title: "لوحة التحكم - SoloDesk"

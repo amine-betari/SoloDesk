@@ -383,12 +383,17 @@ stats:
   quarter_title: "CA par trimestre – %year%"
   ca_total: "CA total (depuis le début) :"
   ca_external: "dont externes :"
+  gain_total: "Gain total (depuis le début) :"
   ca_year: "CA %year% :"
+  gain_year: "Gain %year% :"
+  gain_before_tax_year: "Gain avant impôt %year% :"
   ca_prev_year: "CA %year% :"
   year: "Année"
   no_data: "Aucune donnée disponible pour %year%."
   revenue_by_client: "Répartition du CA par client"
   taxes: "%rate% impôts"
+  gain_externals: "Externes :"
+  gain_prestations: "Prestations :"
 
 home:
   title: "Tableau de bord - SoloDesk"

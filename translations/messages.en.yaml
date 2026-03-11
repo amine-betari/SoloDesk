@@ -383,12 +383,17 @@ stats:
   quarter_title: "Quarterly revenue – %year%"
   ca_total: "Total revenue (since start):"
   ca_external: "external:"
+  gain_total: "Total gain (since start):"
   ca_year: "Revenue %year%:"
+  gain_year: "Gain %year%:"
+  gain_before_tax_year: "Gain before tax %year%:"
   ca_prev_year: "Revenue %year%:"
   year: "Year"
   no_data: "No data available for %year%."
   revenue_by_client: "Revenue split by client"
   taxes: "%rate% taxes"
+  gain_externals: "External invoices:"
+  gain_prestations: "Services:"
 
 home:
   title: "Dashboard - SoloDesk"
