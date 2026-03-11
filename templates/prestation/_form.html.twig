@@ -1,0 +1,87 @@
+<div class="w-full px-6 py-8">
+    <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-8">
+        {% if button_label is defined %}
+            <h1 class="text-3xl font-bold mb-6">{{ 'prestation.edit_title'|trans }}</h1>
+        {% else %}
+            <h1 class="text-3xl font-bold mb-6">{{ 'prestation.new_title'|trans }}</h1>
+        {% endif %}
+
+        {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+        <fieldset class="space-y-4 p-6 bg-white rounded-lg shadow-inner border border-gray-200">
+            <legend class="text-xl font-semibold mb-4 text-gray-900">{{ 'common.information'|trans }}</legend>
+
+            <div>
+                {{ form_label(form.label, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.label, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }}
+                {{ form_errors(form.label, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
+
+            <div>
+                {{ form_label(form.collaborator, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.collaborator) }}
+                {{ form_errors(form.collaborator, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+                {% if form.collaborator.vars.disabled %}
+                    <span class="text-xs text-gray-500 mt-1 inline-block" title="{{ 'prestation.collaborator_locked'|trans }}">info</span>
+                {% endif %}
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    {{ form_label(form.salesDocument, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.salesDocument) }}
+                    {{ form_errors(form.salesDocument, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+                </div>
+                <div>
+                    {{ form_label(form.performedAt, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.performedAt, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900'}}) }}
+                    {{ form_errors(form.performedAt, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    {{ form_label(form.quantity, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.quantity, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900'}}) }}
+                    {{ form_errors(form.quantity, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+                </div>
+                <div>
+                    {{ form_label(form.unitPrice, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.unitPrice, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900'}}) }}
+                    {{ form_errors(form.unitPrice, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+                </div>
+                <div>
+                    {{ form_label(form.status, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                    {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900'}}) }}
+                    {{ form_errors(form.status, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+                </div>
+            </div>
+
+            <div>
+                {{ form_label(form.notes, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.notes, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900'}}) }}
+                {{ form_errors(form.notes, {'attr': {'class': 'text-red-500 text-sm mt-1'}}) }}
+            </div>
+        </fieldset>
+
+        <div class="flex justify-end mt-6">
+            <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md btn-mobile">
+                {{ 'actions.save'|trans }}
+            </button>
+        </div>
+
+        {{ form_end(form) }}
+
+        {% if button_label is defined %}
+            <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                <a href="{{ path('app_prestation_index') }}"
+                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>
+
+                {{ include('prestation/_delete_form.html.twig', {prestation: prestation}) }}
+            </div>
+        {% else %}
+            <a href="{{ path('app_prestation_index') }}"
+               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white mt-4 inline-block">← {{ 'actions.back_to_list'|trans }}</a>
+        {% endif %}
+    </div>
+</div>

@@ -28,6 +28,10 @@
                     </span>
                 </div>
                 <div class="flex gap-2">
+                    <a href="{{ path('app_prestation_new', {'collaborator': collaborator.id}) }}"
+                       class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded font-semibold btn-mobile">
+                        {{ 'prestation.new'|trans }}
+                    </a>
                     <a href="{{ path('app_collaborator_edit', {'id': collaborator.id}) }}"
                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded font-semibold btn-mobile">
                         {{ 'actions.edit'|trans }}
