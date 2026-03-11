@@ -273,7 +273,6 @@ sales_document:
   client: "Client"
   notes: "Notes / Additional information"
   status: "Status"
-  notes: "Notes"
   issue_date: "Issue date"
   external_invoice: "External invoice (for a friend)"
 
