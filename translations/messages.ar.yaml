@@ -274,7 +274,6 @@ sales_document:
   client: "العميل"
   notes: "ملاحظات / معلومات إضافية"
   status: "الحالة"
-  notes: "ملاحظات"
   issue_date: "تاريخ الإصدار"
 
 payment:
