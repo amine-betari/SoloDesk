@@ -155,4 +155,9 @@ class Collaborator
         $this->createdAt = $createdAt;
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return (string) $this->name;
+    }
 }

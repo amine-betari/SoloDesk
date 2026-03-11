@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Form;
 
-use App\Entity\Collaborator;
 use App\Entity\Company;
 use App\Entity\Prestation;
+use App\Form\AutoComplete\CollaboratorAutocompleteField;
 use App\Form\AutoComplete\InvoiceAutocompleteField;
-use App\Repository\CollaboratorRepository;
 use Doctrine\ORM\EntityRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -32,22 +31,12 @@ class PrestationForm extends AbstractType
                     new NotBlank(['message' => 'Veuillez entrer un libellé']),
                 ],
             ])
-            ->add('collaborator', EntityType::class, [
-                'class' => Collaborator::class,
-                'choice_label' => 'name',
+            ->add('collaborator', CollaboratorAutocompleteField::class, [
                 'label' => 'prestation.collaborator',
                 'disabled' => $options['collaborator_locked'],
-                'query_builder' => function (CollaboratorRepository $repo) use ($options) {
-                    $qb = $repo->createQueryBuilder('c')
-                        ->orderBy('c.name', 'ASC');
-
-                    if ($options['company'] instanceof Company) {
-                        $qb->andWhere('c.company = :company')
-                            ->setParameter('company', $options['company']);
-                    }
-
-                    return $qb;
-                },
+                'extra_options' => [
+                    'company_id' => $options['company']?->getId(),
+                ],
                 'attr' => [
                     'class' => 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900',
                 ],
