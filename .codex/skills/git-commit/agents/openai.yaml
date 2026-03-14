@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Commit"
+  short_description: "Standardize git commit workflow for this project"
+  default_prompt: "Follow the project commit workflow: check status, summarize changes, propose/confirm commit message, then commit."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Git Push"
+  short_description: "Standardize git push workflow for this project"
+  default_prompt: "Follow the project push workflow: verify branch and remote, then push."
