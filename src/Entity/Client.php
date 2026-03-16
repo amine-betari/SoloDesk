@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\Company;
+use App\Entity\SalesDocument;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
@@ -46,13 +47,13 @@ class Client
      * @var Collection<int, Estimate>
      */
     #[ORM\OneToMany(targetEntity: Estimate::class, mappedBy: 'client')]
-    private Collection $amount;
+    private Collection $estimates;
 
     /**
-     * @var Collection<int, Estimate>
+     * @var Collection<int, SalesDocument>
      */
-    #[ORM\OneToMany(targetEntity: Estimate::class, mappedBy: 'client')]
-    private Collection $estimates;
+    #[ORM\OneToMany(targetEntity: SalesDocument::class, mappedBy: 'client')]
+    private Collection $salesDocuments;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -71,8 +72,8 @@ class Client
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->projects = new ArrayCollection();
-        $this->amount = new ArrayCollection();
         $this->estimates = new ArrayCollection();
+        $this->salesDocuments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -160,36 +161,6 @@ class Client
     /**
      * @return Collection<int, Estimate>
      */
-    public function getAmount(): Collection
-    {
-        return $this->amount;
-    }
-
-    public function addAmount(Estimate $amount): static
-    {
-        if (!$this->amount->contains($amount)) {
-            $this->amount->add($amount);
-            $amount->setClient($this);
-        }
-
-        return $this;
-    }
-
-    public function removeAmount(Estimate $amount): static
-    {
-        if ($this->amount->removeElement($amount)) {
-            // set the owning side to null (unless already changed)
-            if ($amount->getClient() === $this) {
-                $amount->setClient(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Estimate>
-     */
     public function getEstimates(): Collection
     {
         return $this->estimates;
@@ -211,6 +182,35 @@ class Client
             // set the owning side to null (unless already changed)
             if ($estimate->getClient() === $this) {
                 $estimate->setClient(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SalesDocument>
+     */
+    public function getSalesDocuments(): Collection
+    {
+        return $this->salesDocuments;
+    }
+
+    public function addSalesDocument(SalesDocument $salesDocument): static
+    {
+        if (!$this->salesDocuments->contains($salesDocument)) {
+            $this->salesDocuments->add($salesDocument);
+            $salesDocument->setClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeSalesDocument(SalesDocument $salesDocument): static
+    {
+        if ($this->salesDocuments->removeElement($salesDocument)) {
+            if ($salesDocument->getClient() === $this) {
+                $salesDocument->setClient(null);
             }
         }
 

@@ -77,8 +77,7 @@ class SalesDocument
     private bool $taxApplied = false;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 4, scale: 2, nullable: true)]
-
-    private float $vatRate = 0.0;
+    private ?string $vatRate = '0.0';
 
 
     public function __construct()
@@ -395,12 +394,12 @@ class SalesDocument
 
     public function getVatRate(): float
     {
-        return $this->vatRate;
+        return (float) ($this->vatRate ?? 0.0);
     }
 
     public function setVatRate(float $vatRate): self
     {
-        $this->vatRate = $vatRate;
+        $this->vatRate = (string) $vatRate;
         return $this;
     }
 
