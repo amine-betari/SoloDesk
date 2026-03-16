@@ -69,3 +69,5 @@ cache
 .venv-mcp/
 # Symfony generated reference config
 config/reference.php
+# Local deploy script
+scripts/deploy-dev.sh
