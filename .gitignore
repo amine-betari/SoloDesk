@@ -67,3 +67,5 @@ cache
 
 # Local MCP virtualenv
 .venv-mcp/
+# Symfony generated reference config
+config/reference.php
