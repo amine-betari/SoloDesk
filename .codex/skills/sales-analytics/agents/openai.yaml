@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sales Analytics"
+  short_description: "Answer business questions using CSV exports via MCP"
+  default_prompt: "Use MCP CSV exports (invoices/payments) to answer analytics questions with clear calculations."

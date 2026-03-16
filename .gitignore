@@ -64,3 +64,6 @@ cache
 # Node, PNPM, Bun, etc.
 /node_modules/
 /pnpm-
+
+# Local MCP virtualenv
+.venv-mcp/
