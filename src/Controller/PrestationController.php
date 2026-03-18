@@ -29,7 +29,8 @@ final class PrestationController extends AbstractController
         $limit = 10;
         $q = trim((string) $request->query->get('q', ''));
         $status = trim((string) $request->query->get('status', ''));
-        $collaboratorId = $request->query->getInt('collaborator', 0);
+        $collaboratorRaw = trim((string) $request->query->get('collaborator', ''));
+        $collaboratorId = ctype_digit($collaboratorRaw) ? (int) $collaboratorRaw : 0;
 
         $company = $this->getUser()?->getCompany();
         if (!$company) {
