@@ -1,0 +1,56 @@
+{% if project.salesDocuments|length > 0 %}
+    <div class="bg-gray-700 shadow rounded p-6 mb-6 text-white">
+        <h2 class="text-xl font-semibold mb-4">{{ 'documents.generated'|trans }}</h2>
+
+        <div class="table-responsive">
+            <table class="min-w-full text-sm text-left text-gray-100">
+                <thead class="bg-gray-800 text-xs uppercase">
+                <tr>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'common.reference_short'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.type'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'common.date'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.table_amount_ht'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.table_amount_ttc'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.table_status'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'table.actions'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-600">
+                {% for doc in project.salesDocuments %}
+                    <tr class="hover:bg-gray-600">
+                        <td class="px-4 py-2">{{ doc.reference }}</td>
+                        <td class="px-4 py-2">{{ doc.type }}</td>
+                        <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : 'common.dash'|trans }}</td>
+                        <td class="px-4 py-2">
+                            {{ doc.getTotalHT|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
+                        </td>
+                        <td class="px-4 py-2">
+                            {{ doc.getTotalTTC|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
+                        </td>
+                        {% set color =
+                            doc.status == 'draf' ? 'gray' :
+                            doc.status == 'sent' ? 'indigo' :
+                            doc.status == 'accepted' ? 'green' :
+                            doc.status == 'paid' ? 'green' :
+                            doc.status == 'rejected' ? 'red' : 'gray'
+                        %}
+                        <td class="px-4 py-2">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-{{ color }}-100 text-{{ color }}-800">
+                                {{ doc.status ? doc.status|trans : 'common.dash'|trans }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
+                                   class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 btn-mobile">{{ 'actions.view'|trans }}</a>
+                                <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
+                                   class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 btn-mobile">{{ 'actions.edit'|trans }}</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endif %}

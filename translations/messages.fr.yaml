@@ -152,6 +152,8 @@ project:
   table_project: "Projet"
   table_dates: "Dates"
   table_status: "Statut"
+  table_amount_ht: "Montant HT"
+  table_amount_ttc: "Montant TTC"
   table_amount: "Montant"
   table_client: "Client"
   none: "Aucun projet trouvé"

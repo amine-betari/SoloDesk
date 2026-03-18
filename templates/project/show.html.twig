@@ -78,12 +78,12 @@
 
             {# Documents et actions #}
             {% if project.id %}
-                <div class="flex flex-col md:flex-row md:justify-between md:items-center space-y-4 md:space-y-0">
+                <div class="space-y-4">
                     <a href="{{ path('app_sales_document_new', {'projectId': project.id}) }}"
-                       class="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition btn-mobile">
+                       class="inline-flex px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 transition btn-mobile">
                         {{ 'project.generate_document'|trans }}
                     </a>
-                    {% include 'components/_list_for_estimate.html.twig' with { estimate: project } %}
+                    {% include 'components/_project_sales_documents_list.html.twig' with { project: project } %}
                 </div>
             {% endif %}
 
