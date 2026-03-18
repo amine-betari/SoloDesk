@@ -1,0 +1,66 @@
+{% if invoices|length > 0 %}
+    <div class="bg-[#1F2732] border border-[#2A3747] shadow rounded p-6 mb-6 text-white">
+        <h2 class="text-xl font-semibold mb-4 text-amber-300">
+            {{ 'sales_document.overdue_title'|trans({'%days%': overdueDays}) }}
+        </h2>
+
+        <div class="table-responsive">
+            <table class="min-w-full text-sm text-left text-gray-100">
+                <thead class="bg-[#16202A] text-xs uppercase">
+                <tr>
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'common.reference_short'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'sales_document.table_client'|trans }}</th>
+                    {% if showProject %}
+                        <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'sales_document.project'|trans }}</th>
+                    {% endif %}
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'sales_document.issue_date'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'sales_document.due_date'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'sales_document.table_amount_ttc'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'sales_document.table_balance'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'sales_document.table_status'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-[#2A3747]">{{ 'table.actions'|trans }}</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-[#2A3747]">
+                {% for doc in invoices %}
+                    {% set currency = doc.getResolvedCurrency() %}
+                    <tr class="hover:bg-[#2A3747]">
+                        <td class="px-4 py-2">{{ doc.reference }}</td>
+                        <td class="px-4 py-2">{{ doc.getResolvedClient() ? doc.getResolvedClient().name : 'common.dash'|trans }}</td>
+                        {% if showProject %}
+                            <td class="px-4 py-2">
+                                {% if doc.project %}
+                                    <a class="text-white underline" href="{{ path('app_project_show', { id: doc.project.id }) }}">{{ doc.project.name }}</a>
+                                {% else %}
+                                    {{ 'common.dash'|trans }}
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                        <td class="px-4 py-2">{{ doc.invoiceDate ? doc.invoiceDate|date('d/m/Y') : 'common.dash'|trans }}</td>
+                        <td class="px-4 py-2">
+                            {{ doc.invoiceDate ? doc.invoiceDate|date_modify('+' ~ overdueDays ~ ' days')|date('d/m/Y') : 'common.dash'|trans }}
+                        </td>
+                        <td class="px-4 py-2">{{ doc.getTotalTTC|format_currency(currency, app.request.locale ?: 'fr_FR') }}</td>
+                        <td class="px-4 py-2">{{ doc.getBalanceDue|format_currency(currency, app.request.locale ?: 'fr_FR') }}</td>
+                        <td class="px-4 py-2">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-[#E2E8F0] text-gray-800">
+                                {{ doc.status ? doc.status|trans : 'common.dash'|trans }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2">
+                            <div class="flex flex-col sm:flex-row gap-2">
+                                <a href="{{ path('app_sales_document_show', { id: doc.id }) }}"
+                                   class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 btn-mobile">{{ 'actions.view'|trans }}</a>
+                                <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
+                                   class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 btn-mobile">{{ 'actions.edit'|trans }}</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="text-gray-500 italic mb-6">{{ 'sales_document.overdue_empty'|trans }}</div>
+{% endif %}
