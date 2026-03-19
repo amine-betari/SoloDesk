@@ -2,7 +2,9 @@
 
 namespace App\Repository;
 
+use App\Constants\InvoiceStatus;
 use App\Entity\Company;
+use App\Entity\Project;
 use App\Entity\SalesDocument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -58,6 +60,34 @@ class SalesDocumentRepository extends ServiceEntityRepository
             'companyId' => $company->getId(),
             'startDate' => $startDate ? $startDate->format('Y-m-d H:i:s') : null,
         ]);
+    }
+
+    /**
+     * @return SalesDocument[]
+     */
+    public function findOverdueInvoices(
+        Company $company,
+        \DateTimeInterface $overdueBefore,
+        ?Project $project = null
+    ): array {
+        $qb = $this->createQueryBuilder('s')
+            ->andWhere('s.company = :company')
+            ->andWhere('s.type = :type')
+            ->andWhere('s.invoiceDate IS NOT NULL')
+            ->andWhere('s.invoiceDate < :overdueBefore')
+            ->andWhere('s.status != :paid')
+            ->setParameter('company', $company)
+            ->setParameter('type', SalesDocument::TYPE_INVOICE)
+            ->setParameter('overdueBefore', $overdueBefore)
+            ->setParameter('paid', InvoiceStatus::PAID)
+            ->orderBy('s.invoiceDate', 'ASC');
+
+        if ($project) {
+            $qb->andWhere('s.project = :project')
+                ->setParameter('project', $project);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     //    /**

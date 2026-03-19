@@ -11,6 +11,7 @@
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'common.date'|trans }}</th>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.table_amount_ht'|trans }}</th>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.table_amount_ttc'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.table_balance'|trans }}</th>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.table_status'|trans }}</th>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'table.actions'|trans }}</th>
                 </tr>
@@ -26,6 +27,9 @@
                         </td>
                         <td class="px-4 py-2">
                             {{ doc.getTotalTTC|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
+                        </td>
+                        <td class="px-4 py-2">
+                            {{ doc.getBalanceDue|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
                         </td>
                         {% set color =
                             doc.status == 'draf' ? 'gray' :

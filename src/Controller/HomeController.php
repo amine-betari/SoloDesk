@@ -73,6 +73,10 @@ class HomeController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        $overdueDays = 45;
+        $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
+        $overdueInvoices = $salesDocumentRepository->findOverdueInvoices($company, $overdueBefore);
+
         $data = $clientRepository->countClientsGroupedByYear(
             $company,
             \DateTime::createFromImmutable($activityStartDate),
@@ -266,6 +270,8 @@ class HomeController extends AbstractController
             'totalExternalInvoices' => $totalExternalInvoices,
             'estimateChart' => $estimateChart,
             'invoiceChart' => $invoiceChart,
+            'overdueInvoices' => $overdueInvoices,
+            'overdueDays' => $overdueDays,
         ]);
     }
 

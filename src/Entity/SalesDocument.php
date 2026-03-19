@@ -375,6 +375,24 @@ class SalesDocument
         }
     }
 
+    public function getTotalPaid(): float
+    {
+        $totalPaid = 0.0;
+
+        foreach ($this->payments as $payment) {
+            $totalPaid += (float) $payment->getAmount();
+        }
+
+        return $totalPaid;
+    }
+
+    public function getBalanceDue(): float
+    {
+        $balance = $this->getTotalTTC() - $this->getTotalPaid();
+
+        return max(0.0, $balance);
+    }
+
 
     public function __toString(): string
     {

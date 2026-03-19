@@ -85,9 +85,15 @@ final class SalesDocumentController extends AbstractController
 
         $pagination = $paginator->paginate($qb, $page, $limit);
 
+        $overdueDays = 45;
+        $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
+        $overdueInvoices = $salesDocumentRepository->findOverdueInvoices($company, $overdueBefore);
+
         return $this->render('sales_document/index.html.twig', [
             'pagination' => $pagination,
             'filterForm' => $filterForm->createView(), // on envoie le form à la vu
+            'overdueInvoices' => $overdueInvoices,
+            'overdueDays' => $overdueDays,
         ]);
     }
 

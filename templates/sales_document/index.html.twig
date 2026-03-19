@@ -43,6 +43,12 @@
                 'action': path('app_sales_document_index')
             } %}
 
+            {% include 'components/_overdue_invoices_list.html.twig' with {
+                invoices: overdueInvoices,
+                overdueDays: overdueDays,
+                showProject: true
+            } %}
+
             {% if pagination.items is not empty %}
                 <div class="overflow-x-auto table-responsive rounded-2xl border border-gray-200 bg-white shadow-lg">
                     <table class="min-w-full divide-y divide-gray-200">

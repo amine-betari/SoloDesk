@@ -6,6 +6,7 @@ use App\Entity\Project;
 use App\Form\ProjectForm;
 use App\Form\Search\ProjectFilterForm;
 use App\Repository\ProjectRepository;
+use App\Repository\SalesDocumentRepository;
 use App\Repository\PaginationService;
 use App\Services\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -130,15 +131,21 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
-    public function show(Project $project): Response
+    public function show(Project $project, SalesDocumentRepository $salesDocumentRepository): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $project->getCompany()?->getId() !== $company->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
 
+        $overdueDays = 45;
+        $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
+        $overdueInvoices = $salesDocumentRepository->findOverdueInvoices($company, $overdueBefore, $project);
+
         return $this->render('project/show.html.twig', [
             'project' => $project,
+            'overdueInvoices' => $overdueInvoices,
+            'overdueDays' => $overdueDays,
         ]);
     }
 
