@@ -73,7 +73,7 @@ class HomeController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
-        $overdueDays = 45;
+        $overdueDays = $settings->getInt($company, CompanySettings::KEY_OVERDUE_DAYS, 45);
         $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
         $overdueInvoices = $salesDocumentRepository->findOverdueInvoices($company, $overdueBefore);
 

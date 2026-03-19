@@ -361,10 +361,12 @@ settings:
   general: "عام"
   tax_rate: "نسبة الضريبة (%)"
   activity_start_date: "تاريخ بداية النشاط"
+  overdue_days: "مهلة التذكير (أيام)"
   rate_default: "نسبة الضريبة (%)"
   rate_ae: "نسبة AE (%)"
   rate_sarl: "نسبة ضريبة الشركات (%)"
   rate_help: "مثال: 1.00 تعني 1%"
+  overdue_days_help: "مثال: 45 تعني 45 يومًا"
 
 documents:
   linked_title: "المستندات المرتبطة"

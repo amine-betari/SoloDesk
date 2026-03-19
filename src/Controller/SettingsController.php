@@ -22,10 +22,12 @@ class SettingsController extends AbstractController
 
         $defaultRate = 0.01;
         $defaultStart = new \DateTimeImmutable('2017-01-01');
+        $defaultOverdueDays = 45;
 
         $data = [
             'taxImpotRate' => $settings->getFloat($company, CompanySettings::KEY_TAX_IMPOT_RATE, $defaultRate) * 100,
             'activityStartDate' => $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, $defaultStart),
+            'overdueDays' => $settings->getInt($company, CompanySettings::KEY_OVERDUE_DAYS, $defaultOverdueDays),
         ];
 
         $form = $this->createForm(SettingsForm::class, $data);
@@ -36,9 +38,11 @@ class SettingsController extends AbstractController
             $ratePercent = (float) ($payload['taxImpotRate'] ?? 0);
             $rateDecimal = $ratePercent / 100;
             $startDate = $payload['activityStartDate'] ?? $defaultStart;
+            $overdueDays = (int) ($payload['overdueDays'] ?? $defaultOverdueDays);
 
             $settings->setFloat($company, CompanySettings::KEY_TAX_IMPOT_RATE, $rateDecimal);
             $settings->setDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, $startDate);
+            $settings->setInt($company, CompanySettings::KEY_OVERDUE_DAYS, $overdueDays);
 
             $this->addFlash('success', 'Paramètres enregistrés.');
             return $this->redirectToRoute('app_settings');

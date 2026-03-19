@@ -27,6 +27,7 @@ use Dompdf\Options;
 use App\Services\FilterService;
 use PhpOffice\PhpWord\TemplateProcessor;
 use App\Entity\DocumentTemplate;
+use App\Service\CompanySettings;
 
 #[Route('/sales/document')]
 final class SalesDocumentController extends AbstractController
@@ -43,7 +44,7 @@ final class SalesDocumentController extends AbstractController
         Request $request,
         PaginationService $paginator,
         FilterService $filterService,
-        \App\Service\CompanySettings $settings
+        CompanySettings $settings
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
@@ -59,7 +60,7 @@ final class SalesDocumentController extends AbstractController
             throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
         }
 
-        $activityStartDate = $settings->getDate($company, \App\Service\CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $activityStartDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
 
         $qb = $salesDocumentRepository->createQueryBuilder('s')
             ->andWhere('s.company = :company')
@@ -85,7 +86,7 @@ final class SalesDocumentController extends AbstractController
 
         $pagination = $paginator->paginate($qb, $page, $limit);
 
-        $overdueDays = 45;
+        $overdueDays = $settings->getInt($company, CompanySettings::KEY_OVERDUE_DAYS, 45);
         $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
         $overdueInvoices = $salesDocumentRepository->findOverdueInvoices($company, $overdueBefore);
 
