@@ -53,17 +53,17 @@ def _make_request(url: str, token: str, payload: Dict[str, Any]) -> Dict[str, An
 
 @mcp.tool()
 def create_pull_request(
-    title: Optional[str] = None,
     head: str,
     base: str,
+    title: Optional[str] = None,
     body: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     Create a GitHub Pull Request in amine-betari/SoloDesk.
 
-    - title: PR title (optional, auto-generated from head if omitted)
     - head: source branch (e.g., "feature-branch")
     - base: target branch (e.g., "main")
+    - title: PR title (optional, auto-generated from head if omitted)
     - body: optional PR description
     """
     token = _get_env("GITHUB_SOLODESK_TOKEN")
