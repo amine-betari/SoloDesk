@@ -72,7 +72,7 @@ def create_pull_request(
     if title is None or title.strip() == "":
         title = head.replace("/", " ").replace("-", " ").replace("_", " ").title()
 
-    if body is None:
+    if body is None or body.strip() == "":
         body = (
             "## Contexte\n\n"
             "## Changements\n\n"
