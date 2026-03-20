@@ -369,10 +369,12 @@ settings:
   general: "General"
   tax_rate: "Tax rate (%)"
   activity_start_date: "Activity start date"
+  overdue_days: "Follow-up delay (days)"
   rate_default: "Tax rate (%)"
   rate_ae: "AE rate (%)"
   rate_sarl: "Corporate tax rate (%)"
   rate_help: "Example: 1.00 for 1%"
+  overdue_days_help: "Example: 45 for 45 days"
 
 documents:
   linked_title: "Linked documents"

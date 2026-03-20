@@ -369,10 +369,12 @@ settings:
   general: "Général"
   tax_rate: "Taux impôt (%)"
   activity_start_date: "Date de début d’activité"
+  overdue_days: "Délai de relance (jours)"
   rate_default: "Taux impôt (%)"
   rate_ae: "Taux AE (%)"
   rate_sarl: "Taux IS (%)"
   rate_help: "Exemple: 1.00 pour 1%"
+  overdue_days_help: "Exemple: 45 pour 45 jours"
 
 documents:
   linked_title: "Documents liés"

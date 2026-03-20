@@ -11,6 +11,7 @@ use App\Repository\PaginationService;
 use App\Services\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Services\FilterService;
+use App\Service\CompanySettings;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,7 +27,7 @@ final class ProjectController extends AbstractController
         Request $request,
         PaginationService $paginator,
         FilterService $filterService,
-        \App\Service\CompanySettings $settings
+        CompanySettings $settings
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
@@ -41,7 +42,7 @@ final class ProjectController extends AbstractController
             throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
         }
 
-        $activityStartDate = $settings->getDate($company, \App\Service\CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $activityStartDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
 
         $qb = $projectRepository->createQueryBuilder('p')
             ->andWhere('p.company = :company')
@@ -138,7 +139,7 @@ final class ProjectController extends AbstractController
             throw $this->createAccessDeniedException('Accès refusé.');
         }
 
-        $overdueDays = 45;
+        $overdueDays = $settings->getInt($company, CompanySettings::KEY_OVERDUE_DAYS, 45);
         $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
         $overdueInvoices = $salesDocumentRepository->findOverdueInvoices($company, $overdueBefore, $project);
 

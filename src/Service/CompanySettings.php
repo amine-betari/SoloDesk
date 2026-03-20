@@ -11,6 +11,7 @@ class CompanySettings
 {
     public const KEY_TAX_IMPOT_RATE = 'tax_impot_rate';
     public const KEY_ACTIVITY_START_DATE = 'activity_start_date';
+    public const KEY_OVERDUE_DAYS = 'overdue_days';
 
     public function __construct(
         private CompanySettingRepository $repository,
@@ -25,6 +26,16 @@ class CompanySettings
         }
 
         return (float) $setting->getSettingValue();
+    }
+
+    public function getInt(Company $company, string $key, int $default): int
+    {
+        $setting = $this->repository->findOneByCompanyAndKey($company, $key);
+        if (!$setting || $setting->getSettingValue() === null || $setting->getSettingValue() === '') {
+            return $default;
+        }
+
+        return (int) $setting->getSettingValue();
     }
 
     public function getDate(Company $company, string $key, \DateTimeInterface $default): \DateTimeImmutable
@@ -44,6 +55,11 @@ class CompanySettings
     public function setFloat(Company $company, string $key, float $value): void
     {
         $this->upsert($company, $key, (string) $value, 'float');
+    }
+
+    public function setInt(Company $company, string $key, int $value): void
+    {
+        $this->upsert($company, $key, (string) $value, 'int');
     }
 
     public function setDate(Company $company, string $key, \DateTimeInterface $value): void
