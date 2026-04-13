@@ -132,7 +132,11 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_project_show', methods: ['GET'])]
-    public function show(Project $project, SalesDocumentRepository $salesDocumentRepository): Response
+    public function show(
+        Project $project,
+        SalesDocumentRepository $salesDocumentRepository,
+        CompanySettings $settings
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $project->getCompany()?->getId() !== $company->getId()) {
