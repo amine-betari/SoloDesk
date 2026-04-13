@@ -97,15 +97,18 @@
                                 {% endif %}
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">{{ document.taxApplied ? document.vatRate : 'common.dash'|trans }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">{{ document.invoiceDate ? document.invoiceDate|date('d/m/Y') : 'common.dash'|trans }}</td>
-                                {% set color =
-                                    document.status == 'draf' ? 'gray' :
-                                    document.status == 'sent' ? 'indigo' :
-                                    document.status == 'accepted' ? 'green' :
-                                    document.status == 'paid' ? 'green' :
-                                    document.status == 'rejected' ? 'red' : 'gray'
+                                {% set statusClass =
+                                    document.status == 'draft' ? 'bg-gray-100 text-gray-800' :
+                                    document.status == 'sent' ? 'bg-indigo-100 text-indigo-800' :
+                                    document.status == 'accepted' ? 'bg-green-100 text-green-800' :
+                                    document.status == 'paid' ? 'bg-green-100 text-green-800' :
+                                    document.status == 'rejected' ? 'bg-red-100 text-red-800' :
+                                    document.status == 'partially_paid' ? 'bg-yellow-100 text-yellow-800' :
+                                    document.status == 'cancelled' ? 'bg-red-100 text-red-800' :
+                                    'bg-gray-100 text-gray-800'
                                 %}
                                 <td class="px-6 py-4 text-sm text-gray-700">
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-{{ color }}-100 text-{{ color }}-800">
+                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ statusClass }}">
                                          {{ document.status ? document.status|trans : 'common.dash'|trans }}
                                     </span>
                                 </td>
