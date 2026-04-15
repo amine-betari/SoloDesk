@@ -28,6 +28,7 @@ use App\Services\FilterService;
 use PhpOffice\PhpWord\TemplateProcessor;
 use App\Entity\DocumentTemplate;
 use App\Service\CompanySettings;
+use App\Service\SalesDocumentDuplicator;
 
 #[Route('/sales/document')]
 final class SalesDocumentController extends AbstractController
@@ -191,6 +192,35 @@ final class SalesDocumentController extends AbstractController
         }
 
         return $this->redirectToRoute('app_sales_document_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/{id}/duplicate', name: 'app_sales_document_duplicate', methods: ['POST'])]
+    public function duplicate(
+        Request $request,
+        SalesDocument $salesDocument,
+        SalesDocumentDuplicator $duplicator
+    ): Response
+    {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $salesDocument->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
+
+        if (!$salesDocument->isEstimate()) {
+            throw $this->createNotFoundException('Ce document n’est pas un devis.');
+        }
+
+        if (!$this->isCsrfTokenValid('duplicate'.$salesDocument->getId(), $request->getPayload()->getString('_token'))) {
+            $this->addFlash('error', 'Jeton CSRF invalide.');
+
+            return $this->redirectToRoute('app_sales_document_show', ['id' => $salesDocument->getId()]);
+        }
+
+        $duplicate = $duplicator->duplicateEstimate($salesDocument);
+        $this->entityManager->persist($duplicate);
+        $this->entityManager->flush();
+
+        return $this->redirectToRoute('app_sales_document_edit', ['id' => $duplicate->getId()]);
     }
 
 

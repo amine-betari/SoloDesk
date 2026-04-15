@@ -16,6 +16,21 @@
                        class="px-4 py-2 bg-[#223044] rounded hover:bg-[#2E415B] text-white btn-mobile">← {{ 'actions.back'|trans }}</a>
                     <a href="{{ path('app_sales_document_edit', {'id': sales_document.id}) }}"
                        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold btn-mobile">{{ 'actions.edit'|trans }}</a>
+                    {% if sales_document.isEstimate() %}
+                        <details class="relative w-full sm:w-auto">
+                            <summary class="list-none cursor-pointer px-4 py-2 bg-[#223044] rounded hover:bg-[#2E415B] text-white btn-mobile">
+                                {{ 'table.actions'|trans }}
+                            </summary>
+                            <div class="absolute right-0 mt-2 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg p-2">
+                                <form method="post" action="{{ path('app_sales_document_duplicate', {'id': sales_document.id}) }}">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ sales_document.id) }}">
+                                    <button class="w-full text-left px-3 py-2 rounded bg-amber-600 text-white text-sm font-semibold hover:bg-amber-700 transition">
+                                        {{ 'actions.duplicate'|trans }}
+                                    </button>
+                                </form>
+                            </div>
+                        </details>
+                    {% endif %}
                     {{ include('sales_document/_delete_form.html.twig') }}
                     <a href="{{ path('app_sales_document_generate_word', { id: sales_document.id }) }}"
                        class="px-4 py-2 bg-blue-800 text-white rounded hover:bg-blue-700 btn-mobile">{{ 'sales_document.word'|trans }}</a>

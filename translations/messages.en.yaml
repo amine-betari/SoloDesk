@@ -35,6 +35,7 @@ actions:
   view: "View"
   edit: "Edit"
   delete: "Delete"
+  duplicate: "Duplicate"
   save: "Save"
   search: "Search"
   reset: "Reset"

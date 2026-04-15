@@ -35,6 +35,7 @@ actions:
   view: "Voir"
   edit: "Modifier"
   delete: "Supprimer"
+  duplicate: "Dupliquer"
   save: "Enregistrer"
   search: "Rechercher"
   reset: "Réinitialiser"

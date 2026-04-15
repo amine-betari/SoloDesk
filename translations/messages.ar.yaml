@@ -35,6 +35,7 @@ actions:
   view: "عرض"
   edit: "تعديل"
   delete: "حذف"
+  duplicate: "تكرار"
   save: "حفظ"
   search: "بحث"
   reset: "إعادة ضبط"

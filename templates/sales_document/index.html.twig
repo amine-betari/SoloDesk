@@ -118,6 +118,21 @@
                                            class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">{{ 'actions.view'|trans }}</a>
                                         <a href="{{ path('app_sales_document_edit', {'id': document.id}) }}"
                                            class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">{{ 'actions.edit'|trans }}</a>
+                                        {% if document.isEstimate() %}
+                                            <details class="relative">
+                                                <summary class="list-none cursor-pointer px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
+                                                    {{ 'table.actions'|trans }}
+                                                </summary>
+                                                <div class="absolute right-0 mt-2 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg p-2">
+                                                    <form method="post" action="{{ path('app_sales_document_duplicate', {'id': document.id}) }}">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ document.id) }}">
+                                                        <button class="w-full text-left px-3 py-2 rounded bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition">
+                                                            {{ 'actions.duplicate'|trans }}
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </details>
+                                        {% endif %}
                                     </div>
                                     <div class="sm:hidden">
                                         <details class="relative">
@@ -129,6 +144,12 @@
                                                    class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
                                                 <a href="{{ path('app_sales_document_edit', {'id': document.id}) }}"
                                                    class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
+                                                {% if document.isEstimate() %}
+                                                    <form method="post" action="{{ path('app_sales_document_duplicate', {'id': document.id}) }}">
+                                                        <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ document.id) }}">
+                                                        <button class="w-full px-3 py-2 rounded bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700">{{ 'actions.duplicate'|trans }}</button>
+                                                    </form>
+                                                {% endif %}
                                             </div>
                                         </details>
                                     </div>
