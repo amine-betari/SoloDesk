@@ -65,6 +65,88 @@ class SalesDocumentRepository extends ServiceEntityRepository
     /**
      * @return SalesDocument[]
      */
+    public function findInvoicesForBillingComparison(
+        Company $company,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->createQueryBuilder('s')
+            ->addSelect('items', 'client', 'project', 'estimate')
+            ->leftJoin('s.salesDocumentItems', 'items')
+            ->leftJoin('s.client', 'client')
+            ->leftJoin('s.project', 'project')
+            ->leftJoin('s.estimate', 'estimate')
+            ->andWhere('s.company = :company')
+            ->andWhere('s.type = :type')
+            ->andWhere('s.status != :cancelledStatus')
+            ->andWhere('s.invoiceDate >= :startDate')
+            ->andWhere('s.invoiceDate < :endDate')
+            ->setParameter('company', $company)
+            ->setParameter('type', SalesDocument::TYPE_INVOICE)
+            ->setParameter('cancelledStatus', InvoiceStatus::CANCELLED)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('s.invoiceDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return SalesDocument[]
+     */
+    public function findInvoicesIssuedBetweenWithOutstandingBalance(
+        Company $company,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->createQueryBuilder('s')
+            ->addSelect('items', 'payments', 'client', 'project', 'estimate')
+            ->leftJoin('s.salesDocumentItems', 'items')
+            ->leftJoin('s.payments', 'payments')
+            ->leftJoin('s.client', 'client')
+            ->leftJoin('s.project', 'project')
+            ->leftJoin('s.estimate', 'estimate')
+            ->andWhere('s.company = :company')
+            ->andWhere('s.type = :type')
+            ->andWhere('s.status IN (:statuses)')
+            ->andWhere('s.invoiceDate >= :startDate')
+            ->andWhere('s.invoiceDate < :endDate')
+            ->setParameter('company', $company)
+            ->setParameter('type', SalesDocument::TYPE_INVOICE)
+            ->setParameter('statuses', [InvoiceStatus::SENT, InvoiceStatus::PARTIALLY_PAID])
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('s.invoiceDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return SalesDocument[]
+     */
+    public function findSentEstimatesIssuedBefore(Company $company, \DateTimeInterface $cutoffDate): array
+    {
+        return $this->createQueryBuilder('s')
+            ->addSelect('client', 'estimate')
+            ->leftJoin('s.client', 'client')
+            ->leftJoin('s.estimate', 'estimate')
+            ->andWhere('s.company = :company')
+            ->andWhere('s.type = :type')
+            ->andWhere('s.status = :status')
+            ->andWhere('s.invoiceDate IS NOT NULL')
+            ->andWhere('s.invoiceDate <= :cutoffDate')
+            ->setParameter('company', $company)
+            ->setParameter('type', SalesDocument::TYPE_ESTIMATE)
+            ->setParameter('status', 'sent')
+            ->setParameter('cutoffDate', $cutoffDate)
+            ->orderBy('s.invoiceDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return SalesDocument[]
+     */
     public function findOverdueInvoices(
         Company $company,
         \DateTimeInterface $overdueBefore,

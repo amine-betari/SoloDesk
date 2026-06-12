@@ -33,6 +33,8 @@
         </div>
     </div>
 
+    {% include 'home/_notifications.html.twig' %}
+
     {% include 'components/_overdue_invoices_list.html.twig' with {
         invoices: overdueInvoices,
         overdueDays: overdueDays,
@@ -94,6 +96,22 @@
             </div>
         </div>
 
+    </div>
+
+    <div class="bg-gray-50 p-6 rounded-lg shadow mb-10">
+        <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+            {{ 'home.billing_collection_title'|trans }}
+        </h3>
+        <p class="text-sm text-gray-500 mt-1 mb-4">{{ 'home.billing_collection_note'|trans }}</p>
+        {% if hasBillingCollectionData %}
+            <div class="h-80">
+                {{ render_chart(billingCollectionChart) }}
+            </div>
+        {% else %}
+            <div class="h-32 flex items-center justify-center text-sm text-gray-500">
+                {{ 'home.billing_collection_empty'|trans }}
+            </div>
+        {% endif %}
     </div>
 
     <!-- Stat cards -->

@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Constants\InvoiceStatus;
 use App\Constants\ProjectStatuses;
 use App\Entity\Company;
 use App\Entity\Payment;
+use App\Entity\SalesDocument;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -44,6 +46,33 @@ class PaymentRepository extends ServiceEntityRepository
 
     }
 
-
-
+    /**
+     * @return Payment[]
+     */
+    public function findPaymentsForBillingComparison(
+        Company $company,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->createQueryBuilder('pay')
+            ->addSelect('sd', 'client', 'project', 'estimate')
+            ->innerJoin('pay.salesDocument', 'sd')
+            ->leftJoin('sd.client', 'client')
+            ->leftJoin('sd.project', 'project')
+            ->leftJoin('sd.estimate', 'estimate')
+            ->andWhere('pay.company = :company')
+            ->andWhere('sd.company = :company')
+            ->andWhere('sd.type = :type')
+            ->andWhere('sd.status != :cancelledStatus')
+            ->andWhere('pay.date >= :startDate')
+            ->andWhere('pay.date < :endDate')
+            ->setParameter('company', $company)
+            ->setParameter('type', SalesDocument::TYPE_INVOICE)
+            ->setParameter('cancelledStatus', InvoiceStatus::CANCELLED)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('pay.date', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

@@ -6,12 +6,15 @@ use App\Repository\EstimateRepository;
 use App\Repository\PaymentRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\SalesDocumentRepository;
+use App\Service\BillingCollectionComparison;
+use App\Service\DashboardNotificationProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use \NumberFormatter;
 use App\Service\CompanySettings;
 
@@ -25,7 +28,10 @@ class HomeController extends AbstractController
         PaymentRepository $paymentRepository,
         SalesDocumentRepository $salesDocumentRepository,
         ChartBuilderInterface $chartBuilder,
-        CompanySettings $settings
+        CompanySettings $settings,
+        BillingCollectionComparison $billingCollectionComparison,
+        DashboardNotificationProvider $dashboardNotificationProvider,
+        TranslatorInterface $translator
     ): Response {
         $company = $this->getUser()?->getCompany();
         if (!$company) {
@@ -76,6 +82,7 @@ class HomeController extends AbstractController
         $overdueDays = $settings->getInt($company, CompanySettings::KEY_OVERDUE_DAYS, 45);
         $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
         $overdueInvoices = $salesDocumentRepository->findOverdueInvoices($company, $overdueBefore);
+        $dashboardNotifications = $dashboardNotificationProvider->getNotifications($company, $overdueDays);
 
         $data = $clientRepository->countClientsGroupedByYear(
             $company,
@@ -211,6 +218,7 @@ class HomeController extends AbstractController
                 case 'sent':     $label = 'Envoyé'; break;
                 case 'accepted': $label = 'Accepté'; break;
                 case 'rejected': $label = 'Refusé'; break;
+                case 'expired':  $label = 'Expiré'; break;
                 default:         $label = $status; break;
             }
             $estimateStats[$label] = ($estimateStats[$label] ?? 0) + $total;
@@ -289,6 +297,71 @@ class HomeController extends AbstractController
             ],
         ]);
 
+        $comparisonStartDate = (new \DateTimeImmutable('first day of this month midnight'))->modify('-11 months');
+        $comparisonEndDate = $comparisonStartDate->modify('+12 months');
+        $billingComparison = $billingCollectionComparison->compare(
+            $salesDocumentRepository->findInvoicesForBillingComparison(
+                $company,
+                $comparisonStartDate,
+                $comparisonEndDate
+            ),
+            $paymentRepository->findPaymentsForBillingComparison(
+                $company,
+                $comparisonStartDate,
+                $comparisonEndDate
+            ),
+            $comparisonStartDate,
+            12
+        );
+
+        $billingCollectionDatasets = [];
+        $currencyColors = [
+            ['rgba(37, 99, 235, 0.65)', 'rgb(37, 99, 235)', 'rgba(34, 197, 94, 0.65)', 'rgb(34, 197, 94)'],
+            ['rgba(124, 58, 237, 0.65)', 'rgb(124, 58, 237)', 'rgba(249, 115, 22, 0.65)', 'rgb(249, 115, 22)'],
+            ['rgba(8, 145, 178, 0.65)', 'rgb(8, 145, 178)', 'rgba(219, 39, 119, 0.65)', 'rgb(219, 39, 119)'],
+        ];
+
+        foreach (array_keys($billingComparison['billed']) as $index => $currency) {
+            $colors = $currencyColors[$index % count($currencyColors)];
+            $billingCollectionDatasets[] = [
+                'label' => $translator->trans('home.billing_collection_billed', ['%currency%' => $currency]),
+                'backgroundColor' => $colors[0],
+                'borderColor' => $colors[1],
+                'borderWidth' => 1,
+                'data' => $billingComparison['billed'][$currency],
+            ];
+            $billingCollectionDatasets[] = [
+                'label' => $translator->trans('home.billing_collection_collected', ['%currency%' => $currency]),
+                'backgroundColor' => $colors[2],
+                'borderColor' => $colors[3],
+                'borderWidth' => 1,
+                'data' => $billingComparison['collected'][$currency],
+            ];
+        }
+
+        $billingCollectionChart = $chartBuilder->createChart(Chart::TYPE_BAR);
+        $billingCollectionChart->setData([
+            'labels' => $billingComparison['labels'],
+            'datasets' => $billingCollectionDatasets,
+        ]);
+        $billingCollectionChart->setOptions([
+            'responsive' => true,
+            'maintainAspectRatio' => false,
+            'interaction' => [
+                'mode' => 'index',
+                'intersect' => false,
+            ],
+            'scales' => [
+                'y' => [
+                    'beginAtZero' => true,
+                ],
+            ],
+            'plugins' => [
+                'legend' => [
+                    'position' => 'bottom',
+                ],
+            ],
+        ]);
 
         return $this->render('home/index.html.twig', [
          //   'revenuesGlobalChart' => $revenuesGlobalChart,
@@ -303,6 +376,9 @@ class HomeController extends AbstractController
             'totalExternalInvoices' => $totalExternalInvoices,
             'estimateChart' => $estimateChart,
             'invoiceChart' => $invoiceChart,
+            'billingCollectionChart' => $billingCollectionChart,
+            'hasBillingCollectionData' => $billingCollectionDatasets !== [],
+            'dashboardNotifications' => $dashboardNotifications,
             'overdueInvoices' => $overdueInvoices,
             'overdueDays' => $overdueDays,
         ]);

@@ -1,0 +1,81 @@
+<section class="bg-[#1F2732] border border-[#2A3747] rounded-xl p-6 mb-8 text-white">
+    <div class="flex items-center justify-between gap-4 mb-5">
+        <div>
+            <h2 class="text-xl font-bold">{{ 'home.notifications_title'|trans }}</h2>
+            <p class="text-sm text-gray-400 mt-1">{{ 'home.notifications_subtitle'|trans }}</p>
+        </div>
+        <span class="rounded-full bg-blue-600/20 text-blue-300 px-3 py-1 text-sm font-semibold">
+            {{ dashboardNotifications.total }}
+        </span>
+    </div>
+
+    {% if dashboardNotifications.total > 0 %}
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div class="bg-[#16202A] border border-[#2A3747] rounded-lg p-4">
+                <h3 class="font-semibold text-amber-300 mb-3">
+                    {{ 'home.notifications_invoices'|trans({'%days%': 7}) }}
+                    <span class="text-xs text-gray-400">({{ dashboardNotifications.invoices|length }})</span>
+                </h3>
+                <div class="space-y-2">
+                    {% for alert in dashboardNotifications.invoices %}
+                        {% set document = alert.document %}
+                        <a href="{{ path('app_sales_document_show', {id: document.id}) }}"
+                           class="block rounded border border-[#2A3747] p-3 hover:border-amber-400 transition">
+                            <span class="block text-sm font-semibold">{{ document.reference }}</span>
+                            <span class="block text-xs text-gray-400 mt-1">
+                                {{ document.getResolvedClient() ? document.getResolvedClient().name : 'common.dash'|trans }}
+                                · {{ 'home.notifications_due_on'|trans({'%date%': alert.dueDate|date('d/m/Y')}) }}
+                            </span>
+                        </a>
+                    {% else %}
+                        <p class="text-sm text-gray-500">{{ 'home.notifications_none'|trans }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-[#16202A] border border-[#2A3747] rounded-lg p-4">
+                <h3 class="font-semibold text-blue-300 mb-3">
+                    {{ 'home.notifications_estimates'|trans({'%days%': 14}) }}
+                    <span class="text-xs text-gray-400">({{ dashboardNotifications.estimates|length }})</span>
+                </h3>
+                <div class="space-y-2">
+                    {% for document in dashboardNotifications.estimates %}
+                        <a href="{{ path('app_sales_document_show', {id: document.id}) }}"
+                           class="block rounded border border-[#2A3747] p-3 hover:border-blue-400 transition">
+                            <span class="block text-sm font-semibold">{{ document.reference }}</span>
+                            <span class="block text-xs text-gray-400 mt-1">
+                                {{ document.getResolvedClient() ? document.getResolvedClient().name : 'common.dash'|trans }}
+                                · {{ document.invoiceDate|date('d/m/Y') }}
+                            </span>
+                        </a>
+                    {% else %}
+                        <p class="text-sm text-gray-500">{{ 'home.notifications_none'|trans }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-[#16202A] border border-[#2A3747] rounded-lg p-4">
+                <h3 class="font-semibold text-emerald-300 mb-3">
+                    {{ 'home.notifications_projects'|trans({'%days%': 7}) }}
+                    <span class="text-xs text-gray-400">({{ dashboardNotifications.projects|length }})</span>
+                </h3>
+                <div class="space-y-2">
+                    {% for project in dashboardNotifications.projects %}
+                        <a href="{{ path('app_project_show', {id: project.id}) }}"
+                           class="block rounded border border-[#2A3747] p-3 hover:border-emerald-400 transition">
+                            <span class="block text-sm font-semibold">{{ project.name }}</span>
+                            <span class="block text-xs text-gray-400 mt-1">
+                                {{ project.client ? project.client.name : 'common.dash'|trans }}
+                                · {{ 'home.notifications_ends_on'|trans({'%date%': project.endDate|date('d/m/Y')}) }}
+                            </span>
+                        </a>
+                    {% else %}
+                        <p class="text-sm text-gray-500">{{ 'home.notifications_none'|trans }}</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <p class="text-sm text-gray-400">{{ 'home.notifications_empty'|trans }}</p>
+    {% endif %}
+</section>

@@ -85,5 +85,28 @@ class ProjectRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * @return Project[]
+     */
+    public function findEndingBetween(
+        Company $company,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->createQueryBuilder('p')
+            ->addSelect('client')
+            ->leftJoin('p.client', 'client')
+            ->andWhere('p.company = :company')
+            ->andWhere('p.status NOT IN (:excludedStatuses)')
+            ->andWhere('p.endDate >= :startDate')
+            ->andWhere('p.endDate < :endDate')
+            ->setParameter('company', $company)
+            ->setParameter('excludedStatuses', [ProjectStatuses::COMPLETED, ProjectStatuses::CANCELLED])
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->orderBy('p.endDate', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
 }
