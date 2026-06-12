@@ -45,6 +45,13 @@ final class PaymentController extends AbstractController
         $activityStartDate = $settings->getDate($company, \App\Service\CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
 
         $qb = $paymentRepository->createQueryBuilder('p')
+            ->addSelect('sd', 'directClient', 'project', 'projectClient', 'estimate', 'estimateClient')
+            ->leftJoin('p.salesDocument', 'sd')
+            ->leftJoin('sd.client', 'directClient')
+            ->leftJoin('sd.project', 'project')
+            ->leftJoin('project.client', 'projectClient')
+            ->leftJoin('sd.estimate', 'estimate')
+            ->leftJoin('estimate.client', 'estimateClient')
             ->andWhere('p.company = :company')
             ->andWhere('p.date >= :start')
             ->setParameter('company', $company)

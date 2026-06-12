@@ -39,8 +39,14 @@ final class PrestationController extends AbstractController
         }
 
         $qb = $prestationRepository->createQueryBuilder('p')
+            ->addSelect('c', 'sd', 'directClient', 'project', 'projectClient', 'estimate', 'estimateClient')
             ->leftJoin('p.collaborator', 'c')
             ->leftJoin('p.salesDocument', 'sd')
+            ->leftJoin('sd.client', 'directClient')
+            ->leftJoin('sd.project', 'project')
+            ->leftJoin('project.client', 'projectClient')
+            ->leftJoin('sd.estimate', 'estimate')
+            ->leftJoin('estimate.client', 'estimateClient')
             ->andWhere('p.company = :company')
             ->setParameter('company', $company)
             ->orderBy('p.performedAt', 'DESC');

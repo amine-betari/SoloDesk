@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // src/Repository/PaginationService.php
 namespace App\Repository;
 
@@ -14,13 +16,14 @@ class PaginationService
         $paginator->getQuery()
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
+        $total = count($paginator);
 
         return [
             'items' => iterator_to_array($paginator),
-            'total' => count($paginator),
+            'total' => $total,
             'page' => $page,
             'limit' => $limit,
-            'pages' => ceil(count($paginator) / $limit)
+            'pages' => (int) ceil($total / $limit),
         ];
     }
 }
