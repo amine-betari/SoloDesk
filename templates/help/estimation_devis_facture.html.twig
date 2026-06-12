@@ -13,6 +13,25 @@
                     {{ 'help.faq_intro'|trans }}
                 </p>
 
+                <div class="mt-8">
+                    <h2 class="text-2xl font-semibold text-white">{{ 'help.workflow_title'|trans }}</h2>
+                    <p class="mt-2 text-gray-300">{{ 'help.workflow_intro'|trans }}</p>
+                    <div class="mt-5 grid gap-4 md:grid-cols-3">
+                        {% for step, route in {1: 'app_company_edit', 2: 'app_client_new', 3: 'app_estimate_new'} %}
+                            <a href="{{ path(route) }}" class="rounded-lg border border-[#2A3747] bg-[#16202A] p-5 transition hover:border-blue-500">
+                                <div class="text-xs font-semibold uppercase tracking-wider text-blue-300">{{ ('help.workflow_step_' ~ step)|trans }}</div>
+                                <div class="mt-2 font-semibold text-white">{{ ('help.workflow_step_' ~ step ~ '_title')|trans }}</div>
+                                <div class="mt-2 text-sm text-gray-400">{{ ('help.workflow_step_' ~ step ~ '_text')|trans }}</div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="mt-8 rounded-lg border border-blue-700/50 bg-blue-950/30 p-5">
+                    <h2 class="text-xl font-semibold text-blue-200">{{ 'help.convert_title'|trans }}</h2>
+                    <p class="mt-2 text-gray-300">{{ 'help.convert_text'|trans }}</p>
+                </div>
+
                 <div class="mt-8 grid gap-6">
                     <div class="bg-[#16202A] border border-[#2A3747] rounded-lg p-5">
                         <h2 class="text-xl font-semibold text-white mb-2">{{ 'help.estimation_title'|trans }}</h2>
@@ -56,6 +75,18 @@
                     <p class="text-gray-300 leading-relaxed">
                         {{ 'help.summary_text'|trans|raw }}
                     </p>
+                </div>
+
+                <div class="mt-8">
+                    <h2 class="text-2xl font-semibold text-white">{{ 'help.personas_title'|trans }}</h2>
+                    <div class="mt-5 grid gap-4 md:grid-cols-3">
+                        {% for persona in ['simple', 'project', 'service'] %}
+                            <div class="rounded-lg border border-[#2A3747] bg-[#16202A] p-5">
+                                <div class="font-semibold text-white">{{ ('help.persona_' ~ persona ~ '_title')|trans }}</div>
+                                <p class="mt-2 text-sm leading-relaxed text-gray-300">{{ ('help.persona_' ~ persona ~ '_text')|trans }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>

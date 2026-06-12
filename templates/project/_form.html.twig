@@ -13,6 +13,13 @@
         </div>
     {% endif %}
 
+    {% if sourceEstimate is defined and sourceEstimate %}
+        <div class="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+            <div class="font-semibold">{{ 'project.from_estimate_title'|trans({'%reference%': sourceEstimate.estimateNumber}) }}</div>
+            <div class="mt-1">{{ 'project.from_estimate_help'|trans }}</div>
+        </div>
+    {% endif %}
+
     {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
 
     <!-- Informations générales -->
@@ -43,7 +50,6 @@
             }) }}
             <div class="flex flex-wrap gap-3 text-sm">
                 <button type="button" class="text-blue-600 hover:text-blue-700" data-action="click->client-modal#openModal touchstart->client-modal#openModal">{{ 'client.add_new'|trans }}</button>
-                <a href="{{ path('app_client_new') }}" target="_blank" rel="noopener" class="text-blue-600 hover:text-blue-700">{{ 'common.open_new_tab'|trans }}</a>
             </div>
 
             <div data-client-modal-target="modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">

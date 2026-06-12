@@ -7,12 +7,14 @@ use App\Constants\ProjectStatuses;
 use App\Form\ProjectForm;
 use App\Form\Search\ProjectFilterForm;
 use App\Repository\ProjectRepository;
+use App\Repository\EstimateRepository;
 use App\Repository\SalesDocumentRepository;
 use App\Repository\PaginationService;
 use App\Services\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Services\FilterService;
 use App\Service\CompanySettings;
+use App\Service\ProjectFromEstimateFactory;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -100,16 +102,40 @@ final class ProjectController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         SluggerInterface $slugger,
-        DocumentManager $documentManager
+        DocumentManager $documentManager,
+        EstimateRepository $estimateRepository,
+        ProjectFromEstimateFactory $projectFromEstimateFactory
     ): Response
     {
-        $project = new Project();
         $company = $this->getUser()?->getCompany();
-        if ($company) {
-            $project->setCompany($company);
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
         }
 
-        $form = $this->createForm(ProjectForm::class, $project);
+        $sourceEstimate = null;
+        $estimateId = $request->query->getInt('estimate');
+        if ($estimateId > 0) {
+            $sourceEstimate = $estimateRepository->findOneBy([
+                'id' => $estimateId,
+                'company' => $company,
+            ]);
+            if (!$sourceEstimate) {
+                throw $this->createNotFoundException('Pré-estimation introuvable.');
+            }
+            if ($sourceEstimate->getProject()) {
+                $this->addFlash('warning', 'Ce devis est déjà associé à un projet.');
+
+                return $this->redirectToRoute('app_estimate_show', ['id' => $sourceEstimate->getId()]);
+            }
+        }
+
+        $project = $sourceEstimate
+            ? $projectFromEstimateFactory->create($sourceEstimate)
+            : (new Project())->setCompany($company);
+
+        $form = $this->createForm(ProjectForm::class, $project, [
+            'action' => $this->generateUrl('app_project_new', $sourceEstimate ? ['estimate' => $sourceEstimate->getId()] : []),
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -140,8 +166,18 @@ final class ProjectController extends AbstractController
                 $project->setRecurringPeriod(null);
             }
 
+            if ($sourceEstimate) {
+                $sourceEstimate->setProject($project);
+            }
+
             $entityManager->persist($project);
             $entityManager->flush();
+
+            if ($sourceEstimate) {
+                $this->addFlash('success', 'Projet créé et lié à la pré-estimation.');
+
+                return $this->redirectToRoute('app_project_show', ['id' => $project->getId()], Response::HTTP_SEE_OTHER);
+            }
 
             return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -149,6 +185,7 @@ final class ProjectController extends AbstractController
         return $this->render('project/new.html.twig', [
             'project' => $project,
             'form' => $form,
+            'sourceEstimate' => $sourceEstimate,
         ]);
     }
 

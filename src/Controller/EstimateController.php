@@ -2,13 +2,10 @@
 
 namespace App\Controller;
 
-use App\Constants\ProjectStatuses;
-use App\Constants\ProjectTypes;
 use App\Constants\EstimateStatuses;
 use App\Form\Search\ProjectFilterForm;
 use App\Entity\Estimate;
 use App\Repository\PaginationService;
-use App\Entity\Project;
 use App\Services\DocumentManager;
 use App\Form\EstimateForm;
 use App\Services\FilterService;
@@ -242,38 +239,21 @@ final class EstimateController extends AbstractController
         return $this->redirectToRoute('app_estimate_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/estimate/{id}/convert-to-project', name: 'app_estimate_convert_to_project')]
-    public function convertToProject(Estimate $estimate, EntityManagerInterface $em): Response
+    #[Route('/{id}/convert-to-project', name: 'app_estimate_convert_to_project', methods: ['GET'])]
+    public function convertToProject(Estimate $estimate): Response
     {
-        // 1. Vérifier s'il a déjà un projet
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $estimate->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
+
         if ($estimate->getProject()) {
             $this->addFlash('warning', 'Ce devis est déjà associé à un projet.');
+
             return $this->redirectToRoute('app_estimate_show', ['id' => $estimate->getId()]);
         }
 
-        // 2. Créer le projet à partir des infos du devis
-        $project = new Project();
-        $project->setName($estimate->getEstimateNumber()); // ou autre champ
-        $project->setStartDate(new \DateTimeImmutable());
-        $project->setStatus(ProjectStatuses::IN_PROGRESS);
-        $project->setClient($estimate->getClient());
-        $project->setType(ProjectTypes::AUTRE);
-        $project->setDescription($estimate->getDescription());
-        $project->setAmount($estimate->getAmount());
-        $project->setVatRate($estimate->getVatRate());
-        $project->setCurrency($estimate->getClient()->getCurrency());
-        //$project->setHasVat($estimate->isHasVat());
-
-        // 3. Lier les deux
-        $estimate->setProject($project);
-
-        // 4. Persister
-        $em->persist($project);
-        $em->flush();
-
-        $this->addFlash('success', 'Projet créé avec succès depuis le devis.');
-
-        return $this->redirectToRoute('app_project_edit', ['id' => $project->getId()]);
+        return $this->redirectToRoute('app_project_new', ['estimate' => $estimate->getId()]);
     }
 
 }

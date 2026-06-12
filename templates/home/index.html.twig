@@ -46,7 +46,9 @@
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
                 {{ 'home.card_clients'|trans }}
             </h3>
-            {{ render_chart(clientDataChart) }}
+            <div class="h-52 md:h-56">
+                {{ render_chart(clientDataChart) }}
+            </div>
         </div>
 
         <!-- Devis -->
@@ -54,7 +56,9 @@
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
                 {{ 'home.card_estimates'|trans }}
             </h3>
-            {{ render_chart(estimateChart) }}
+            <div class="h-52 md:h-56">
+                {{ render_chart(estimateChart) }}
+            </div>
             <p class="text-sm text-gray-500 mt-2">{{ 'home.card_estimates_note'|trans }}</p>
         </div>
 
@@ -63,7 +67,9 @@
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
                 {{ 'home.card_invoices'|trans }}
             </h3>
-            {{ render_chart(invoiceChart) }}
+            <div class="h-52 md:h-56">
+                {{ render_chart(invoiceChart) }}
+            </div>
             <p class="text-sm text-gray-500 mt-2">
                 {{ 'home.card_invoices_note'|trans({'%count%': totalExternalInvoices}) }}
             </p>
@@ -74,7 +80,9 @@
             <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-4">
                 {{ 'home.card_revenue'|trans }}
             </h3>
-            {{ render_chart(paymentsChart) }}
+            <div class="h-52 md:h-56">
+                {{ render_chart(paymentsChart) }}
+            </div>
             <div class="mt-4">
                 {% if hasPaymentsStats %}
                     <a href="{{ path('stats_ca_trimestre') }}"
