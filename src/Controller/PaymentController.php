@@ -62,10 +62,16 @@ final class PaymentController extends AbstractController
         );
 
         $pagination = $paginator->paginate($qb, $page, $limit);
+        $displayedTotals = [];
+        foreach ($pagination['items'] as $payment) {
+            $currency = $payment->getSalesDocument()?->getResolvedCurrency() ?? 'EUR';
+            $displayedTotals[$currency] = ($displayedTotals[$currency] ?? 0.0) + (float) $payment->getAmount();
+        }
 
         return $this->render('payment/index.html.twig', [
             'pagination' => $pagination,
             'filterForm' => $filterForm->createView(), // on envoie le form à la vu
+            'displayedTotals' => $displayedTotals,
         ]);
     }
 
@@ -121,11 +127,18 @@ final class PaymentController extends AbstractController
         if (!$company || $payment->getCompany()?->getId() !== $company->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
+        $originalSalesDocument = $payment->getSalesDocument();
         $form = $this->createForm(PaymentForm::class, $payment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
+
+            if ($originalSalesDocument && $originalSalesDocument !== $payment->getSalesDocument()) {
+                $originalSalesDocument->getPayments()->removeElement($payment);
+                $originalSalesDocument->updateStatusBasedOnPayments();
+                $entityManager->flush();
+            }
 
             return $this->redirectToRoute('app_payment_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -144,8 +157,16 @@ final class PaymentController extends AbstractController
             throw $this->createAccessDeniedException('Accès refusé.');
         }
         if ($this->isCsrfTokenValid('delete'.$payment->getId(), $request->getPayload()->getString('_token'))) {
+            $salesDocument = $payment->getSalesDocument();
+            $salesDocument?->getPayments()->removeElement($payment);
+
             $entityManager->remove($payment);
             $entityManager->flush();
+
+            if ($salesDocument) {
+                $salesDocument->updateStatusBasedOnPayments();
+                $entityManager->flush();
+            }
         }
 
         return $this->redirectToRoute('app_payment_index', [], Response::HTTP_SEE_OTHER);

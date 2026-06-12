@@ -1,4 +1,9 @@
-<form method="post" action="{{ path('app_estimate_delete', {'id': estimate.id}) }}" onsubmit="return confirm('{{ 'estimate.delete_confirm'|trans }}');" class="w-full sm:w-auto">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ estimate.id) }}">
-    <button class="px-4 py-2 bg-red-500 text-white rounded transition hover:bg-red-600 btn-mobile">{{ 'actions.delete'|trans }}</button>
-</form>
+{% set canDelete = canDelete is defined ? canDelete : estimate.canBeDeleted %}
+{% if canDelete %}
+    <form method="post" action="{{ path('app_estimate_delete', {'id': estimate.id}) }}" onsubmit="return confirm('{{ 'estimate.delete_confirm'|trans }}');" class="w-full sm:w-auto">
+        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ estimate.id) }}">
+        <button class="w-full px-4 py-2 bg-red-500 text-white rounded transition hover:bg-red-600 btn-mobile">{{ 'actions.delete'|trans }}</button>
+    </form>
+{% else %}
+    <p class="px-3 py-2 rounded bg-amber-50 text-amber-800 text-xs font-semibold">{{ 'estimate.delete_linked_help'|trans }}</p>
+{% endif %}

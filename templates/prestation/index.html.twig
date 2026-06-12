@@ -57,6 +57,31 @@
                 </form>
             </div>
 
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'prestation.status_draft'|trans }}</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ statusCounts.draft }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'prestation.status_invoiced'|trans }}</div>
+                    <div class="mt-2 text-2xl font-semibold text-blue-300">{{ statusCounts.invoiced }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'prestation.status_paid'|trans }}</div>
+                    <div class="mt-2 text-2xl font-semibold text-emerald-300">{{ statusCounts.paid }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'prestation.displayed_total'|trans }}</div>
+                    <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-white">
+                        {% for currency, total in displayedTotals %}
+                            <span>{{ total|format_currency(currency) }}</span>
+                        {% else %}
+                            <span>{{ 'common.dash'|trans }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
             {% if pagination.items is not empty %}
                 <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-lg">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -74,7 +99,17 @@
                         <tbody class="divide-y divide-gray-100">
                         {% for prestation in pagination.items %}
                             {% set currency = prestation.salesDocument ? prestation.salesDocument.getResolvedCurrency() : 'EUR' %}
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            {% set canDelete = prestation.status == 'draft' %}
+                            {% set statusClass =
+                                prestation.status == 'paid' ? 'bg-emerald-100 text-emerald-700' :
+                                prestation.status == 'invoiced' ? 'bg-blue-100 text-blue-700' :
+                                'bg-gray-100 text-gray-700'
+                            %}
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                tabindex="0"
+                                role="link"
+                                onclick="if (!event.target.closest('a, button, summary, details, form')) window.location.href='{{ path('app_prestation_show', {'id': prestation.id}) }}'"
+                                onkeydown="if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, summary, details, form')) { event.preventDefault(); window.location.href='{{ path('app_prestation_show', {'id': prestation.id}) }}'; }">
                                 <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ prestation.label }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ prestation.collaborator.name }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-700">
@@ -91,22 +126,23 @@
                                     {{ prestation.total|format_currency(currency, app.request.locale ?: 'fr_FR') }}
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ statusClass }}">
                                         {{ ('prestation.status_' ~ prestation.status)|trans }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="flex flex-wrap gap-2">
-                                        <a href="{{ path('app_prestation_show', {'id': prestation.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-[#223044] text-white text-xs font-semibold hover:bg-[#2E415B] transition">
-                                            {{ 'actions.view'|trans }}
-                                        </a>
-                                        <a href="{{ path('app_prestation_edit', {'id': prestation.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            {{ 'actions.edit'|trans }}
-                                        </a>
-                                        {{ include('prestation/_delete_form.html.twig', {prestation: prestation}) }}
-                                    </div>
+                                    <details class="relative">
+                                        <summary class="list-none inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                                            {{ 'table.actions'|trans }}
+                                        </summary>
+                                        <div class="absolute right-0 mt-2 z-10 w-52 rounded-lg border border-gray-200 bg-white shadow-lg p-2 flex flex-col gap-2">
+                                            <a href="{{ path('app_prestation_edit', {'id': prestation.id}) }}"
+                                               class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                                                {{ 'actions.edit'|trans }}
+                                            </a>
+                                            {{ include('prestation/_delete_form.html.twig', {prestation: prestation, canDelete: canDelete}) }}
+                                        </div>
+                                    </details>
                                 </td>
                             </tr>
                         {% else %}
@@ -120,7 +156,7 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <p class="text-sm text-gray-400">
-                        {{ 'prestation.pagination'|trans({'count': pagination.items|length, 'total': pagination.total}) }}
+                        {{ 'prestation.pagination'|trans({'%count%': pagination.items|length, '%total%': pagination.total}) }}
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}

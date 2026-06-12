@@ -11,10 +11,6 @@
                     <p class="text-sm text-gray-400 mt-2">{{ 'project.subtitle'|trans }}</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
-                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
-                        <span class="text-white font-semibold">{{ pagination.total }}</span>
-                    </div>
                     <a href="{{ path('app_project_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
                         {{ 'project.new'|trans }}
@@ -22,18 +18,40 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'project.count_shown'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+            <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'project.count_total'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'project.count_shown'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'project.displayed_total'|trans }}</div>
+                        <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-white">
+                            {% for currency, total in displayedTotals %}
+                                <span>{{ total|format_currency(currency) }}</span>
+                            {% else %}
+                                <span>{{ 'common.dash'|trans }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'project.count_total'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+                <div class="mt-5 border-t border-[#2A3747] pt-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400 mb-3">{{ 'project.status_summary'|trans }}</div>
+                    <div class="flex flex-wrap gap-2">
+                        {% for status, count in statusCounts %}
+                            <span class="rounded-full bg-[#111922] border border-[#2A3747] px-3 py-1 text-xs font-semibold text-gray-200">
+                                {{ status|trans }} : {{ count }}
+                            </span>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
 
@@ -55,7 +73,12 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                         {% for project in pagination.items %}
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            {% set canDelete = project.canBeDeleted %}
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                tabindex="0"
+                                role="link"
+                                onclick="if (!event.target.closest('a, button, summary, details, form')) window.location.href='{{ path('app_project_show', {'id': project.id}) }}'"
+                                onkeydown="if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, summary, details, form')) { event.preventDefault(); window.location.href='{{ path('app_project_show', {'id': project.id}) }}'; }">
                                 <td class="px-6 py-4">
                                     <div class="min-w-0">
                                         <a href="{{ path('app_project_show', {'id': project.id}) }}"
@@ -73,6 +96,8 @@
                                 <td class="px-6 py-4">
                                     {% set statusColors = {
                                         'in_progress': 'bg-yellow-100 text-yellow-800',
+                                        'stand_by': 'bg-gray-100 text-gray-800',
+                                        'late': 'bg-amber-100 text-amber-800',
                                         'completed': 'bg-green-100 text-green-800',
                                         'cancelled': 'bg-red-100 text-red-800'
                                     } %}
@@ -83,6 +108,7 @@
                                 <td class="px-6 py-4 text-sm text-gray-700">
                                     {% if project.isRecurring %}
                                         {{ project.calculatedAmount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
+                                        <div class="mt-1 text-xs text-blue-600">{{ 'project.recurring'|trans }}</div>
                                     {% else %}
                                         {{ project.amount|format_currency(project.currency, app.request.locale ?: 'fr_FR') }}
                                     {% endif %}
@@ -91,29 +117,18 @@
                                     {{ project.client.name }}
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="hidden sm:flex flex-wrap gap-2">
-                                        <a href="{{ path('app_project_show', {'id': project.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
-                                            {{ 'actions.view'|trans }}
-                                        </a>
-                                        <a href="{{ path('app_project_edit', {'id': project.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            {{ 'actions.edit'|trans }}
-                                        </a>
-                                    </div>
-                                    <div class="sm:hidden">
-                                        <details class="relative">
-                                            <summary class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700">
-                                                {{ 'table.actions'|trans }}
-                                            </summary>
-                                            <div class="mt-2 flex flex-col gap-2">
-                                                <a href="{{ path('app_project_show', {'id': project.id}) }}"
-                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
-                                                <a href="{{ path('app_project_edit', {'id': project.id}) }}"
-                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
-                                            </div>
-                                        </details>
-                                    </div>
+                                    <details class="relative">
+                                        <summary class="list-none inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                                            {{ 'table.actions'|trans }}
+                                        </summary>
+                                        <div class="absolute right-0 mt-2 z-10 w-56 rounded-lg border border-gray-200 bg-white shadow-lg p-2 flex flex-col gap-2">
+                                            <a href="{{ path('app_project_edit', {'id': project.id}) }}"
+                                               class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                                                {{ 'actions.edit'|trans }}
+                                            </a>
+                                            {{ include('project/_delete_form.html.twig', {project: project, canDelete: canDelete}) }}
+                                        </div>
+                                    </details>
                                 </td>
                             </tr>
                         {% else %}
@@ -131,7 +146,7 @@
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
-                            <a href="?page={{ i }}"
+                            <a href="{{ path('app_project_index', {page: i}) }}"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
                                 {{ i }}
                             </a>

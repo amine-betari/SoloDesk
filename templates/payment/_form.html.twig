@@ -7,6 +7,12 @@
         <h1 class="text-4xl font-extrabold mb-8">{{ 'payment.new_title'|trans }}</h1>
     {% endif %}
 
+    {% if button_label is defined %}
+        <div class="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            {{ 'payment.edit_warning'|trans }}
+        </div>
+    {% endif %}
+
     {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
 
     <!-- Informations du paiement -->

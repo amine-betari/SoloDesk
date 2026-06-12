@@ -11,10 +11,6 @@
                     <p class="text-sm text-gray-400 mt-2">{{ 'client.subtitle'|trans }}</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
-                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
-                        <span class="text-white font-semibold">{{ pagination.total }}</span>
-                    </div>
                     <a href="{{ path('app_client_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
                         {{ 'client.new'|trans }}
@@ -22,18 +18,49 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'client.count_shown'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'client.count_total'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+            <div class="bg-[#1F2732] border border-[#2A3747] rounded-2xl p-4">
+                <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                    <input type="text"
+                           name="q"
+                           value="{{ q }}"
+                           placeholder="{{ 'client.search_placeholder'|trans }}"
+                           class="w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 placeholder-gray-500 px-4 py-2" />
+                    <select name="country" class="w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-4 py-2">
+                        <option value="">{{ 'client.filter_country'|trans }}</option>
+                        {% for availableCountry in countries %}
+                            <option value="{{ availableCountry }}" {{ country == availableCountry ? 'selected' : '' }}>{{ availableCountry }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="currency" class="w-full rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-4 py-2">
+                        <option value="">{{ 'client.filter_currency'|trans }}</option>
+                        {% for availableCurrency in currencies %}
+                            <option value="{{ availableCurrency }}" {{ currency == availableCurrency ? 'selected' : '' }}>{{ availableCurrency }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="flex gap-2 md:col-span-3">
+                        <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md btn-mobile">{{ 'actions.search'|trans }}</button>
+                        {% if q or country or currency %}
+                            <a href="{{ path('app_client_index') }}"
+                               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] text-white font-semibold rounded-md btn-mobile">{{ 'actions.reset'|trans }}</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'client.count_total'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'client.count_shown'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+                    </div>
                 </div>
             </div>
 
@@ -44,13 +71,18 @@
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'client.table_name'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{{ 'client.table_country'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{{ 'client.currency'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'client.table_first_contact'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                         {% for client in pagination.items %}
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                tabindex="0"
+                                role="link"
+                                onclick="if (!event.target.closest('a, button, summary, details')) window.location.href='{{ path('app_client_show', {'id': client.id}) }}'"
+                                onkeydown="if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, summary, details')) { event.preventDefault(); window.location.href='{{ path('app_client_show', {'id': client.id}) }}'; }">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-800 flex items-center justify-center font-semibold">
@@ -66,38 +98,23 @@
                                     </div>
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">{{ client.country ?: 'common.dash'|trans }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">{{ client.currency }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
                                     {{ client.firstContactAt ? client.firstContactAt|date('d/m/Y') : 'common.dash'|trans }}
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="hidden sm:flex flex-wrap gap-2">
-                                        <a href="{{ path('app_client_show', {'id': client.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
-                                            {{ 'actions.view'|trans }}
-                                        </a>
-                                        <a href="{{ path('app_client_edit', {'id': client.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            {{ 'actions.edit'|trans }}
-                                        </a>
-                                    </div>
-                                    <div class="sm:hidden">
-                                        <details class="relative">
-                                            <summary class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700">
-                                                {{ 'table.actions'|trans }}
-                                            </summary>
-                                            <div class="mt-2 flex flex-col gap-2">
-                                                <a href="{{ path('app_client_show', {'id': client.id}) }}"
-                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
-                                                <a href="{{ path('app_client_edit', {'id': client.id}) }}"
-                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
-                                            </div>
-                                        </details>
-                                    </div>
+                                    <details class="relative">
+                                        <summary class="list-none inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition">{{ 'table.actions'|trans }}</summary>
+                                        <div class="absolute right-0 mt-2 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg p-2">
+                                            <a href="{{ path('app_client_edit', {'id': client.id}) }}"
+                                               class="block px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
+                                        </div>
+                                    </details>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="4" class="px-6 py-10 text-center text-gray-400">{{ 'client.none'|trans }}</td>
+                                <td colspan="5" class="px-6 py-10 text-center text-gray-400">{{ 'client.none'|trans }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -106,11 +123,11 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <p class="text-sm text-gray-400">
-                        {{ 'client.pagination'|trans({'count': pagination.items|length, 'total': pagination.total}) }}
+                        {{ 'client.pagination'|trans({'%count%': pagination.items|length, '%total%': pagination.total}) }}
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
-                            <a href="?page={{ i }}"
+                            <a href="?page={{ i }}{% if q %}&q={{ q|url_encode }}{% endif %}{% if country %}&country={{ country|url_encode }}{% endif %}{% if currency %}&currency={{ currency|url_encode }}{% endif %}"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
                                 {{ i }}
                             </a>

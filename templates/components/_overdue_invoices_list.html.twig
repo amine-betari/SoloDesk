@@ -1,10 +1,11 @@
 {% if invoices|length > 0 %}
-    <div class="bg-[#1F2732] border border-[#2A3747] shadow rounded p-6 mb-6 text-white">
-        <h2 class="text-xl font-semibold mb-4 text-amber-300">
+    <details class="bg-[#1F2732] border border-[#2A3747] shadow rounded p-6 mb-6 text-white">
+        <summary class="list-none cursor-pointer text-xl font-semibold text-amber-300 flex items-center justify-between gap-4">
             {{ 'sales_document.overdue_title'|trans({'%days%': overdueDays}) }}
-        </h2>
+            <span class="rounded-full bg-amber-300/10 px-3 py-1 text-sm">{{ invoices|length }}</span>
+        </summary>
 
-        <div class="table-responsive">
+        <div class="table-responsive mt-4">
             <table class="min-w-full text-sm text-left text-gray-100">
                 <thead class="bg-[#16202A] text-xs uppercase">
                 <tr>
@@ -60,7 +61,7 @@
                 </tbody>
             </table>
         </div>
-    </div>
+    </details>
 {% else %}
     <div class="text-gray-500 italic mb-6">{{ 'sales_document.overdue_empty'|trans }}</div>
 {% endif %}

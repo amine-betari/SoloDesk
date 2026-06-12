@@ -75,11 +75,14 @@ class SalesDocumentRepository extends ServiceEntityRepository
             ->andWhere('s.type = :type')
             ->andWhere('s.invoiceDate IS NOT NULL')
             ->andWhere('s.invoiceDate < :overdueBefore')
-            ->andWhere('s.status != :paid')
+            ->andWhere('s.status IN (:overdueStatuses)')
             ->setParameter('company', $company)
             ->setParameter('type', SalesDocument::TYPE_INVOICE)
             ->setParameter('overdueBefore', $overdueBefore)
-            ->setParameter('paid', InvoiceStatus::PAID)
+            ->setParameter('overdueStatuses', [
+                InvoiceStatus::SENT,
+                InvoiceStatus::PARTIALLY_PAID,
+            ])
             ->orderBy('s.invoiceDate', 'ASC');
 
         if ($project) {

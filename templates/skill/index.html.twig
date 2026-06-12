@@ -23,24 +23,37 @@
             </div>
 
             <div class="bg-[#1F2732] border border-[#2A3747] rounded-2xl p-4">
-                <form method="get" class="flex flex-col md:flex-row gap-3 md:items-center">
-                    <input
-                        type="text"
-                        name="q"
-                        value="{{ q }}"
-                        placeholder="{{ 'skill.search_placeholder'|trans }}"
-                        class="w-full md:flex-1 rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 placeholder-gray-500 px-4 py-2"
-                    />
-                    <div class="flex gap-2">
-                        <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md btn-mobile">
-                            {{ 'actions.search'|trans }}
-                        </button>
-                        {% if q %}
-                            <a href="{{ path('app_skill_index') }}"
-                               class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] text-white font-semibold rounded-md btn-mobile">
-                                {{ 'actions.reset'|trans }}
-                            </a>
-                        {% endif %}
+                <form method="get" class="flex flex-col gap-3">
+                    <div class="flex flex-col md:flex-row gap-3 md:items-center">
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ q }}"
+                            placeholder="{{ 'skill.search_placeholder'|trans }}"
+                            class="w-full md:flex-1 rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 placeholder-gray-500 px-4 py-2"
+                        />
+                        <div class="flex gap-2">
+                            <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md btn-mobile">
+                                {{ 'actions.search'|trans }}
+                            </button>
+                            {% if q or filter != 'all' %}
+                                <a href="{{ path('app_skill_index') }}"
+                                   class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] text-white font-semibold rounded-md btn-mobile">
+                                    {{ 'actions.reset'|trans }}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-xs uppercase tracking-wider text-gray-400">{{ 'skill.filter'|trans }}</label>
+                        <select name="filter"
+                                class="mt-1 w-full md:max-w-sm rounded-md border border-[#2A3747] bg-[#111922] text-gray-100 px-3 py-2">
+                            <option value="all" {{ filter == 'all' ? 'selected' : '' }}>{{ 'common.all_f'|trans }}</option>
+                            <option value="core" {{ filter == 'core' ? 'selected' : '' }}>{{ 'skill.filter_core'|trans }}</option>
+                            <option value="non_core" {{ filter == 'non_core' ? 'selected' : '' }}>{{ 'skill.filter_non_core'|trans }}</option>
+                            <option value="used" {{ filter == 'used' ? 'selected' : '' }}>{{ 'skill.filter_used'|trans }}</option>
+                            <option value="unused" {{ filter == 'unused' ? 'selected' : '' }}>{{ 'skill.filter_unused'|trans }}</option>
+                        </select>
                     </div>
                 </form>
             </div>
@@ -51,11 +64,13 @@
                         <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'skill.name'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'skill.usage'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                         {% for skill in pagination.items %}
+                            {% set usageCount = usageCounts[skill.id]|default(0) %}
                             <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-2">
@@ -67,19 +82,27 @@
                                         {% endif %}
                                     </div>
                                 </td>
+                                <td class="px-6 py-4 text-sm text-gray-600">
+                                    {{ 'skill.usage_count'|trans({'%count%': usageCount}) }}
+                                </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="flex flex-wrap gap-2">
-                                        <a href="{{ path('app_skill_edit', {'id': skill.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            {{ 'actions.edit'|trans }}
-                                        </a>
-                                        {{ include('skill/_delete_form.html.twig') }}
-                                    </div>
+                                    <details class="relative">
+                                        <summary class="list-none inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                                            {{ 'table.actions'|trans }}
+                                        </summary>
+                                        <div class="absolute right-0 mt-2 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg p-2 flex flex-col gap-2">
+                                            <a href="{{ path('app_skill_edit', {'id': skill.id}) }}"
+                                               class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                                                {{ 'actions.edit'|trans }}
+                                            </a>
+                                            {{ include('skill/_delete_form.html.twig', {canDelete: usageCount == 0}) }}
+                                        </div>
+                                    </details>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="2" class="px-6 py-10 text-center text-gray-400">{{ 'skill.none'|trans }}</td>
+                                <td colspan="3" class="px-6 py-10 text-center text-gray-400">{{ 'skill.none'|trans }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -88,11 +111,11 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <p class="text-sm text-gray-400">
-                        {{ 'skill.pagination'|trans({'count': pagination.items|length, 'total': pagination.total}) }}
+                        {{ 'skill.pagination'|trans({'%count%': pagination.items|length, '%total%': pagination.total}) }}
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
-                            <a href="?page={{ i }}{% if q %}&q={{ q|url_encode }}{% endif %}"
+                            <a href="?page={{ i }}{% if q %}&q={{ q|url_encode }}{% endif %}{% if filter != 'all' %}&filter={{ filter|url_encode }}{% endif %}"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
                                 {{ i }}
                             </a>

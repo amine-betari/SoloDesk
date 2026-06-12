@@ -22,6 +22,12 @@
             {% if button_label is defined %}{{ 'sales_document.edit_title'|trans }}{% else %}{{ 'sales_document.new_title'|trans }}{% endif %}
         </h1>
 
+        {% if button_label is defined and salesDocument.isInvoice() and salesDocument.status in ['paid', 'cancelled'] %}
+            <div class="mb-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+                {{ 'sales_document.edit_locked_warning'|trans }}
+            </div>
+        {% endif %}
+
         {{ form_start(form, {
             'attr': {'class': 'space-y-8', 'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}
         }) }}

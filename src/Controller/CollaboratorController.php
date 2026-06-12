@@ -102,7 +102,7 @@ final class CollaboratorController extends AbstractController
         }
 
         $topSkills = $conn->fetchAllAssociative(
-            'SELECT s.name AS name, COUNT(cs.collaborator_id) AS total
+            'SELECT s.id AS id, s.name AS name, COUNT(cs.collaborator_id) AS total
              FROM collaborator_skill cs
              INNER JOIN skill s ON s.id = cs.skill_id
              WHERE s.company_id = :companyId

@@ -4,7 +4,7 @@ namespace App\Controller;
 
 use App\Constants\ProjectStatuses;
 use App\Constants\ProjectTypes;
-use App\Entity\Document;
+use App\Constants\EstimateStatuses;
 use App\Form\Search\ProjectFilterForm;
 use App\Entity\Estimate;
 use App\Repository\PaginationService;
@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/estimate')]
 final class EstimateController extends AbstractController
@@ -69,11 +70,29 @@ final class EstimateController extends AbstractController
             return $this->redirectToRoute('app_estimate_index');
         }
 
+        $statusCounts = array_fill_keys(array_keys(EstimateStatuses::CHOICES), 0);
+        $statusRows = (clone $qb)
+            ->select('e.status AS status, COUNT(e.id) AS total')
+            ->resetDQLPart('orderBy')
+            ->groupBy('e.status')
+            ->getQuery()
+            ->getArrayResult();
+        foreach ($statusRows as $row) {
+            $statusCounts[$row['status']] = (int) $row['total'];
+        }
+
         $pagination = $paginator->paginate($qb, $page, $limit);
+        $displayedTotals = [];
+        foreach ($pagination['items'] as $estimate) {
+            $currency = $estimate->getCurrency();
+            $displayedTotals[$currency] = ($displayedTotals[$currency] ?? 0.0) + (float) $estimate->getAmount();
+        }
 
         return $this->render('estimate/index.html.twig', [
             'pagination' => $pagination,
             'filterForm' => $filterForm->createView(), // on envoie le form à la vu
+            'statusCounts' => $statusCounts,
+            'displayedTotals' => $displayedTotals,
         ]);
     }
 
@@ -198,13 +217,24 @@ final class EstimateController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_estimate_delete', methods: ['POST'])]
-    public function delete(Request $request, Estimate $estimate, EntityManagerInterface $entityManager): Response
+    public function delete(
+        Request $request,
+        Estimate $estimate,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $estimate->getCompany()?->getId() !== $company->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
         if ($this->isCsrfTokenValid('delete'.$estimate->getId(), $request->getPayload()->getString('_token'))) {
+            if (!$estimate->canBeDeleted()) {
+                $this->addFlash('warning', $translator->trans('estimate.delete_linked_error'));
+
+                return $this->redirectToRoute('app_estimate_show', ['id' => $estimate->getId()], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->remove($estimate);
             $entityManager->flush();
         }

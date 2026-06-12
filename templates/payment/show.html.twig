@@ -31,11 +31,11 @@
                 </div>
                 <div class="bg-white rounded-2xl p-6 shadow-md">
                     <h2 class="text-sm font-semibold text-gray-500 mb-2">{{ 'payment.amount'|trans }}</h2>
-                    <p class="text-gray-900 text-xl">{{ payment.amount|format_currency(payment.salesDocument.client.currency, app.request.locale ?: 'fr_FR') }}</p>
+                    <p class="text-gray-900 text-xl">{{ payment.amount|format_currency(payment.salesDocument.getResolvedCurrency()) }}</p>
                 </div>
                 <div class="bg-white rounded-2xl p-6 shadow-md">
                     <h2 class="text-sm font-semibold text-gray-500 mb-2">{{ 'payment.method'|trans }}</h2>
-                    <p class="text-gray-900 text-xl">{{ payment.method }}</p>
+                    <p class="text-gray-900 text-xl">{{ payment.method ? ('payment.method_' ~ payment.method)|trans : 'common.dash'|trans }}</p>
                 </div>
                 <div class="col-span-1 md:col-span-2 bg-white rounded-2xl p-6 shadow-md">
                     <h2 class="text-sm font-semibold text-gray-500 mb-2">{{ 'payment.label'|trans }}</h2>

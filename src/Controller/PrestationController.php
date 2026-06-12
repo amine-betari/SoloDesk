@@ -14,6 +14,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/prestations')]
 final class PrestationController extends AbstractController
@@ -59,7 +60,27 @@ final class PrestationController extends AbstractController
                 ->setParameter('collaboratorId', $collaboratorId);
         }
 
+        $statusCounts = [
+            Prestation::STATUS_DRAFT => 0,
+            Prestation::STATUS_INVOICED => 0,
+            Prestation::STATUS_PAID => 0,
+        ];
+        $statusRows = (clone $qb)
+            ->select('p.status AS status, COUNT(p.id) AS total')
+            ->resetDQLPart('orderBy')
+            ->groupBy('p.status')
+            ->getQuery()
+            ->getArrayResult();
+        foreach ($statusRows as $row) {
+            $statusCounts[$row['status']] = (int) $row['total'];
+        }
+
         $pagination = $paginator->paginate($qb->distinct(), $page, $limit);
+        $displayedTotals = [];
+        foreach ($pagination['items'] as $prestation) {
+            $currency = $prestation->getSalesDocument()?->getResolvedCurrency() ?? 'EUR';
+            $displayedTotals[$currency] = ($displayedTotals[$currency] ?? 0.0) + $prestation->getTotal();
+        }
 
         $collaborators = $collaboratorRepository->createQueryBuilder('c')
             ->andWhere('c.company = :company')
@@ -74,6 +95,8 @@ final class PrestationController extends AbstractController
             'status' => $status,
             'collaboratorId' => $collaboratorId,
             'collaborators' => $collaborators,
+            'statusCounts' => $statusCounts,
+            'displayedTotals' => $displayedTotals,
         ]);
     }
 
@@ -169,7 +192,12 @@ final class PrestationController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_prestation_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
-    public function delete(Request $request, Prestation $prestation, EntityManagerInterface $entityManager): Response
+    public function delete(
+        Request $request,
+        Prestation $prestation,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $prestation->getCompany()?->getId() !== $company->getId()) {
@@ -177,6 +205,12 @@ final class PrestationController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete'.$prestation->getId(), $request->getPayload()->getString('_token'))) {
+            if ($prestation->getStatus() !== Prestation::STATUS_DRAFT) {
+                $this->addFlash('error', $translator->trans('prestation.delete_locked_error'));
+
+                return $this->redirectToRoute('app_prestation_index', [], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->remove($prestation);
             $entityManager->flush();
         }

@@ -11,10 +11,6 @@
                     <p class="text-sm text-gray-400 mt-2">{{ 'sales_document.subtitle'|trans }}</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
-                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
-                        <span class="text-white font-semibold">{{ pagination.total }}</span>
-                    </div>
                     <a href="{{ path('app_sales_document_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
                         {{ 'sales_document.new'|trans }}
@@ -22,18 +18,20 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'sales_document.count_shown'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'sales_document.count_total'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+            <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'sales_document.count_total'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'sales_document.count_shown'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+                    </div>
                 </div>
             </div>
 
@@ -56,7 +54,7 @@
                         <tr>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'sales_document.table_document'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{{ 'sales_document.table_client'|trans }}</th>
-                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'sales_document.table_amount'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'sales_document.table_amounts'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'sales_document.table_vat'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'sales_document.table_issued'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'sales_document.table_status'|trans }}</th>
@@ -65,7 +63,12 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                         {% for document in pagination.items %}
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            {% set currency = document.getResolvedCurrency() %}
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                tabindex="0"
+                                role="link"
+                                onclick="if (!event.target.closest('a, button, summary, details, form')) window.location.href='{{ path('app_sales_document_show', {'id': document.id}) }}'"
+                                onkeydown="if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, summary, details, form')) { event.preventDefault(); window.location.href='{{ path('app_sales_document_show', {'id': document.id}) }}'; }">
                                 <td class="px-6 py-4">
                                     <div class="min-w-0">
                                         <div class="text-sm font-semibold text-gray-900">
@@ -82,20 +85,13 @@
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">
                                     {{ document.getResolvedClient() ? document.getResolvedClient().getName() : 'common.dash'|trans }}
                                 </td>
-                                {% if  document.estimate %}
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ document.getTotalHT|format_currency(document.estimate.currency, app.request.locale ?: 'fr_FR') }}
-                                    </td>
-                                {% elseif document.project  %}
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ document.getTotalHT|format_currency(document.project.currency, app.request.locale ?: 'fr_FR') }}
-                                    </td>
-                                {% else %}
-                                    <td class="px-6 py-4 text-sm text-gray-700">
-                                        {{ document.getTotalHT|format_currency(document.client.currency, app.request.locale ?: 'fr_FR') }}
-                                    </td>
-                                {% endif %}
-                                <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">{{ document.taxApplied ? document.vatRate : 'common.dash'|trans }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    <div>{{ 'sales_document.amount_ht_short'|trans }} {{ document.getTotalHT|format_currency(currency) }}</div>
+                                    <div class="text-xs text-gray-500">{{ 'sales_document.amount_ttc_short'|trans }} {{ document.getTotalTTC|format_currency(currency) }}</div>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
+                                    {{ document.taxApplied ? document.vatRate ~ ' %' : 'sales_document.vat_not_applicable'|trans }}
+                                </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">{{ document.invoiceDate ? document.invoiceDate|date('d/m/Y') : 'common.dash'|trans }}</td>
                                 {% set statusClass =
                                     document.status == 'draft' ? 'bg-gray-100 text-gray-800' :
@@ -113,46 +109,23 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="hidden sm:flex flex-wrap gap-2">
-                                        <a href="{{ path('app_sales_document_show', {'id': document.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">{{ 'actions.view'|trans }}</a>
-                                        <a href="{{ path('app_sales_document_edit', {'id': document.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">{{ 'actions.edit'|trans }}</a>
-                                        {% if document.isEstimate() %}
-                                            <details class="relative">
-                                                <summary class="list-none cursor-pointer px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
-                                                    {{ 'table.actions'|trans }}
-                                                </summary>
-                                                <div class="absolute right-0 mt-2 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg p-2">
-                                                    <form method="post" action="{{ path('app_sales_document_duplicate', {'id': document.id}) }}">
-                                                        <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ document.id) }}">
-                                                        <button class="w-full text-left px-3 py-2 rounded bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition">
-                                                            {{ 'actions.duplicate'|trans }}
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </details>
-                                        {% endif %}
-                                    </div>
-                                    <div class="sm:hidden">
-                                        <details class="relative">
-                                            <summary class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700">
-                                                {{ 'table.actions'|trans }}
-                                            </summary>
-                                            <div class="mt-2 flex flex-col gap-2">
-                                                <a href="{{ path('app_sales_document_show', {'id': document.id}) }}"
-                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
-                                                <a href="{{ path('app_sales_document_edit', {'id': document.id}) }}"
-                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
-                                                {% if document.isEstimate() %}
-                                                    <form method="post" action="{{ path('app_sales_document_duplicate', {'id': document.id}) }}">
-                                                        <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ document.id) }}">
-                                                        <button class="w-full px-3 py-2 rounded bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700">{{ 'actions.duplicate'|trans }}</button>
-                                                    </form>
-                                                {% endif %}
-                                            </div>
-                                        </details>
-                                    </div>
+                                    <details class="relative">
+                                        <summary class="list-none inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                                            {{ 'table.actions'|trans }}
+                                        </summary>
+                                        <div class="absolute right-0 mt-2 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg p-2 flex flex-col gap-2">
+                                            <a href="{{ path('app_sales_document_edit', {'id': document.id}) }}"
+                                               class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">{{ 'actions.edit'|trans }}</a>
+                                            {% if document.isEstimate() %}
+                                                <form method="post" action="{{ path('app_sales_document_duplicate', {'id': document.id}) }}">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token('duplicate' ~ document.id) }}">
+                                                    <button class="w-full text-left px-3 py-2 rounded bg-amber-600 text-white text-xs font-semibold hover:bg-amber-700 transition">
+                                                        {{ 'actions.duplicate'|trans }}
+                                                    </button>
+                                                </form>
+                                            {% endif %}
+                                        </div>
+                                    </details>
                                 </td>
                             </tr>
                         {% else %}
@@ -170,7 +143,7 @@
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
-                            <a href="?page={{ i }}"
+                            <a href="{{ path('app_sales_document_index', {page: i}) }}"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
                                 {{ i }}
                             </a>

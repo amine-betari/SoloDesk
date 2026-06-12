@@ -1,4 +1,11 @@
+{% if canDelete|default(true) %}
 <form method="post" action="{{ path('app_client_delete', {'id': client.id}) }}" onsubmit="return confirm('{{ 'client.delete_confirm'|trans }}');" class="w-full sm:w-auto">
     <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ client.id) }}">
     <button class="px-4 py-2 bg-red-500 text-white rounded transition hover:bg-red-600 btn-mobile">{{ 'actions.delete'|trans }}</button>
 </form>
+{% else %}
+    <button type="button"
+            disabled
+            title="{{ 'client.delete_linked_help'|trans }}"
+            class="px-4 py-2 bg-gray-600 text-gray-300 rounded cursor-not-allowed btn-mobile">{{ 'actions.delete'|trans }}</button>
+{% endif %}

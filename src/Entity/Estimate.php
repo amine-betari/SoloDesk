@@ -328,6 +328,11 @@ class Estimate
         return $this;
     }
 
+    public function canBeDeleted(): bool
+    {
+        return $this->project === null && $this->salesDocuments->isEmpty();
+    }
+
     #[Assert\Callback]
     public function validateDates(ExecutionContextInterface $context): void
     {

@@ -498,6 +498,12 @@ class Project
 
         return $this;
     }
+
+    public function canBeDeleted(): bool
+    {
+        return $this->salesDocuments->isEmpty();
+    }
+
     public function __toString(): string
     {
         return (string) $this->name; // retourne le champ que tu veux afficher

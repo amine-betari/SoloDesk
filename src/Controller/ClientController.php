@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/client')]
 final class ClientController extends AbstractController
@@ -26,6 +27,9 @@ final class ClientController extends AbstractController
     {
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 10;
+        $q = trim((string) $request->query->get('q', ''));
+        $country = trim((string) $request->query->get('country', ''));
+        $currency = trim((string) $request->query->get('currency', ''));
         $company = $this->getUser()?->getCompany();
         if (!$company) {
             throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
@@ -36,10 +40,48 @@ final class ClientController extends AbstractController
             ->setParameter('company', $company)
             ->orderBy('c.name', 'ASC');
 
+        if ($q !== '') {
+            $qb->andWhere('c.name LIKE :q OR c.email LIKE :q')
+                ->setParameter('q', '%'.$q.'%');
+        }
+
+        if ($country !== '') {
+            $qb->andWhere('c.country = :country')
+                ->setParameter('country', $country);
+        }
+
+        if ($currency !== '') {
+            $qb->andWhere('c.currency = :currency')
+                ->setParameter('currency', $currency);
+        }
+
         $pagination = $paginator->paginate($qb, $page, $limit);
 
+        $countries = $clientRepository->createQueryBuilder('c')
+            ->select('DISTINCT c.country AS country')
+            ->andWhere('c.company = :company')
+            ->andWhere('c.country IS NOT NULL')
+            ->andWhere("c.country != ''")
+            ->setParameter('company', $company)
+            ->orderBy('c.country', 'ASC')
+            ->getQuery()
+            ->getSingleColumnResult();
+
+        $currencies = $clientRepository->createQueryBuilder('c')
+            ->select('DISTINCT c.currency AS currency')
+            ->andWhere('c.company = :company')
+            ->setParameter('company', $company)
+            ->orderBy('c.currency', 'ASC')
+            ->getQuery()
+            ->getSingleColumnResult();
+
         return $this->render('client/index.html.twig', [
-            'pagination' => $pagination
+            'pagination' => $pagination,
+            'q' => $q,
+            'country' => $country,
+            'currency' => $currency,
+            'countries' => $countries,
+            'currencies' => $currencies,
         ]);
     }
 
@@ -80,6 +122,7 @@ final class ClientController extends AbstractController
         return $this->render('client/show.html.twig', [
             'client' => $client,
             'projectsCount' => $projectsCount,
+            'canDelete' => $this->canDeleteClient($client),
         ]);
     }
 
@@ -102,17 +145,29 @@ final class ClientController extends AbstractController
         return $this->render('client/edit.html.twig', [
             'client' => $client,
             'form' => $form,
+            'canDelete' => $this->canDeleteClient($client),
         ]);
     }
 
     #[Route('/{id}', name: 'app_client_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
-    public function delete(Request $request, Client $client, EntityManagerInterface $entityManager): Response
+    public function delete(
+        Request $request,
+        Client $client,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $client->getCompany()?->getId() !== $company->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
         if ($this->isCsrfTokenValid('delete'.$client->getId(), $request->getPayload()->getString('_token'))) {
+            if (!$this->canDeleteClient($client)) {
+                $this->addFlash('error', $translator->trans('client.delete_linked_error'));
+
+                return $this->redirectToRoute('app_client_show', ['id' => $client->getId()], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->remove($client);
             $entityManager->flush();
         }
@@ -167,5 +222,12 @@ final class ClientController extends AbstractController
             'id' => $client->getId(),
             'name' => $client->getName(),
         ]);
+    }
+
+    private function canDeleteClient(Client $client): bool
+    {
+        return $client->getProjects()->isEmpty()
+            && $client->getEstimates()->isEmpty()
+            && $client->getSalesDocuments()->isEmpty();
     }
 }

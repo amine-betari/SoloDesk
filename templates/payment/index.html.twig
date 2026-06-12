@@ -11,10 +11,6 @@
                     <p class="text-sm text-gray-400 mt-2">{{ 'payment.subtitle'|trans }}</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
-                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
-                        <span class="text-white font-semibold">{{ pagination.total }}</span>
-                    </div>
                     <a href="{{ path('app_payment_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
                         {{ 'payment.new'|trans }}
@@ -22,18 +18,30 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'payment.count_shown'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'payment.count_total'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+            <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'payment.count_total'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'payment.count_shown'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
+                        <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'payment.displayed_total'|trans }}</div>
+                        <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-white">
+                            {% for currency, total in displayedTotals %}
+                                <span>{{ total|format_currency(currency) }}</span>
+                            {% else %}
+                                <span>{{ 'common.dash'|trans }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -55,16 +63,22 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                         {% for payment in pagination.items %}
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                tabindex="0"
+                                role="link"
+                                onclick="if (!event.target.closest('a, button, summary, details, form')) window.location.href='{{ path('app_payment_show', {'id': payment.id}) }}'"
+                                onkeydown="if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, summary, details, form')) { event.preventDefault(); window.location.href='{{ path('app_payment_show', {'id': payment.id}) }}'; }">
                                 <td class="px-6 py-4">
                                     <div class="min-w-0">
                                         <div class="text-sm font-semibold text-gray-900">#{{ payment.id }}</div>
                                         <div class="text-xs text-gray-500">{{ payment.date ? payment.date|date('d/m/Y') : 'common.dash'|trans }}</div>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">{{ payment.method }}</td>
-                                {% set paymentCurrency = payment.salesDocument ? (payment.salesDocument.getResolvedClient() ? payment.salesDocument.getResolvedClient().currency : (payment.salesDocument.project ? payment.salesDocument.project.currency : 'EUR')) : 'EUR' %}
-                                <td class="px-6 py-4 text-sm text-gray-700">{{ payment.amount|format_currency(paymentCurrency, app.request.locale ?: 'fr_FR') }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-600 hidden md:table-cell">
+                                    {{ payment.method ? ('payment.method_' ~ payment.method)|trans : 'common.dash'|trans }}
+                                </td>
+                                {% set paymentCurrency = payment.salesDocument ? payment.salesDocument.getResolvedCurrency() : 'EUR' %}
+                                <td class="px-6 py-4 text-sm text-gray-700">{{ payment.amount|format_currency(paymentCurrency) }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">{{ payment.label ?: 'common.dash'|trans }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
                                     {% if payment.salesDocument %}
@@ -76,29 +90,15 @@
                                     {% endif %}
                                 </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="hidden sm:flex flex-wrap gap-2">
-                                        <a href="{{ path('app_payment_show', {'id': payment.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
-                                            {{ 'actions.view'|trans }}
-                                        </a>
-                                        <a href="{{ path('app_payment_edit', {'id': payment.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            {{ 'actions.edit'|trans }}
-                                        </a>
-                                    </div>
-                                    <div class="sm:hidden">
-                                        <details class="relative">
-                                            <summary class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700">
-                                                {{ 'table.actions'|trans }}
-                                            </summary>
-                                            <div class="mt-2 flex flex-col gap-2">
-                                                <a href="{{ path('app_payment_show', {'id': payment.id}) }}"
-                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
-                                                <a href="{{ path('app_payment_edit', {'id': payment.id}) }}"
-                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
-                                            </div>
-                                        </details>
-                                    </div>
+                                    <details class="relative">
+                                        <summary class="list-none inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                                            {{ 'table.actions'|trans }}
+                                        </summary>
+                                        <div class="absolute right-0 mt-2 z-10 w-44 rounded-lg border border-gray-200 bg-white shadow-lg p-2">
+                                            <a href="{{ path('app_payment_edit', {'id': payment.id}) }}"
+                                               class="block px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
+                                        </div>
+                                    </details>
                                 </td>
                             </tr>
                         {% else %}
@@ -116,7 +116,7 @@
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}
-                            <a href="?page={{ i }}"
+                            <a href="{{ path('app_payment_index', {page: i}) }}"
                                class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
                                 {{ i }}
                             </a>

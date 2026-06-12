@@ -7,6 +7,12 @@
         <h1 class="text-4xl font-extrabold mb-8">{{ 'estimate.new_title'|trans }}</h1>
     {% endif %}
 
+    {% if button_label is defined and estimate.status in ['accepted', 'rejected', 'expired'] %}
+        <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">
+            {{ 'estimate.edit_locked_warning'|trans }}
+        </div>
+    {% endif %}
+
     {{ form_start(form, {'attr': {'class': 'space-y-6', 'enctype': 'multipart/form-data'}}) }}
 
     <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6">

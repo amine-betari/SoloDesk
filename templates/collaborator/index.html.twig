@@ -11,10 +11,6 @@
                     <p class="text-sm text-gray-400 mt-2">{{ 'collaborator.subtitle'|trans }}</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
-                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
-                        <span class="text-white font-semibold">{{ pagination.total }}</span>
-                    </div>
                     <a href="{{ path('app_collaborator_new') }}"
                        class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
                         {{ 'collaborator.new'|trans }}
@@ -90,47 +86,50 @@
                 </form>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.count_shown'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.count_total'|trans }}</div>
+                            <div class="mt-2 text-3xl font-semibold text-white">{{ pagination.total }}</div>
+                        </div>
+                        <div class="text-sm text-gray-400">{{ 'common.page'|trans }} {{ pagination.page }} / {{ pagination.pages }}</div>
+                    </div>
+                    <div class="mt-5 grid grid-cols-3 gap-3 border-t border-[#2A3747] pt-4">
+                        <div>
+                            <div class="text-xs text-gray-400">{{ 'collaborator.type_salarie'|trans }}</div>
+                            <div class="mt-1 text-xl font-semibold text-white">{{ countsByType.salarie }}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-400">{{ 'collaborator.type_freelance'|trans }}</div>
+                            <div class="mt-1 text-xl font-semibold text-white">{{ countsByType.freelance }}</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-gray-400">{{ 'collaborator.type_collaborateur'|trans }}</div>
+                            <div class="mt-1 text-xl font-semibold text-white">{{ countsByType.collaborateur }}</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.count_total'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'common.page'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.page }} / {{ pagination.pages }}</div>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.type_salarie'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.salarie }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.type_freelance'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.freelance }}</div>
-                </div>
-                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.type_collaborateur'|trans }}</div>
-                    <div class="mt-2 text-2xl font-semibold text-white">{{ countsByType.collaborateur }}</div>
-                </div>
-            </div>
 
-            <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
-                <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.top_skills'|trans }}</div>
-                <div class="mt-3 flex flex-wrap gap-2">
-                    {% if topSkills is not empty %}
-                        {% for s in topSkills %}
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#223044] text-gray-200">
-                                {{ s.name }} ({{ s.total }})
-                            </span>
-                        {% endfor %}
-                    {% else %}
-                        <span class="text-sm text-gray-400">{{ 'collaborator.no_skills'|trans }}</span>
-                    {% endif %}
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-5">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'collaborator.top_skills'|trans }}</div>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        {% if topSkills is not empty %}
+                            {% for s in topSkills %}
+                                <a href="{{ path('app_collaborator_index', {
+                                    skill: skillId == s.id ? null : s.id,
+                                    type: type ?: null,
+                                    sort: sort != 'name_asc' ? sort : null
+                                }) }}"
+                                   class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold transition-colors {{ skillId == s.id ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
+                                    {{ s.name }} ({{ s.total }})
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <span class="text-sm text-gray-400">{{ 'collaborator.no_skills'|trans }}</span>
+                        {% endif %}
+                    </div>
+                    <p class="mt-3 text-xs text-gray-500">{{ 'collaborator.top_skills_help'|trans }}</p>
                 </div>
             </div>
 
@@ -142,12 +141,17 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'collaborator.table_name'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{{ 'collaborator.table_type'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'collaborator.table_skills'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'collaborator.monthly_cost'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
                         </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                         {% for collaborator in pagination.items %}
-                            <tr class="hover:bg-gray-50 transition-colors">
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                tabindex="0"
+                                role="link"
+                                onclick="if (!event.target.closest('a, button, summary, details')) window.location.href='{{ path('app_collaborator_show', {'id': collaborator.id}) }}'"
+                                onkeydown="if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, summary, details')) { event.preventDefault(); window.location.href='{{ path('app_collaborator_show', {'id': collaborator.id}) }}'; }">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
                                         <div class="w-10 h-10 rounded-full bg-gray-100 text-gray-800 flex items-center justify-center font-semibold">
@@ -192,41 +196,26 @@
                                         {{ 'common.dash'|trans }}
                                     {% endif %}
                                 </td>
+                                <td class="px-6 py-4 text-sm text-gray-700 hidden lg:table-cell">
+                                    {{ collaborator.monthlyCost is not null ? collaborator.monthlyCost|number_format(2, ',', ' ') : ('common.dash'|trans) }}
+                                </td>
                                 <td class="px-6 py-4 text-sm">
-                                    <div class="hidden sm:flex flex-wrap gap-2">
-                                        <a href="{{ path('app_prestation_new', {'collaborator': collaborator.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition">
-                                            {{ 'prestation.new'|trans }}
-                                        </a>
-                                        <a href="{{ path('app_collaborator_show', {'id': collaborator.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
-                                            {{ 'actions.view'|trans }}
-                                        </a>
-                                        <a href="{{ path('app_collaborator_edit', {'id': collaborator.id}) }}"
-                                           class="px-3 py-1.5 rounded-md bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
-                                            {{ 'actions.edit'|trans }}
-                                        </a>
-                                    </div>
-                                    <div class="sm:hidden">
-                                        <details class="relative">
-                                            <summary class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700">
-                                                {{ 'table.actions'|trans }}
-                                            </summary>
-                                            <div class="mt-2 flex flex-col gap-2">
-                                                <a href="{{ path('app_prestation_new', {'collaborator': collaborator.id}) }}"
-                                                   class="px-3 py-2 rounded bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700">{{ 'prestation.new'|trans }}</a>
-                                                <a href="{{ path('app_collaborator_show', {'id': collaborator.id}) }}"
-                                                   class="px-3 py-2 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200">{{ 'actions.view'|trans }}</a>
-                                                <a href="{{ path('app_collaborator_edit', {'id': collaborator.id}) }}"
-                                                   class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
-                                            </div>
-                                        </details>
-                                    </div>
+                                    <details class="relative">
+                                        <summary class="list-none inline-flex cursor-pointer items-center gap-2 px-3 py-1.5 text-xs font-semibold rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition">
+                                            {{ 'table.actions'|trans }}
+                                        </summary>
+                                        <div class="absolute right-0 mt-2 z-10 w-48 rounded-lg border border-gray-200 bg-white shadow-lg p-2 flex flex-col gap-2">
+                                            <a href="{{ path('app_prestation_new', {'collaborator': collaborator.id}) }}"
+                                               class="px-3 py-2 rounded bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700">{{ 'prestation.new'|trans }}</a>
+                                            <a href="{{ path('app_collaborator_edit', {'id': collaborator.id}) }}"
+                                               class="px-3 py-2 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700">{{ 'actions.edit'|trans }}</a>
+                                        </div>
+                                    </details>
                                 </td>
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="4" class="px-6 py-10 text-center text-gray-400">{{ 'collaborator.none'|trans }}</td>
+                                <td colspan="5" class="px-6 py-10 text-center text-gray-400">{{ 'collaborator.none'|trans }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -235,7 +224,7 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4">
                     <p class="text-sm text-gray-400">
-                        {{ 'collaborator.pagination'|trans({'count': pagination.items|length, 'total': pagination.total}) }}
+                        {{ 'collaborator.pagination'|trans({'%count%': pagination.items|length, '%total%': pagination.total}) }}
                     </p>
                     <div class="flex flex-wrap gap-2">
                         {% for i in 1..pagination.pages %}

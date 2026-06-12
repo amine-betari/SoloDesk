@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/skills')]
 final class SkillController extends AbstractController
@@ -24,6 +25,11 @@ final class SkillController extends AbstractController
         $page = max(1, $request->query->getInt('page', 1));
         $limit = 12;
         $q = trim((string) $request->query->get('q', ''));
+        $filter = trim((string) $request->query->get('filter', 'all'));
+        $allowedFilters = ['all', 'core', 'non_core', 'used', 'unused'];
+        if (!in_array($filter, $allowedFilters, true)) {
+            $filter = 'all';
+        }
 
         $company = $this->getUser()?->getCompany();
         if (!$company) {
@@ -40,11 +46,42 @@ final class SkillController extends AbstractController
                 ->setParameter('q', '%' . $q . '%');
         }
 
+        switch ($filter) {
+            case 'core':
+                $qb->andWhere('s.isCore = true');
+                break;
+            case 'non_core':
+                $qb->andWhere('s.isCore = false');
+                break;
+            case 'used':
+                $qb->andWhere('EXISTS (
+                    SELECT usedCollaborator.id
+                    FROM App\Entity\Collaborator usedCollaborator
+                    JOIN usedCollaborator.skills usedSkill
+                    WHERE usedSkill = s
+                )');
+                break;
+            case 'unused':
+                $qb->andWhere('NOT EXISTS (
+                    SELECT usedCollaborator.id
+                    FROM App\Entity\Collaborator usedCollaborator
+                    JOIN usedCollaborator.skills usedSkill
+                    WHERE usedSkill = s
+                )');
+                break;
+        }
+
         $pagination = $paginator->paginate($qb, $page, $limit);
+        $usageCounts = [];
+        foreach ($pagination['items'] as $skill) {
+            $usageCounts[$skill->getId()] = $skill->getCollaborators()->count();
+        }
 
         return $this->render('skill/index.html.twig', [
             'pagination' => $pagination,
             'q' => $q,
+            'filter' => $filter,
+            'usageCounts' => $usageCounts,
         ]);
     }
 
@@ -97,7 +134,12 @@ final class SkillController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_skill_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
-    public function delete(Request $request, Skill $skill, EntityManagerInterface $entityManager): Response
+    public function delete(
+        Request $request,
+        Skill $skill,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $skill->getCompany()?->getId() !== $company->getId()) {
@@ -105,6 +147,12 @@ final class SkillController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete'.$skill->getId(), $request->getPayload()->getString('_token'))) {
+            if (!$skill->getCollaborators()->isEmpty()) {
+                $this->addFlash('error', $translator->trans('skill.delete_used_error'));
+
+                return $this->redirectToRoute('app_skill_index', [], Response::HTTP_SEE_OTHER);
+            }
+
             $entityManager->remove($skill);
             $entityManager->flush();
         }

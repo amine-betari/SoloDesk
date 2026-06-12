@@ -94,7 +94,7 @@
                 <a href="{{ path('app_client_index') }}"
                    class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>
 
-                {{ include('client/_delete_form.html.twig') }}
+                {{ include('client/_delete_form.html.twig', {canDelete: canDelete|default(true)}) }}
             </div>
         {% else %}
             <a href="{{ path('app_client_index') }}"

@@ -15,7 +15,7 @@
                        class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back'|trans }}</a>
                     <a href="{{ path('app_client_edit', {'id': client.id}) }}"
                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold btn-mobile">{{ 'actions.edit'|trans }}</a>
-                    {{ include('client/_delete_form.html.twig') }}
+                    {{ include('client/_delete_form.html.twig', {canDelete: canDelete}) }}
                 </div>
             </div>
 

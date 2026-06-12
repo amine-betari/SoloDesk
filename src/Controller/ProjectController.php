@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Project;
+use App\Constants\ProjectStatuses;
 use App\Form\ProjectForm;
 use App\Form\Search\ProjectFilterForm;
 use App\Repository\ProjectRepository;
@@ -17,6 +18,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/project')]
 final class ProjectController extends AbstractController
@@ -66,11 +68,30 @@ final class ProjectController extends AbstractController
             return $this->redirectToRoute('app_project_index');
         }
 
+        $statusCounts = array_fill_keys(array_keys(ProjectStatuses::CHOICES), 0);
+        $statusRows = (clone $qb)
+            ->select('p.status AS status, COUNT(p.id) AS total')
+            ->resetDQLPart('orderBy')
+            ->groupBy('p.status')
+            ->getQuery()
+            ->getArrayResult();
+        foreach ($statusRows as $row) {
+            $statusCounts[$row['status']] = (int) $row['total'];
+        }
+
         $pagination = $paginator->paginate($qb, $page, $limit);
+        $displayedTotals = [];
+        foreach ($pagination['items'] as $project) {
+            $currency = $project->getCurrency();
+            $amount = $project->isRecurring() ? $project->getCalculatedAmount() : (float) $project->getAmount();
+            $displayedTotals[$currency] = ($displayedTotals[$currency] ?? 0.0) + (float) $amount;
+        }
 
         return $this->render('project/index.html.twig', [
             'pagination' => $pagination,
             'filterForm' => $filterForm->createView(), // on envoie le form à la vu
+            'statusCounts' => $statusCounts,
+            'displayedTotals' => $displayedTotals,
         ]);
     }
 
@@ -219,13 +240,23 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_project_delete', methods: ['POST'])]
-    public function delete(Request $request, Project $project, EntityManagerInterface $entityManager): Response
+    public function delete(
+        Request $request,
+        Project $project,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $project->getCompany()?->getId() !== $company->getId()) {
             throw $this->createAccessDeniedException('Accès refusé.');
         }
         if ($this->isCsrfTokenValid('delete'.$project->getId(), $request->getPayload()->getString('_token'))) {
+            if (!$project->canBeDeleted()) {
+                $this->addFlash('warning', $translator->trans('project.delete_linked_error'));
+
+                return $this->redirectToRoute('app_project_show', ['id' => $project->getId()], Response::HTTP_SEE_OTHER);
+            }
 
             if ($project->getEstimate()) {
                 $project->getEstimate()->setProject(null);
