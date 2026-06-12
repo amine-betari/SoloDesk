@@ -17,8 +17,13 @@ final class SalesDocumentItemController extends AbstractController
     #[Route(name: 'app_sales_document_item_index', methods: ['GET'])]
     public function index(SalesDocumentItemRepository $salesDocumentItemRepository): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
         return $this->render('sales_document_item/index.html.twig', [
-            'sales_document_items' => $salesDocumentItemRepository->findAll(),
+            'sales_document_items' => $salesDocumentItemRepository->findBy(['company' => $company]),
         ]);
     }
 
@@ -53,6 +58,8 @@ final class SalesDocumentItemController extends AbstractController
     #[Route('/{id}', name: 'app_sales_document_item_show', methods: ['GET'])]
     public function show(SalesDocumentItem $salesDocumentItem): Response
     {
+        $this->assertItemCompany($salesDocumentItem);
+
         return $this->render('sales_document_item/show.html.twig', [
             'sales_document_item' => $salesDocumentItem,
         ]);
@@ -61,6 +68,8 @@ final class SalesDocumentItemController extends AbstractController
     #[Route('/{id}/edit', name: 'app_sales_document_item_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, SalesDocumentItem $salesDocumentItem, EntityManagerInterface $entityManager): Response
     {
+        $this->assertItemCompany($salesDocumentItem);
+
         $form = $this->createForm(SalesDocumentItemForm::class, $salesDocumentItem);
         $form->handleRequest($request);
 
@@ -79,11 +88,21 @@ final class SalesDocumentItemController extends AbstractController
     #[Route('/{id}', name: 'app_sales_document_item_delete', methods: ['POST'])]
     public function delete(Request $request, SalesDocumentItem $salesDocumentItem, EntityManagerInterface $entityManager): Response
     {
+        $this->assertItemCompany($salesDocumentItem);
+
         if ($this->isCsrfTokenValid('delete'.$salesDocumentItem->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($salesDocumentItem);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_sales_document_item_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    private function assertItemCompany(SalesDocumentItem $salesDocumentItem): void
+    {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $salesDocumentItem->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
     }
 }

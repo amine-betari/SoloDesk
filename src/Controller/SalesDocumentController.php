@@ -228,12 +228,16 @@ final class SalesDocumentController extends AbstractController
     public function generateQuote(Request $request, EntityManagerInterface $em): Response
     {
         $salesDocument = new SalesDocument();
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
 
         $estimateId = $request->query->get('estimateId');
         $projectId = $request->query->get('projectId');
 
         if ($estimateId) {
-            $estimate = $em->getRepository(Estimate::class)->find($estimateId);
+            $estimate = $em->getRepository(Estimate::class)->findOneBy(['id' => $estimateId, 'company' => $company]);
             if ($estimate) {
                 $salesDocument->setEstimate($estimate);
                 $salesDocument->setType("estimate");
@@ -244,7 +248,7 @@ final class SalesDocumentController extends AbstractController
 
             }
         } elseif ($projectId) {
-            $project = $em->getRepository(Project::class)->find($projectId);
+            $project = $em->getRepository(Project::class)->findOneBy(['id' => $projectId, 'company' => $company]);
             if ($project) {
                 $salesDocument->setProject($project);
                 $salesDocument->setType("invoice");
@@ -256,10 +260,7 @@ final class SalesDocumentController extends AbstractController
             $salesDocument->setReference('INV-' . date('Y') . '-' . strtoupper(bin2hex(random_bytes(3))));
             // Display les deux champs dans le formulaire (TVA ou non and Taux TVA) car tu dépend plus de projets mais il s'agit d'une facture directe
             $this->applyVatFromRate($salesDocument, 0.0);
-            $company = $this->getUser()?->getCompany();
-            if ($company) {
-                $salesDocument->setCompany($company);
-            }
+            $salesDocument->setCompany($company);
         }
 
         $form = $this->createForm(SalesDocumentForm::class, $salesDocument);
@@ -284,6 +285,8 @@ final class SalesDocumentController extends AbstractController
     #[Route('/sales-document/{id}/word', name: 'app_sales_document_generate_word')]
     public function generateWord(SalesDocument $salesDocument): Response
     {
+        $this->assertSalesDocumentCompany($salesDocument);
+
         $templatePath = $this->getWordTemplatePath($salesDocument);
         if ($templatePath) {
             $template = new TemplateProcessor($templatePath);
@@ -386,6 +389,8 @@ final class SalesDocumentController extends AbstractController
     #[Route('/sales-document/{id}/excel', name: 'app_sales_document_generate_excel')]
     public function generateExcel(SalesDocument $salesDocument): Response
     {
+        $this->assertSalesDocumentCompany($salesDocument);
+
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setTitle("Devis");
@@ -427,6 +432,8 @@ final class SalesDocumentController extends AbstractController
     #[Route('/sales-document/{id}/pdf', name: 'app_sales_document_generate_pdf')]
     public function generatePdf(SalesDocument $salesDocument): Response
     {
+        $this->assertSalesDocumentCompany($salesDocument);
+
         // 1. Configure Dompdf
         $pdfOptions = new Options();
         $pdfOptions->set('defaultFont', 'Helvetica');
@@ -498,6 +505,7 @@ final class SalesDocumentController extends AbstractController
         SalesDocument $salesDocument,
         EntityManagerInterface $em
     ): Response {
+        $this->assertSalesDocumentCompany($salesDocument);
 
         // Vérifier que le document est bien un devis
         if (!$salesDocument->isEstimate()) {
@@ -656,5 +664,13 @@ final class SalesDocumentController extends AbstractController
         $name = preg_replace('/[^A-Za-z0-9._-]/', '-', $name) ?? $name;
         $name = trim($name, '-');
         return $name !== '' ? $name : 'document';
+    }
+
+    private function assertSalesDocumentCompany(SalesDocument $salesDocument): void
+    {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $salesDocument->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
     }
 }

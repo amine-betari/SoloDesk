@@ -8,10 +8,15 @@ use Symfony\UX\Autocomplete\Form\AsEntityAutocompleteField;
 use Symfony\UX\Autocomplete\Form\BaseEntityAutocompleteType;
 use App\Entity\SalesDocument;
 use Doctrine\ORM\EntityRepository;
+use Symfony\Bundle\SecurityBundle\Security;
 
 #[AsEntityAutocompleteField]
 class InvoiceAutocompleteField extends AbstractType
 {
+    public function __construct(private readonly Security $security)
+    {
+    }
+
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -24,9 +29,12 @@ class InvoiceAutocompleteField extends AbstractType
                 return sprintf('%s - %s', $document->getReference(), $clientName);
             },
             'query_builder' => function (EntityRepository $er) {
+                $company = $this->security->getUser()?->getCompany();
+
                 return $er->createQueryBuilder('s')
-                    ->where('s.type = :type1')
-                    ->orWhere('s.type = :type2')
+                    ->andWhere('s.company = :company')
+                    ->andWhere('s.type = :type1 OR s.type = :type2')
+                    ->setParameter('company', $company)
                     ->setParameter('type1', 'invoice')
                     ->setParameter('type2', 'project')
                     ->orderBy('s.reference', 'ASC');

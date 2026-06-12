@@ -18,6 +18,11 @@ final class SearchController extends AbstractController
     #[Route('', name: 'app_search', methods: ['GET'])]
     public function index(Request $request, EntityManagerInterface $em): Response
     {
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
+        }
+
         $term = trim((string) $request->query->get('q', ''));
 
         $clients = [];
@@ -30,37 +35,41 @@ final class SearchController extends AbstractController
 
             $clients = $em->createQuery(
                 'SELECT c FROM App\Entity\Client c
-                 WHERE c.name LIKE :q OR c.email LIKE :q
+                 WHERE c.company = :company AND (c.name LIKE :q OR c.email LIKE :q)
                  ORDER BY c.name ASC'
             )
                 ->setParameter('q', $like)
+                ->setParameter('company', $company)
                 ->setMaxResults(20)
                 ->getResult();
 
             $projects = $em->createQuery(
                 'SELECT p FROM App\Entity\Project p
-                 WHERE p.name LIKE :q OR p.projectNumber LIKE :q
+                 WHERE p.company = :company AND (p.name LIKE :q OR p.projectNumber LIKE :q)
                  ORDER BY p.name ASC'
             )
                 ->setParameter('q', $like)
+                ->setParameter('company', $company)
                 ->setMaxResults(20)
                 ->getResult();
 
             $estimates = $em->createQuery(
                 'SELECT e FROM App\Entity\Estimate e
-                 WHERE e.name LIKE :q OR e.estimateNumber LIKE :q
+                 WHERE e.company = :company AND (e.name LIKE :q OR e.estimateNumber LIKE :q)
                  ORDER BY e.startDate DESC'
             )
                 ->setParameter('q', $like)
+                ->setParameter('company', $company)
                 ->setMaxResults(20)
                 ->getResult();
 
             $salesDocuments = $em->createQuery(
                 'SELECT s FROM App\Entity\SalesDocument s
-                 WHERE s.reference LIKE :q
+                 WHERE s.company = :company AND s.reference LIKE :q
                  ORDER BY s.invoiceDate DESC'
             )
                 ->setParameter('q', $like)
+                ->setParameter('company', $company)
                 ->setMaxResults(20)
                 ->getResult();
         }

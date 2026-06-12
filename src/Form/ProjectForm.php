@@ -137,9 +137,11 @@ class ProjectForm extends AbstractType
                 'query_builder' => function (EntityRepository $er) use ($project) {
                     return $er->createQueryBuilder('s')
                         ->where('s.type = :type1 OR s.type = :type2')
+                        ->andWhere('s.company = :company')
                         ->andWhere('s.project IS NULL OR s.project = :project')
                         ->setParameter('type1', 'invoice')
                         ->setParameter('type2', 'project')
+                        ->setParameter('company', $project->getCompany())
                         ->setParameter('project', $project)
                         ->orderBy('s.reference', 'ASC');
                 },

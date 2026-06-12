@@ -21,7 +21,15 @@ class DocumentTemplateController extends AbstractController
     #[Route('/', name: 'app_templates_index')]
     public function index(EM $em): Response
     {
-        $templates = $em->getRepository(DocumentTemplate::class)->findBy([], ['createdAt' => 'DESC']);
+        $company = $this->getUser()?->getCompany();
+        if (!$company) {
+            throw $this->createAccessDeniedException('Aucune entreprise liée.');
+        }
+
+        $templates = $em->getRepository(DocumentTemplate::class)->findBy(
+            ['company' => $company],
+            ['createdAt' => 'DESC']
+        );
 
         return $this->render('templates/index.html.twig', [
             'templates' => $templates,
@@ -287,8 +295,8 @@ class DocumentTemplateController extends AbstractController
     public function setDefault(DocumentTemplate $template, EM $em): Response
     {
         $company = $this->getUser()?->getCompany();
-        if (!$company) {
-            throw $this->createAccessDeniedException('Aucune entreprise liée.');
+        if (!$company || $template->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
         }
 
         $em->createQuery('UPDATE App\Entity\DocumentTemplate t SET t.isDefault = false WHERE t.type = :type AND t.format = :format AND t.company = :company')
