@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\PaymentRepository;
@@ -46,10 +48,31 @@ class Payment
     #[Assert\Callback]
     public function validateContext(ExecutionContextInterface $context): void
     {
-       // Si aucun projet n'est choisi, alors la facture est obligatoire
         if (!$this->salesDocument) {
             $context->buildViolation('Veuillez sélectionner une facture')
-                ->atPath('salesDocument') // ça pointe sur le champ facture
+                ->atPath('salesDocument')
+                ->addViolation();
+
+            return;
+        }
+
+        $amount = (float) $this->amount;
+        if ($amount <= 0) {
+            $context->buildViolation('Le montant du paiement doit être supérieur à zéro.')
+                ->atPath('amount')
+                ->addViolation();
+
+            return;
+        }
+
+        $totalPaid = $this->salesDocument->getTotalPaid();
+        if (!$this->salesDocument->getPayments()->contains($this)) {
+            $totalPaid += $amount;
+        }
+
+        if (round($totalPaid, 2) > round($this->salesDocument->getTotalTTC(), 2)) {
+            $context->buildViolation('Le paiement dépasse le solde restant de la facture.')
+                ->atPath('amount')
                 ->addViolation();
         }
     }

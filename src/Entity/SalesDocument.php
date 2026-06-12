@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\SalesDocumentRepository;
@@ -84,6 +86,7 @@ class SalesDocument
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->invoiceDate = new \DateTimeImmutable();
+        $this->payments = new ArrayCollection();
         $this->salesDocumentItems = new ArrayCollection();
        // $this->reference = $this->projectNumber ?? $this->generateProjectNumber();
 
@@ -360,6 +363,10 @@ class SalesDocument
 
     public function updateStatusBasedOnPayments(): void
     {
+        if ($this->status === InvoiceStatus::CANCELLED) {
+            return;
+        }
+
         $totalPaid = 0;
 
         foreach ($this->payments as $payment) {

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Constants\InvoiceStatus;
@@ -36,9 +38,12 @@ class PaymentRepository extends ServiceEntityRepository
             ->leftJoin('pay.salesDocument', 'sd')
             ->addSelect('sd')
             ->where('sd IS NOT NULL')
-            ->andWhere('sd.status = :paidStatus')
+            ->andWhere('sd.status IN (:reportStatuses)')
             ->andWhere('sd.company = :company')
-            ->setParameter('paidStatus', 'paid')
+            ->setParameter('reportStatuses', [
+                InvoiceStatus::PAID,
+                InvoiceStatus::PARTIALLY_PAID,
+            ])
             ->setParameter('company', $company)
             ->orderBy('pay.date', 'ASC');
 
