@@ -61,6 +61,7 @@
             </div>
         </div>
 
+        <div class="{{ compact_layout|default(false) ? 'grid grid-cols-1 gap-6 lg:grid-cols-2' : 'space-y-6' }}">
         {% if form.estimateNumber is defined %}
             <div class="space-y-2">
                 {{ form_label(form.estimateNumber, 'estimate.reference'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
@@ -73,6 +74,7 @@
             {{ form_label(form.name, 'estimate.name'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
             {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
             {{ form_errors(form.name) }}
+        </div>
         </div>
 
         <div class="space-y-2">
@@ -115,27 +117,29 @@
             </div>
         </div>
 
-        <div class="space-y-2">
-            {{ form_label(form.amount, 'estimate.amount_ht'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-            {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
-            {{ form_errors(form.amount) }}
-        </div>
-
-        <div data-controller="toggle-vat">
-            <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
-                {{ form_widget(form.noVat, {
-                    'attr': {
-                        'data-toggle-vat-target': 'checkbox',
-                        'data-action': 'toggle-vat#toggle'
-                    }
-                }) }}
-                {{ form_label(form.noVat, 'estimate.no_vat'|trans, {'label_attr': {'class': 'text-sm text-gray-900'}}) }}
+        <div class="{{ compact_layout|default(false) ? 'grid grid-cols-1 items-start gap-6 lg:grid-cols-2' : 'space-y-6' }}">
+            <div class="space-y-2">
+                {{ form_label(form.amount, 'estimate.amount_ht'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                {{ form_errors(form.amount) }}
             </div>
 
-            <div data-toggle-vat-target="vat" class="mb-4">
-                {{ form_label(form.vatRate, 'estimate.vat_rate'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900', 'step': '0.01'}}) }}
-                {{ form_errors(form.vatRate) }}
+            <div data-controller="toggle-vat">
+                <div class="flex flex-col sm:flex-row sm:items-center gap-2 mb-4">
+                    {{ form_widget(form.noVat, {
+                        'attr': {
+                            'data-toggle-vat-target': 'checkbox',
+                            'data-action': 'toggle-vat#toggle'
+                        }
+                    }) }}
+                    {{ form_label(form.noVat, 'estimate.no_vat'|trans, {'label_attr': {'class': 'text-sm text-gray-900'}}) }}
+                </div>
+
+                <div data-toggle-vat-target="vat">
+                    {{ form_label(form.vatRate, 'estimate.vat_rate'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
+                    {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900', 'step': '0.01'}}) }}
+                    {{ form_errors(form.vatRate) }}
+                </div>
             </div>
         </div>
 

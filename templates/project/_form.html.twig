@@ -26,19 +26,21 @@
     <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6 border border-gray-200">
         <legend class="text-2xl font-semibold text-gray-700">{{ 'common.general_info'|trans }}</legend>
 
-        <div class="space-y-2">
-            {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-            {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
-            {{ form_errors(form.name) }}
-        </div>
+        <div class="{{ compact_layout|default(false) ? 'grid grid-cols-1 gap-6 lg:grid-cols-2' : 'space-y-6' }}">
+            <div class="space-y-2">
+                {{ form_label(form.name, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_widget(form.name, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                {{ form_errors(form.name) }}
+            </div>
 
-        {% if form.projectNumber is defined %}
+            {% if form.projectNumber is defined %}
             <div class="space-y-2">
                 {{ form_label(form.projectNumber, 'project.reference'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.projectNumber, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.projectNumber) }}
             </div>
-        {% endif %}
+            {% endif %}
+        </div>
 
         <div data-controller="client-modal" data-client-modal-endpoint-value="{{ path('client_create_from_modal') }}" class="space-y-2">
             {{ form_label(form.client, 'project.client'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
