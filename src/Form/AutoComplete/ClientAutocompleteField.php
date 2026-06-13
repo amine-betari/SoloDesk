@@ -31,6 +31,9 @@ class ClientAutocompleteField extends AbstractType
                     ->setParameter('company', $company)
                     ->orderBy('client.name', 'ASC');
             },
+            'choice_attr' => static fn (Client $client): array => [
+                'data-currency' => $client->getCurrency(),
+            ],
         ]);
     }
 

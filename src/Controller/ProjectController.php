@@ -176,10 +176,16 @@ final class ProjectController extends AbstractController
             if ($sourceEstimate) {
                 $this->addFlash('success', 'Projet créé et lié à la pré-estimation.');
 
-                return $this->redirectToRoute('app_project_show', ['id' => $project->getId()], Response::HTTP_SEE_OTHER);
+                return $this->redirectToRoute('app_project_show', [
+                    'id' => $project->getId(),
+                    'created' => 1,
+                ], Response::HTTP_SEE_OTHER);
             }
 
-            return $this->redirectToRoute('app_project_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_project_show', [
+                'id' => $project->getId(),
+                'created' => 1,
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('project/new.html.twig', [

@@ -3,5 +3,5 @@
 {% block title %}{{ 'prestation.new_title'|trans }}{% endblock %}
 
 {% block body %}
-    {{ include('prestation/_form.html.twig') }}
+    {{ include('prestation/_form.html.twig', {'new_mode': true}) }}
 {% endblock %}

@@ -44,6 +44,17 @@ actions:
   cancel: "إلغاء"
   create: "إنشاء"
 
+form:
+  required_help: "الحقول المميزة بعلامة النجمة مطلوبة."
+  error_summary: "يحتوي النموذج على أخطاء. تحقق من الحقول المحددة."
+  financial_summary: "الملخص المالي"
+  total_ht: "المجموع دون ضريبة"
+  vat_amount: "قيمة الضريبة"
+  total_ttc: "المجموع مع الضريبة"
+  currency: "العملة"
+  automatic_reference_help: "يتم إنشاء هذا المرجع تلقائيًا ولا يمكن تعديله أثناء الإنشاء."
+  created_success: "تم الإنشاء بنجاح. يمكنك الآن المتابعة باستخدام أحد الإجراءات التالية."
+
 common:
   total: "الإجمالي"
   all: "الكل"
@@ -173,6 +184,7 @@ project:
   linked_estimate: "عرض مرتبط"
   description_empty: "لا يوجد وصف."
   generate_document: "إنشاء مستند تجاري"
+  create_invoice: "إنشاء فاتورة"
   select_invoices: "اختر الفواتير"
   linked_invoices_existing: "فواتير مرتبطة بالفعل"
   new_title: "مشروع جديد"

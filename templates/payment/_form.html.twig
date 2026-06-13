@@ -13,7 +13,11 @@
         </div>
     {% endif %}
 
-    {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
+    {{ form_start(form, {'attr': {'class': 'space-y-8', 'id': form.vars.id, 'data-controller': new_mode|default(false) ? 'new-form' : ''}}) }}
+
+    {% if new_mode|default(false) %}
+        {% include 'components/_new_form_intro.html.twig' %}
+    {% endif %}
 
     <!-- Informations du paiement -->
     <fieldset class="bg-white p-6 rounded-lg space-y-6 shadow-inner border border-gray-200">
@@ -61,13 +65,15 @@
     </fieldset>
 
     <!-- Bouton -->
-    <div class="flex justify-end mt-6">
+    <div class="{{ new_mode|default(false) ? 'hidden' : 'flex justify-end mt-6' }}">
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors btn-mobile">{{ 'actions.save'|trans }}</button>
     </div>
 
     {{ form_end(form) }}
 
-    {% if button_label is defined  %}
+    {% if new_mode|default(false) %}
+        {% include 'components/_new_form_actions.html.twig' with {cancel_route: 'app_payment_index', form_id: form.vars.id} %}
+    {% elseif button_label is defined  %}
         <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <a href="{{ path('app_payment_index') }}"
                class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>

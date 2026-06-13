@@ -44,6 +44,17 @@ actions:
   cancel: "Annuler"
   create: "Créer"
 
+form:
+  required_help: "Les champs marqués d’un astérisque sont obligatoires."
+  error_summary: "Le formulaire contient des erreurs. Vérifiez les champs signalés."
+  financial_summary: "Résumé financier"
+  total_ht: "Total HT"
+  vat_amount: "Montant TVA"
+  total_ttc: "Total TTC"
+  currency: "Devise"
+  automatic_reference_help: "Cette référence est générée automatiquement et ne peut pas être modifiée pendant la création."
+  created_success: "Création réussie. Vous pouvez maintenant poursuivre avec l’une des actions suivantes."
+
 common:
   total: "Total"
   all: "Tous"
@@ -175,6 +186,7 @@ project:
   linked_estimate: "Devis lié"
   description_empty: "Aucune description disponible."
   generate_document: "Générer un document commercial"
+  create_invoice: "Créer une facture"
   select_invoices: "Sélectionner des factures"
   linked_invoices_existing: "Factures déjà liées"
   new_title: "Nouveau projet"

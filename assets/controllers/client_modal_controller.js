@@ -83,12 +83,14 @@ export default class extends Controller {
         const value = String(data.id);
 
         if (select.tomselect) {
-            select.tomselect.addOption({ value, text: data.name });
+            select.tomselect.addOption({ value, text: data.name, currency: data.currency });
             select.tomselect.addItem(value, true);
+            select.dispatchEvent(new Event("change", { bubbles: true }));
             return;
         }
 
         const option = new Option(data.name, value, true, true);
+        option.dataset.currency = data.currency;
         select.add(option);
         select.dispatchEvent(new Event("change", { bubbles: true }));
     }

@@ -5,6 +5,24 @@
 {% block body %}
     <div class="w-full px-6 py-8">
         <div class="space-y-6">
+            {% include 'components/_creation_success.html.twig' with {
+                creation_actions: [
+                    {
+                        label: 'actions.edit',
+                        url: path('app_estimate_edit', {id: estimate.id})
+                    },
+                    {
+                        label: 'estimate.convert_to_project',
+                        url: path('app_estimate_convert_to_project', {id: estimate.id}),
+                        primary: true
+                    },
+                    {
+                        label: 'estimate.generate_sales_document',
+                        url: path('app_sales_document_new', {estimateId: estimate.id})
+                    }
+                ]
+            } %}
+
             {# Header avec titre et actions #}
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>

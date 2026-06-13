@@ -44,6 +44,17 @@ actions:
   cancel: "Cancel"
   create: "Create"
 
+form:
+  required_help: "Fields marked with an asterisk are required."
+  error_summary: "The form contains errors. Check the highlighted fields."
+  financial_summary: "Financial summary"
+  total_ht: "Subtotal"
+  vat_amount: "VAT amount"
+  total_ttc: "Total including VAT"
+  currency: "Currency"
+  automatic_reference_help: "This reference is generated automatically and cannot be changed during creation."
+  created_success: "Created successfully. You can now continue with one of the following actions."
+
 common:
   total: "Total"
   all: "All"
@@ -175,6 +186,7 @@ project:
   linked_estimate: "Linked estimate"
   description_empty: "No description available."
   generate_document: "Generate a commercial document"
+  create_invoice: "Create an invoice"
   select_invoices: "Select invoices"
   linked_invoices_existing: "Already linked invoices"
   new_title: "New project"

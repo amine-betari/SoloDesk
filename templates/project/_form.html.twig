@@ -1,5 +1,5 @@
-<div class="w-full px-6 py-8">
-    <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-8">
+<div class="w-full px-3 py-4 sm:px-6 sm:py-8">
+    <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-4 sm:p-8">
 
 {% if button_label is defined %}
         <h1 class="text-4xl font-extrabold mb-8">{{ 'project.edit_title'|trans }}</h1>
@@ -20,7 +20,16 @@
         </div>
     {% endif %}
 
-    {{ form_start(form, {'attr': {'class': 'space-y-8'}}) }}
+    {{ form_start(form, {'attr': {
+        'class': 'space-y-8',
+        'id': form.vars.id,
+        'data-controller': 'new-form',
+        'data-new-form-currency-value': project.client ? project.client.currency : ''
+    }}) }}
+
+    {% if new_mode|default(false) %}
+        {% include 'components/_new_form_intro.html.twig' %}
+    {% endif %}
 
     <!-- Informations générales -->
     <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6 border border-gray-200">
@@ -38,6 +47,9 @@
                 {{ form_label(form.projectNumber, 'project.reference'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.projectNumber, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.projectNumber) }}
+                {% if new_mode|default(false) %}
+                    {% include 'components/_automatic_reference_help.html.twig' %}
+                {% endif %}
             </div>
             {% endif %}
         </div>
@@ -99,7 +111,7 @@
             {{ form_errors(form.description) }}
         </div>
 
-        <div class="grid grid-cols-2 gap-4" data-controller="project-type" data-project-type-other-value-value="other">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2" data-controller="project-type" data-project-type-other-value-value="other">
             <div>
                 {{ form_label(form.status, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.status, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
@@ -124,7 +136,7 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
                 {{ form_label(form.startDate, 'project.start_date'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {{ form_widget(form.startDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
@@ -157,7 +169,10 @@
 
         <div>
             {{ form_label(form.amount, 'project.amount_ht'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-            {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+            {{ form_widget(form.amount, {'attr': {
+                'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900',
+                'data-financial-role': 'amount'
+            }}) }}
             {{ form_errors(form.amount) }}
         </div>
 
@@ -165,6 +180,7 @@
             {{ form_widget(form.noVat, {
                 'attr': {
                     'data-toggle-vat-target': 'checkbox',
+                    'data-financial-role': 'no-vat',
                     'data-action': 'toggle-vat#toggle'
                 }
             }) }}
@@ -173,7 +189,11 @@
 
         <div data-toggle-vat-target="vat" class="mt-2">
             {{ form_label(form.vatRate, 'project.vat_rate'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
-            {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900', 'step': '0.01'}}) }}
+            {{ form_widget(form.vatRate, {'attr': {
+                'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900',
+                'step': '0.01',
+                'data-financial-role': 'vat-rate'
+            }}) }}
             {{ form_errors(form.vatRate) }}
         </div>
     </fieldset>
@@ -278,14 +298,21 @@
         </fieldset>
     {% endif %}
 
+    {% include 'components/_financial_summary.html.twig' %}
+
     <!-- Bouton -->
-    <div class="flex justify-end mt-6">
+    <div class="{{ new_mode|default(false) ? 'hidden' : 'flex justify-end mt-6' }}">
         <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors btn-mobile">{{ 'actions.save'|trans }}</button>
     </div>
 
     {{ form_end(form) }}
 
-    {% if button_label is defined %}
+    {% if new_mode|default(false) %}
+        {% include 'components/_new_form_actions.html.twig' with {
+            cancel_route: 'app_project_index',
+            form_id: form.vars.id
+        } %}
+    {% elseif button_label is defined %}
         <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <a href="{{ path('app_project_index') }}"
                class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>

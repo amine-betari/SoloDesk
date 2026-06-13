@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Form\AutoComplete;
 
+use App\Entity\Client;
 use App\Entity\Company;
 use App\Entity\User;
 use App\Form\AutoComplete\ClientAutocompleteField;
@@ -46,6 +47,17 @@ final class CompanyScopedAutocompleteTest extends TestCase
 
         $options = $this->resolveOptions($field);
         $options['query_builder']($repository);
+    }
+
+    public function testClientAutocompleteExposesClientCurrency(): void
+    {
+        $field = new ClientAutocompleteField($this->createSecurityWithoutExpectation());
+        $client = (new Client())->setName('Client');
+        $client->setCurrency('MAD');
+
+        $options = $this->resolveOptions($field);
+
+        self::assertSame(['data-currency' => 'MAD'], $options['choice_attr']($client));
     }
 
     public function testInvoiceAutocompleteFiltersByCurrentCompany(): void
@@ -105,6 +117,11 @@ final class CompanyScopedAutocompleteTest extends TestCase
             ->willReturn($user);
 
         return $security;
+    }
+
+    private function createSecurityWithoutExpectation(): Security
+    {
+        return $this->createMock(Security::class);
     }
 
     /**

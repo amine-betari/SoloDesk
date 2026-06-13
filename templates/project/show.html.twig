@@ -5,6 +5,24 @@
 {% block body %}
     <div class="w-full px-6 py-8">
         <div class="space-y-6">
+            {% include 'components/_creation_success.html.twig' with {
+                creation_actions: [
+                    {
+                        label: 'actions.edit',
+                        url: path('app_project_edit', {id: project.id})
+                    },
+                    {
+                        label: 'project.create_invoice',
+                        url: path('app_sales_document_new', {projectId: project.id}),
+                        primary: true
+                    },
+                    {
+                        label: 'actions.back_to_list',
+                        url: path('app_project_index')
+                    }
+                ]
+            } %}
+
             {# Header #}
             <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div>

@@ -122,7 +122,10 @@ final class SalesDocumentController extends AbstractController
             $entityManager->persist($salesDocument);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_sales_document_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_sales_document_show', [
+                'id' => $salesDocument->getId(),
+                'created' => 1,
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('sales_document/new.html.twig', [
@@ -272,6 +275,7 @@ final class SalesDocumentController extends AbstractController
 
             return $this->redirectToRoute('app_sales_document_show', [
                 'id' => $salesDocument->getId(),
+                'created' => 1,
             ]);
         }
 
@@ -490,7 +494,10 @@ final class SalesDocumentController extends AbstractController
             $em->persist($invoice);
             $em->flush();
 
-            return $this->redirectToRoute('app_sales_document_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_sales_document_show', [
+                'id' => $invoice->getId(),
+                'created' => 1,
+            ], Response::HTTP_SEE_OTHER);
 
         }
 

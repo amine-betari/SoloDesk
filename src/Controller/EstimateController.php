@@ -133,7 +133,10 @@ final class EstimateController extends AbstractController
             $entityManager->persist($estimate);
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_estimate_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_estimate_show', [
+                'id' => $estimate->getId(),
+                'created' => 1,
+            ], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('estimate/new.html.twig', [

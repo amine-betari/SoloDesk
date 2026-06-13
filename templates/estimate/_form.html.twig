@@ -1,5 +1,5 @@
-<div class="w-full px-6 py-8">
-    <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-8">
+<div class="w-full px-3 py-4 sm:px-6 sm:py-8">
+    <div class="bg-white text-gray-900 rounded-2xl shadow-xl p-4 sm:p-8">
 
     {% if button_label is defined %}
         <h1 class="text-4xl font-extrabold mb-8">{{ 'estimate.edit_title'|trans }}</h1>
@@ -13,7 +13,17 @@
         </div>
     {% endif %}
 
-    {{ form_start(form, {'attr': {'class': 'space-y-6', 'enctype': 'multipart/form-data'}}) }}
+    {{ form_start(form, {'attr': {
+        'class': 'space-y-6',
+        'id': form.vars.id,
+        'enctype': 'multipart/form-data',
+        'data-controller': 'new-form',
+        'data-new-form-currency-value': estimate.client ? estimate.client.currency : ''
+    }}) }}
+
+    {% if new_mode|default(false) %}
+        {% include 'components/_new_form_intro.html.twig' %}
+    {% endif %}
 
     <fieldset class="bg-gray-50 p-6 rounded-lg space-y-6">
         <legend class="text-lg font-semibold text-gray-900">{{ 'common.general_info'|trans }}</legend>
@@ -67,6 +77,9 @@
                 {{ form_label(form.estimateNumber, 'estimate.reference'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                 {{ form_widget(form.estimateNumber, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
                 {{ form_errors(form.estimateNumber) }}
+                {% if new_mode|default(false) %}
+                    {% include 'components/_automatic_reference_help.html.twig' %}
+                {% endif %}
             </div>
         {% endif %}
 
@@ -91,7 +104,7 @@
             {{ form_errors(form.description) }}
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
                 {{ form_label(form.startDate, 'estimate.start_date'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
                 {{ form_widget(form.startDate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
@@ -120,7 +133,10 @@
         <div class="{{ compact_layout|default(false) ? 'grid grid-cols-1 items-start gap-6 lg:grid-cols-2' : 'space-y-6' }}">
             <div class="space-y-2">
                 {{ form_label(form.amount, 'estimate.amount_ht'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                {{ form_widget(form.amount, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900'}}) }}
+                {{ form_widget(form.amount, {'attr': {
+                    'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900',
+                    'data-financial-role': 'amount'
+                }}) }}
                 {{ form_errors(form.amount) }}
             </div>
 
@@ -129,6 +145,7 @@
                     {{ form_widget(form.noVat, {
                         'attr': {
                             'data-toggle-vat-target': 'checkbox',
+                            'data-financial-role': 'no-vat',
                             'data-action': 'toggle-vat#toggle'
                         }
                     }) }}
@@ -137,7 +154,11 @@
 
                 <div data-toggle-vat-target="vat">
                     {{ form_label(form.vatRate, 'estimate.vat_rate'|trans, {'label_attr': {'class': 'block text-sm font-medium text-gray-900'}}) }}
-                    {{ form_widget(form.vatRate, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900', 'step': '0.01'}}) }}
+                    {{ form_widget(form.vatRate, {'attr': {
+                        'class': 'mt-1 w-full rounded-md border-gray-300 bg-white text-gray-900',
+                        'step': '0.01',
+                        'data-financial-role': 'vat-rate'
+                    }}) }}
                     {{ form_errors(form.vatRate) }}
                 </div>
             </div>
@@ -153,14 +174,21 @@
         {% include 'partials/_documents_form.html.twig' with { form: form, relatedEntity: estimate } %}
         {# Documents liés #}
 
-        <div class="flex justify-end items-center">
+        {% include 'components/_financial_summary.html.twig' %}
+
+        <div class="{{ new_mode|default(false) ? 'hidden' : 'flex justify-end items-center' }}">
             <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded btn-mobile">{{ 'actions.save'|trans }}</button>
         </div>
     </fieldset>
 
     {{ form_end(form) }}
 
-    {% if button_label is defined %}
+    {% if new_mode|default(false) %}
+        {% include 'components/_new_form_actions.html.twig' with {
+            cancel_route: 'app_estimate_index',
+            form_id: form.vars.id
+        } %}
+    {% elseif button_label is defined %}
         <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <a href="{{ path('app_estimate_index') }}"
                class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>

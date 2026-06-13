@@ -22,6 +22,7 @@
     </button>
 
     {{ form_errors(form.documents) }}
+    {% do form.documents.setRendered %}
 </div>
 
 {% if relatedEntity.documents|length > 0 %}

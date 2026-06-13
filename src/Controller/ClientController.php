@@ -221,6 +221,7 @@ final class ClientController extends AbstractController
         return $this->json([
             'id' => $client->getId(),
             'name' => $client->getName(),
+            'currency' => $client->getCurrency(),
         ]);
     }
 

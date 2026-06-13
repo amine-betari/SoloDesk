@@ -12,7 +12,11 @@
             </div>
         {% endif %}
 
-        {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+        {{ form_start(form, {'attr': {'class': 'space-y-6', 'id': form.vars.id, 'data-controller': new_mode|default(false) ? 'new-form' : ''}}) }}
+
+        {% if new_mode|default(false) %}
+            {% include 'components/_new_form_intro.html.twig' %}
+        {% endif %}
 
         <fieldset class="space-y-4 p-6 bg-white rounded-lg shadow-inner border border-gray-200">
             <legend class="text-xl font-semibold mb-4 text-gray-900">{{ 'common.information'|trans }}</legend>
@@ -70,7 +74,7 @@
             </div>
         </fieldset>
 
-        <div class="flex justify-end mt-6">
+        <div class="{{ new_mode|default(false) ? 'hidden' : 'flex justify-end mt-6' }}">
             <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md btn-mobile">
                 {{ 'actions.save'|trans }}
             </button>
@@ -78,7 +82,9 @@
 
         {{ form_end(form) }}
 
-        {% if button_label is defined %}
+        {% if new_mode|default(false) %}
+            {% include 'components/_new_form_actions.html.twig' with {cancel_route: 'app_prestation_index', form_id: form.vars.id} %}
+        {% elseif button_label is defined %}
             <div class="flex flex-col sm:flex-row gap-3 mt-4">
                 <a href="{{ path('app_prestation_index') }}"
                    class="px-4 py-2 bg-[#223044] hover:bg-[#2E415B] rounded text-white btn-mobile">← {{ 'actions.back_to_list'|trans }}</a>
