@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php" colors="true">
+<phpunit bootstrap="tests/bootstrap.php" colors="true">
+    <php>
+        <server name="APP_ENV" value="test" force="true" />
+        <server name="APP_SECRET" value="test-secret-not-for-production" force="true" />
+        <server name="KERNEL_CLASS" value="App\Kernel" />
+        <server name="SHELL_VERBOSITY" value="-1" />
+    </php>
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
         </testsuite>
     </testsuites>
-    <extensions>
-        <bootstrap class="Symfony\Bridge\PhpUnit\SymfonyExtension">
-            <parameter name="clock-mock-namespaces" value="App" />
-            <parameter name="dns-mock-namespaces" value="App" />
-        </bootstrap>
-    </extensions>
 </phpunit>
