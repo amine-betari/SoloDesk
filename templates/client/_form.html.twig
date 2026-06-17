@@ -37,7 +37,7 @@
             </div>
 
             <div>
-                {{ form_label(form.address, null, {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
+                {{ form_label(form.address, 'client.address'|trans ~ ' *', {'label_attr': {'class': 'block text-sm font-medium text-gray-700'}}) }}
                 {# {{ form_widget(form.address, {'attr': {'class': 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-400'}}) }} #}
                 <div
                     data-controller="ckeditor"

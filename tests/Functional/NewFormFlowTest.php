@@ -12,6 +12,7 @@ use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 final class NewFormFlowTest extends WebTestCase
 {
@@ -89,6 +90,74 @@ final class NewFormFlowTest extends WebTestCase
         self::assertInstanceOf(Project::class, $project);
         self::assertSame('MAD', $project->getCurrency());
         self::assertResponseRedirects('/project/'.$project->getId().'?created=1');
+    }
+
+    public function testClientNewPageDoesNotExposeNativeRequiredOnCkeditorAddress(): void
+    {
+        $browser = $this->createAuthenticatedBrowser();
+
+        $crawler = $browser->request('GET', '/client/new');
+
+        self::assertResponseIsSuccessful();
+        self::assertCount(1, $crawler->filter('textarea[name="client_form[address]"]'));
+        self::assertNull($crawler->filter('textarea[name="client_form[address]"]')->attr('required'));
+    }
+
+    public function testClientAddressIsStillRequiredServerSide(): void
+    {
+        $browser = $this->createAuthenticatedBrowser();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $crawler = $browser->request('GET', '/client/new');
+        $csrfToken = $crawler->filter('form#client_form input[name="client_form[_token]"]')->attr('value');
+        $name = 'Functional Client Without Address '.bin2hex(random_bytes(4));
+
+        self::assertNotNull($csrfToken);
+        $browser->request('POST', '/client/new', [
+            'client_form' => [
+                'name' => $name,
+                'email' => 'client-'.bin2hex(random_bytes(6)).'@example.com',
+                'phone' => '',
+                'address' => '',
+                'country' => 'DE',
+                'currency' => 'EUR',
+                'firstContactAt' => '2026-06-17',
+                'notes' => '',
+                '_token' => $csrfToken,
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        self::assertNull($entityManager->getRepository(Client::class)->findOneBy(['name' => $name]));
+    }
+
+    public function testClientCanBeCreatedAndRedirectsToTheList(): void
+    {
+        $browser = $this->createAuthenticatedBrowser();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $crawler = $browser->request('GET', '/client/new');
+        $csrfToken = $crawler->filter('form#client_form input[name="client_form[_token]"]')->attr('value');
+        $name = 'Functional Client '.bin2hex(random_bytes(4));
+
+        self::assertNotNull($csrfToken);
+        $browser->request('POST', '/client/new', [
+            'client_form' => [
+                'name' => $name,
+                'email' => 'client-'.bin2hex(random_bytes(6)).'@example.com',
+                'phone' => '',
+                'address' => '<p>Zollstockgurtel 35 50969 Cologne</p>',
+                'country' => 'DE',
+                'currency' => 'EUR',
+                'firstContactAt' => '2026-06-17',
+                'notes' => '',
+                '_token' => $csrfToken,
+            ],
+        ]);
+
+        self::assertResponseRedirects('/client');
+        $client = $entityManager->getRepository(Client::class)->findOneBy(['name' => $name]);
+        self::assertInstanceOf(Client::class, $client);
+        self::assertSame('EUR', $client->getCurrency());
+        self::assertSame('<p>Zollstockgurtel 35 50969 Cologne</p>', $client->getAddress());
     }
 
     /**
