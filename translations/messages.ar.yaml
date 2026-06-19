@@ -474,6 +474,7 @@ home:
   view_quarterly: "عرض الإيراد الفصلي →"
   billing_collection_title: "المفوتر مقابل المحصل — آخر 12 شهرًا"
   billing_collection_note: "تُجمع الفواتير حسب تاريخ الإصدار والمدفوعات حسب تاريخ التحصيل الفعلي."
+  billing_collection_view_by_client: "عرض التفاصيل حسب العميل ←"
   billing_collection_billed: "المفوتر %currency%"
   billing_collection_collected: "المحصل %currency%"
   billing_collection_empty: "لا توجد فواتير أو مدفوعات خلال هذه الفترة."

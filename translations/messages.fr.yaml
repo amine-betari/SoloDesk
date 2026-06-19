@@ -476,6 +476,7 @@ home:
   view_quarterly: "Voir le CA par trimestre →"
   billing_collection_title: "Facturé contre encaissé — 12 derniers mois"
   billing_collection_note: "Les factures sont regroupées par date d’émission et les paiements par date réelle d’encaissement."
+  billing_collection_view_by_client: "Voir le détail par client →"
   billing_collection_billed: "Facturé %currency%"
   billing_collection_collected: "Encaissé %currency%"
   billing_collection_empty: "Aucune facture ou aucun paiement sur cette période."

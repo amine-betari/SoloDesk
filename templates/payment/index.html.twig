@@ -56,6 +56,7 @@
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'payment.table_payment'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden md:table-cell">{{ 'payment.table_method'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'payment.table_amount'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden xl:table-cell">{{ 'payment.client'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'payment.table_label'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500 hidden lg:table-cell">{{ 'payment.table_reference'|trans }}</th>
                             <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
@@ -79,6 +80,16 @@
                                 </td>
                                 {% set paymentCurrency = payment.salesDocument ? payment.salesDocument.getResolvedCurrency() : 'EUR' %}
                                 <td class="px-6 py-4 text-sm text-gray-700">{{ payment.amount|format_currency(paymentCurrency) }}</td>
+                                {% set paymentClient = payment.salesDocument ? payment.salesDocument.getResolvedClient() : null %}
+                                <td class="px-6 py-4 text-sm text-gray-700 hidden xl:table-cell">
+                                    {% if paymentClient %}
+                                        <a href="{{ path('app_client_show', {'id': paymentClient.id}) }}" class="text-blue-600 hover:text-blue-700">
+                                            {{ paymentClient.name }}
+                                        </a>
+                                    {% else %}
+                                        {{ 'common.dash'|trans }}
+                                    {% endif %}
+                                </td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">{{ payment.label ?: 'common.dash'|trans }}</td>
                                 <td class="px-6 py-4 text-sm text-gray-600 hidden lg:table-cell">
                                     {% if payment.salesDocument %}
@@ -103,7 +114,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="6" class="px-6 py-10 text-center text-gray-400">{{ 'payment.none'|trans }}</td>
+                                <td colspan="7" class="px-6 py-10 text-center text-gray-400">{{ 'payment.none'|trans }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

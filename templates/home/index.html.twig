@@ -99,10 +99,20 @@
     </div>
 
     <div class="bg-gray-50 p-6 rounded-lg shadow mb-10">
-        <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide">
-            {{ 'home.billing_collection_title'|trans }}
-        </h3>
-        <p class="text-sm text-gray-500 mt-1 mb-4">{{ 'home.billing_collection_note'|trans }}</p>
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <h3 class="text-sm font-semibold text-gray-600 uppercase tracking-wide">
+                    {{ 'home.billing_collection_title'|trans }}
+                </h3>
+                <p class="text-sm text-gray-500 mt-1 mb-4">{{ 'home.billing_collection_note'|trans }}</p>
+            </div>
+            {% if hasBillingCollectionData %}
+                <a href="{{ path('stats_ca_trimestre') }}"
+                   class="text-blue-600 hover:underline text-sm font-medium btn-mobile inline-block sm:text-right">
+                    {{ 'home.billing_collection_view_by_client'|trans }}
+                </a>
+            {% endif %}
+        </div>
         {% if hasBillingCollectionData %}
             <div class="h-80">
                 {{ render_chart(billingCollectionChart) }}

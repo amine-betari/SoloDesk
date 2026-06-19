@@ -48,6 +48,9 @@ class FilterService
                             ->leftJoin("$alias.estimate", "e")
                             ->andWhere("s.client = :client OR p.client = :client OR e.client = :client")
                             ->setParameter('client', $value);
+                    } elseif ($alias === 'payment') {
+                        $qb->andWhere('directClient = :client OR projectClient = :client OR estimateClient = :client')
+                            ->setParameter('client', $value);
                     } else {
                         $qb->andWhere("$alias.client = :client")->setParameter('client', $value);
                     }

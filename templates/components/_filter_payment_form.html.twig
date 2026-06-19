@@ -1,10 +1,14 @@
 <div class="bg-white p-4 rounded-xl mb-6 shadow-xl w-full">
     {{ form_start(form, {'action': action}) }}
 
-    <div class="grid grid-cols-1 md:grid-cols-6 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-8 gap-4">
         <div class="md:col-span-2">
             {{ form_label(form.salesDocument, 'payment.reference'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
             {{ form_widget(form.salesDocument, {'attr': {'class': 'w-full'}}) }}
+        </div>
+        <div class="md:col-span-2">
+            {{ form_label(form.client, 'payment.client'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}
+            {{ form_widget(form.client, {'attr': {'class': 'w-full'}}) }}
         </div>
         <div class="md:col-span-2">
             {{ form_label(form.date, 'payment.date'|trans, {'label_attr': {'class': 'font-semibold text-gray-700'}}) }}

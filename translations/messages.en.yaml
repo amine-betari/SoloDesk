@@ -476,6 +476,7 @@ home:
   view_quarterly: "View quarterly revenue →"
   billing_collection_title: "Billed versus collected — last 12 months"
   billing_collection_note: "Invoices are grouped by issue date and payments by their actual collection date."
+  billing_collection_view_by_client: "View details by client →"
   billing_collection_billed: "Billed %currency%"
   billing_collection_collected: "Collected %currency%"
   billing_collection_empty: "No invoices or payments during this period."
