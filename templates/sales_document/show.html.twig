@@ -151,6 +151,23 @@
                             {{ sales_document.estimate.estimateNumber }}
                         </a>
                     </p>
+                    {% if invoice_progress %}
+                        {% set invoiceProgressCurrency = sales_document.getResolvedCurrency() %}
+                        <div class="mt-4 grid grid-cols-1 gap-3 rounded-2xl border border-gray-700 bg-gray-900/60 p-4 text-sm sm:grid-cols-3">
+                            <div>
+                                <div class="text-gray-400">{{ 'sales_document.invoice_progress_estimate_total'|trans }}</div>
+                                <div class="font-semibold text-white">{{ invoice_progress.estimate_ht|format_currency(invoiceProgressCurrency, app.request.locale ?: 'fr_FR') }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400">{{ 'sales_document.invoice_progress_already_invoiced'|trans }}</div>
+                                <div class="font-semibold text-white">{{ invoice_progress.invoiced_ht|format_currency(invoiceProgressCurrency, app.request.locale ?: 'fr_FR') }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-400">{{ 'sales_document.invoice_progress_remaining'|trans }}</div>
+                                <div class="font-semibold text-emerald-300">{{ invoice_progress.remaining_ht|format_currency(invoiceProgressCurrency, app.request.locale ?: 'fr_FR') }}</div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             {% endif %}
         {% endif %}

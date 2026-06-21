@@ -29,6 +29,7 @@ use PhpOffice\PhpWord\TemplateProcessor;
 use App\Entity\DocumentTemplate;
 use App\Service\CompanySettings;
 use App\Service\SalesDocumentDuplicator;
+use App\Service\SalesDocumentInvoiceProgress;
 
 #[Route('/sales/document')]
 final class SalesDocumentController extends AbstractController
@@ -135,7 +136,7 @@ final class SalesDocumentController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_sales_document_show', methods: ['GET'])]
-    public function show(SalesDocument $salesDocument): Response
+    public function show(SalesDocument $salesDocument, SalesDocumentInvoiceProgress $invoiceProgress): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $salesDocument->getCompany()?->getId() !== $company->getId()) {
@@ -143,6 +144,7 @@ final class SalesDocumentController extends AbstractController
         }
         return $this->render('sales_document/show.html.twig', [
             'sales_document' => $salesDocument,
+            'invoice_progress' => $salesDocument->isEstimate() ? $invoiceProgress->getProgress($salesDocument) : null,
         ]);
     }
 
@@ -510,7 +512,8 @@ final class SalesDocumentController extends AbstractController
     #[Route('/sales-document/from-estimate/{salesDocument}', name: 'app_sales_document_from_estimate')]
     public function createFromEstimate(
         SalesDocument $salesDocument,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        SalesDocumentInvoiceProgress $invoiceProgress
     ): Response {
         $this->assertSalesDocumentCompany($salesDocument);
 
@@ -531,11 +534,8 @@ final class SalesDocumentController extends AbstractController
             $this->applyVatFromRate($invoice, $estimateRelated->getVatRate());
         }
 
-        // Copier les items de l'estimate
-        foreach ($salesDocument->getSalesDocumentItems() as $item) {
-            $newItem = clone $item; // clone permet de copier les propriétés
-            $newItem->setSalesDocument($invoice);
-            $em->persist($newItem);
+        foreach ($invoiceProgress->createInvoiceItems($salesDocument) as $newItem) {
+            $invoice->addSalesDocumentItem($newItem);
         }
 
         $em->persist($invoice);
