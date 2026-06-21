@@ -10,6 +10,7 @@ use App\Services\DocumentManager;
 use App\Form\EstimateForm;
 use App\Services\FilterService;
 use App\Repository\EstimateRepository;
+use App\Service\SalesDocumentInvoiceProgress;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -27,7 +28,8 @@ final class EstimateController extends AbstractController
         Request $request,
         PaginationService $paginator,
         FilterService $filterService,
-        \App\Service\CompanySettings $settings
+        \App\Service\CompanySettings $settings,
+        SalesDocumentInvoiceProgress $invoiceProgress
     ): Response
     {
 
@@ -83,9 +85,11 @@ final class EstimateController extends AbstractController
 
         $pagination = $paginator->paginate($qb, $page, $limit);
         $displayedTotals = [];
+        $billingProgressByEstimateId = [];
         foreach ($pagination['items'] as $estimate) {
             $currency = $estimate->getCurrency();
             $displayedTotals[$currency] = ($displayedTotals[$currency] ?? 0.0) + (float) $estimate->getAmount();
+            $billingProgressByEstimateId[$estimate->getId()] = $invoiceProgress->getEstimateProgress($estimate);
         }
 
         return $this->render('estimate/index.html.twig', [
@@ -93,6 +97,7 @@ final class EstimateController extends AbstractController
             'filterForm' => $filterForm->createView(), // on envoie le form à la vu
             'statusCounts' => $statusCounts,
             'displayedTotals' => $displayedTotals,
+            'billingProgressByEstimateId' => $billingProgressByEstimateId,
         ]);
     }
 
@@ -149,7 +154,7 @@ final class EstimateController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_estimate_show', methods: ['GET'])]
-    public function show(Estimate $estimate): Response
+    public function show(Estimate $estimate, SalesDocumentInvoiceProgress $invoiceProgress): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $estimate->getCompany()?->getId() !== $company->getId()) {
@@ -157,6 +162,7 @@ final class EstimateController extends AbstractController
         }
         return $this->render('estimate/show.html.twig', [
             'estimate' => $estimate,
+            'billing_progress' => $invoiceProgress->getEstimateProgress($estimate),
         ]);
     }
 

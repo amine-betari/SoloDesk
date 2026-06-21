@@ -9,6 +9,7 @@ use App\Entity\Client;
 use App\Entity\Company;
 use App\Entity\Estimate;
 use App\Entity\SalesDocument;
+use App\Entity\SalesDocumentItem;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -43,12 +44,14 @@ final class EstimateIndexTest extends WebTestCase
             ->setReference('EST-DOC-'.bin2hex(random_bytes(3)))
             ->setEstimate($estimate)
             ->setStatus('accepted');
+        $commercialEstimate->addSalesDocumentItem($this->createSalesDocumentItem('Commercial estimate line', '42200.00'));
 
         $invoice = (new SalesDocument())
             ->setType(SalesDocument::TYPE_INVOICE)
             ->setReference('INV-DOC-'.bin2hex(random_bytes(3)))
             ->setEstimate($estimate)
             ->setStatus(InvoiceStatus::SENT);
+        $invoice->addSalesDocumentItem($this->createSalesDocumentItem('Invoice line', '20000.00'));
 
         $entityManager->persist($client);
         $entityManager->persist($estimate);
@@ -62,6 +65,7 @@ final class EstimateIndexTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('table', 'Devis : 1');
         self::assertSelectorTextContains('table', 'Factures : 1');
+        self::assertSelectorTextContains('table', 'Partiellement facturé');
     }
 
     private function createAuthenticatedBrowser(): KernelBrowser
@@ -80,5 +84,14 @@ final class EstimateIndexTest extends WebTestCase
         $browser->loginUser($user);
 
         return $browser;
+    }
+
+    private function createSalesDocumentItem(string $description, string $amount): SalesDocumentItem
+    {
+        return (new SalesDocumentItem())
+            ->setDescription($description)
+            ->setQuantity('1.000')
+            ->setUnitPrice($amount)
+            ->setLineTotal($amount);
     }
 }

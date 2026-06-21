@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Constants\InvoiceStatus;
+use App\Entity\Estimate;
 use App\Entity\SalesDocument;
 use App\Entity\SalesDocumentItem;
 use App\Repository\SalesDocumentRepository;
@@ -34,6 +35,39 @@ final class SalesDocumentInvoiceProgress
             'invoiced_ttc' => $invoicedTotalTTC,
             'remaining_ttc' => max(0.0, $estimateTotalTTC - $invoicedTotalTTC),
             'over_invoiced_ttc' => max(0.0, $invoicedTotalTTC - $estimateTotalTTC),
+        ];
+    }
+
+    /**
+     * @return array{estimate_amount_ht: float, commercial_estimate_ht: float, invoiced_ht: float, remaining_ht: float, over_invoiced_ht: float, status: string}
+     */
+    public function getEstimateProgress(Estimate $estimate): array
+    {
+        $estimateAmount = (float) $estimate->getAmount();
+        $commercialEstimateTotal = 0.0;
+        $invoicedTotal = 0.0;
+
+        foreach ($estimate->getSalesDocuments() as $document) {
+            if ($document->isEstimate()) {
+                $commercialEstimateTotal += $document->getTotalHT();
+            }
+
+            if ($document->isInvoice() && $document->getStatus() !== InvoiceStatus::CANCELLED) {
+                $invoicedTotal += $document->getTotalHT();
+            }
+        }
+
+        $billingTarget = $commercialEstimateTotal > 0.0 ? $commercialEstimateTotal : $estimateAmount;
+        $remaining = max(0.0, $billingTarget - $invoicedTotal);
+        $overInvoiced = max(0.0, $invoicedTotal - $billingTarget);
+
+        return [
+            'estimate_amount_ht' => $estimateAmount,
+            'commercial_estimate_ht' => $commercialEstimateTotal,
+            'invoiced_ht' => $invoicedTotal,
+            'remaining_ht' => $remaining,
+            'over_invoiced_ht' => $overInvoiced,
+            'status' => $this->getEstimateBillingStatus($billingTarget, $invoicedTotal),
         ];
     }
 
@@ -118,6 +152,23 @@ final class SalesDocumentInvoiceProgress
     private function formatDecimal(float $amount, int $decimals = 2): string
     {
         return number_format($amount, $decimals, '.', '');
+    }
+
+    private function getEstimateBillingStatus(float $billingTarget, float $invoicedTotal): string
+    {
+        if ($billingTarget > 0.0 && $invoicedTotal > $billingTarget) {
+            return 'over_invoiced';
+        }
+
+        if ($invoicedTotal <= 0.0) {
+            return 'not_invoiced';
+        }
+
+        if ($billingTarget > 0.0 && $invoicedTotal >= $billingTarget) {
+            return 'fully_invoiced';
+        }
+
+        return 'partially_invoiced';
     }
 
     /**

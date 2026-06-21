@@ -74,6 +74,45 @@
                 </dl>
             </div>
 
+            <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-6">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <h2 class="text-xl font-semibold text-white">{{ 'estimate.billing_progress_title'|trans }}</h2>
+                    {% set billingStatusClass = billing_progress.status == 'fully_invoiced'
+                        ? 'bg-green-100 text-green-800'
+                        : (billing_progress.status == 'over_invoiced'
+                            ? 'bg-red-100 text-red-800'
+                            : (billing_progress.status == 'partially_invoiced' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'))
+                    %}
+                    <span class="inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold {{ billingStatusClass }}">
+                        {{ ('estimate.billing_status_' ~ billing_progress.status)|trans }}
+                    </span>
+                </div>
+                <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-4">
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'estimate.billing_estimate_amount'|trans }}</div>
+                        <div class="mt-2 text-lg font-semibold text-white">{{ billing_progress.estimate_amount_ht|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'estimate.billing_commercial_total'|trans }}</div>
+                        <div class="mt-2 text-lg font-semibold text-white">{{ billing_progress.commercial_estimate_ht|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'estimate.billing_invoiced_total'|trans }}</div>
+                        <div class="mt-2 text-lg font-semibold text-white">{{ billing_progress.invoiced_ht|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}</div>
+                    </div>
+                    <div>
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'estimate.billing_remaining_total'|trans }}</div>
+                        <div class="mt-2 text-lg font-semibold {{ billing_progress.over_invoiced_ht > 0 ? 'text-red-300' : 'text-emerald-300' }}">
+                            {% if billing_progress.over_invoiced_ht > 0 %}
+                                {{ billing_progress.over_invoiced_ht|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }} {{ 'estimate.billing_overrun_suffix'|trans }}
+                            {% else %}
+                                {{ billing_progress.remaining_ht|format_currency(estimate.currency, app.request.locale ?: 'fr_FR') }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {# Documents liés #}
             {% include 'components/_documents_list.html.twig' with { documents: estimate.documents } %}
 
