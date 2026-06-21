@@ -33,6 +33,10 @@
                                    class="px-3 py-1 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 btn-mobile">{{ 'actions.view'|trans }}</a>
                                 <a href="{{ path('app_sales_document_edit', { id: doc.id }) }}"
                                    class="px-3 py-1 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 btn-mobile">{{ 'actions.edit'|trans }}</a>
+                                {% if doc.isEstimate() and estimate.status == 'accepted' %}
+                                    <a href="{{ path('app_sales_document_from_estimate', { salesDocument: doc.id }) }}"
+                                       class="px-3 py-1 rounded bg-green-600 text-white text-xs font-semibold hover:bg-green-700 btn-mobile">{{ 'sales_document.create_invoice_short'|trans }}</a>
+                                {% endif %}
                             </div>
                         </td>
                     </tr>

@@ -138,6 +138,108 @@ final class SalesDocumentShowTest extends WebTestCase
         self::assertStringContainsString('Solde restant', (string) $createdInvoice->getSalesDocumentItems()->first()->getDescription());
     }
 
+    public function testCommercialEstimateShowsOverInvoicedWarning(): void
+    {
+        $browser = $this->createAuthenticatedBrowser();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $user = self::getContainer()->get('security.token_storage')->getToken()?->getUser();
+        self::assertInstanceOf(User::class, $user);
+        $company = $user->getCompany();
+        self::assertInstanceOf(Company::class, $company);
+
+        $client = (new Client())
+            ->setName('Overrun Client '.bin2hex(random_bytes(4)))
+            ->setCompany($company);
+        $client->setCurrency('MAD');
+
+        $estimate = (new Estimate())
+            ->setName('Overrun estimate '.bin2hex(random_bytes(4)))
+            ->setClient($client)
+            ->setEstimateNumber('EST-OVERRUN-'.bin2hex(random_bytes(3)))
+            ->setAmount('100.00')
+            ->setStatus('accepted');
+        $estimate->setCurrency('MAD');
+
+        $commercialEstimate = (new SalesDocument())
+            ->setType(SalesDocument::TYPE_ESTIMATE)
+            ->setReference('EST-COM-OVERRUN-'.bin2hex(random_bytes(3)))
+            ->setEstimate($estimate)
+            ->setStatus('sent');
+        $commercialEstimate->addSalesDocumentItem(
+            (new SalesDocumentItem())
+                ->setDescription('Commercial estimate total')
+                ->setQuantity('1.000')
+                ->setUnitPrice('100.00')
+                ->setLineTotal('100.00')
+        );
+
+        $invoice = (new SalesDocument())
+            ->setType(SalesDocument::TYPE_INVOICE)
+            ->setReference('INV-OVERRUN-'.bin2hex(random_bytes(3)))
+            ->setEstimate($estimate)
+            ->setStatus(InvoiceStatus::SENT);
+        $invoice->addSalesDocumentItem(
+            (new SalesDocumentItem())
+                ->setDescription('Overrun invoice')
+                ->setQuantity('1.000')
+                ->setUnitPrice('120.00')
+                ->setLineTotal('120.00')
+        );
+
+        $entityManager->persist($client);
+        $entityManager->persist($estimate);
+        $entityManager->persist($commercialEstimate);
+        $entityManager->persist($invoice);
+        $entityManager->flush();
+
+        $browser->request('GET', '/sales/document/'.$commercialEstimate->getId());
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Attention : les factures dépassent le devis de');
+    }
+
+    public function testInvoiceShowsLinkedPreEstimateContext(): void
+    {
+        $browser = $this->createAuthenticatedBrowser();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $user = self::getContainer()->get('security.token_storage')->getToken()?->getUser();
+        self::assertInstanceOf(User::class, $user);
+        $company = $user->getCompany();
+        self::assertInstanceOf(Company::class, $company);
+
+        $client = (new Client())
+            ->setName('Invoice Context Client '.bin2hex(random_bytes(4)))
+            ->setCompany($company);
+        $client->setCurrency('MAD');
+
+        $estimate = (new Estimate())
+            ->setName('Invoice context estimate '.bin2hex(random_bytes(4)))
+            ->setClient($client)
+            ->setEstimateNumber('EST-CONTEXT-'.bin2hex(random_bytes(3)))
+            ->setAmount('100.00')
+            ->setStatus('accepted');
+        $estimate->setCurrency('MAD');
+
+        $invoice = (new SalesDocument())
+            ->setType(SalesDocument::TYPE_INVOICE)
+            ->setReference('INV-CONTEXT-'.bin2hex(random_bytes(3)))
+            ->setEstimate($estimate)
+            ->setStatus(InvoiceStatus::SENT);
+        $invoice->addSalesDocumentItem($this->createSalesDocumentItem('Invoice context line'));
+
+        $entityManager->persist($client);
+        $entityManager->persist($estimate);
+        $entityManager->persist($invoice);
+        $entityManager->flush();
+
+        $browser->request('GET', '/sales/document/'.$invoice->getId());
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Pré-estimation liée');
+        self::assertSelectorTextContains('body', 'Cette facture est regroupée avec les autres documents de cette pré-estimation.');
+        self::assertSelectorExists(\sprintf('a[href="/estimate/%d"]', $estimate->getId()));
+    }
+
     private function createAuthenticatedBrowser(): KernelBrowser
     {
         $browser = static::createClient();

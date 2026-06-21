@@ -16,7 +16,7 @@ final class SalesDocumentInvoiceProgress
     }
 
     /**
-     * @return array{estimate_ht: float, invoiced_ht: float, remaining_ht: float, estimate_ttc: float, invoiced_ttc: float, remaining_ttc: float}
+     * @return array{estimate_ht: float, invoiced_ht: float, remaining_ht: float, over_invoiced_ht: float, estimate_ttc: float, invoiced_ttc: float, remaining_ttc: float, over_invoiced_ttc: float}
      */
     public function getProgress(SalesDocument $commercialEstimate): array
     {
@@ -29,9 +29,11 @@ final class SalesDocumentInvoiceProgress
             'estimate_ht' => $estimateTotalHT,
             'invoiced_ht' => $invoicedTotalHT,
             'remaining_ht' => max(0.0, $estimateTotalHT - $invoicedTotalHT),
+            'over_invoiced_ht' => max(0.0, $invoicedTotalHT - $estimateTotalHT),
             'estimate_ttc' => $estimateTotalTTC,
             'invoiced_ttc' => $invoicedTotalTTC,
             'remaining_ttc' => max(0.0, $estimateTotalTTC - $invoicedTotalTTC),
+            'over_invoiced_ttc' => max(0.0, $invoicedTotalTTC - $estimateTotalTTC),
         ];
     }
 
