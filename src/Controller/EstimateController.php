@@ -78,6 +78,9 @@ final class EstimateController extends AbstractController
             $statusCounts[$row['status']] = (int) $row['total'];
         }
 
+        $qb->addSelect('salesDocuments')
+            ->leftJoin('e.salesDocuments', 'salesDocuments');
+
         $pagination = $paginator->paginate($qb, $page, $limit);
         $displayedTotals = [];
         foreach ($pagination['items'] as $estimate) {
