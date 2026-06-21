@@ -312,6 +312,7 @@ sales_document:
   amount_ht: "Montant (HT) :"
   vat_applied: "TVA appliquée :"
   create_invoice_from_estimate: "Créer une facture depuis ce devis"
+  invoice_grouped_in_estimate_help: "La facture sera regroupée dans la pré-estimation liée :"
   no_payments: "Aucun paiement enregistré."
   items_title: "Lignes d'articles"
   items_empty: "Aucune ligne d'article enregistrée."
@@ -433,6 +434,8 @@ documents:
   add_one: "+ Ajouter un document"
   existing: "Documents existants"
   generated: "Documents générés"
+  linked_to_estimate: "Documents liés à cette pré-estimation"
+  linked_to_estimate_help: "Les devis commerciaux et factures générés depuis cette pré-estimation sont regroupés ici."
 
 stats:
   view: "Voir %name%"

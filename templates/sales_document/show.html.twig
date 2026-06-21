@@ -140,15 +140,18 @@
         {# Après la section “Client / Adresse” ou juste après le header principal, par exemple #}
         {% if sales_document.isEstimate() %}
             {% if sales_document.estimate and sales_document.estimate.status == 'accepted' %}
-                {% set hasInvoice = sales_document.estimate.salesDocuments|filter(doc => doc.isInvoice())|length > 0 %}
-                    {% if not hasInvoice %}
-                        <div class="mt-2">
-                        <a href="{{ path('app_sales_document_from_estimate', {'salesDocument': sales_document.id}) }}"
-                           class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition btn-mobile">
-                            {{ 'sales_document.create_invoice_from_estimate'|trans }}
+                <div class="mt-2">
+                    <a href="{{ path('app_sales_document_from_estimate', {'salesDocument': sales_document.id}) }}"
+                       class="px-5 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition btn-mobile">
+                        {{ 'sales_document.create_invoice_from_estimate'|trans }}
+                    </a>
+                    <p class="mt-2 text-sm text-gray-400">
+                        {{ 'sales_document.invoice_grouped_in_estimate_help'|trans }}
+                        <a href="{{ path('app_estimate_show', {'id': sales_document.estimate.id}) }}" class="text-blue-400 hover:text-blue-300 underline">
+                            {{ sales_document.estimate.estimateNumber }}
                         </a>
-                    </div>
-                {% endif %}
+                    </p>
+                </div>
             {% endif %}
         {% endif %}
 

@@ -1,6 +1,7 @@
 {% if estimate.salesDocuments|length > 0 %}
     <div class="bg-gray-700 shadow rounded p-6 mb-6 text-white">
-        <h2 class="text-xl font-semibold mb-4">{{ 'documents.generated'|trans }}</h2>
+        <h2 class="text-xl font-semibold mb-2">{{ 'documents.linked_to_estimate'|trans }}</h2>
+        <p class="mb-4 text-sm text-gray-300">{{ 'documents.linked_to_estimate_help'|trans }}</p>
 
         <div class="table-responsive">
             <table class="min-w-full text-sm text-left text-gray-100">

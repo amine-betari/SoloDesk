@@ -312,6 +312,7 @@ sales_document:
   amount_ht: "Amount (excl. tax):"
   vat_applied: "VAT applied:"
   create_invoice_from_estimate: "Create an invoice from this estimate"
+  invoice_grouped_in_estimate_help: "The invoice will be grouped under the related pre-estimate:"
   no_payments: "No payments recorded."
   items_title: "Items"
   items_empty: "No item line recorded."
@@ -433,6 +434,8 @@ documents:
   add_one: "+ Add a document"
   existing: "Existing documents"
   generated: "Generated documents"
+  linked_to_estimate: "Documents linked to this pre-estimate"
+  linked_to_estimate_help: "Commercial estimates and invoices generated from this pre-estimate are grouped here."
 
 stats:
   view: "View %name%"

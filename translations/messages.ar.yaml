@@ -311,6 +311,7 @@ sales_document:
   amount_ht: "المبلغ (بدون ضريبة):"
   vat_applied: "الضريبة المطبقة:"
   create_invoice_from_estimate: "إنشاء فاتورة من هذا العرض"
+  invoice_grouped_in_estimate_help: "سيتم تجميع الفاتورة ضمن التقدير الأولي المرتبط:"
   no_payments: "لا توجد مدفوعات مسجلة."
   items_title: "بنود الفاتورة"
   items_empty: "لا توجد بنود مسجلة."
@@ -431,6 +432,8 @@ documents:
   add_one: "+ إضافة مستند"
   existing: "المستندات الحالية"
   generated: "المستندات المولدة"
+  linked_to_estimate: "المستندات المرتبطة بهذا التقدير الأولي"
+  linked_to_estimate_help: "يتم تجميع العروض التجارية والفواتير المنشأة من هذا التقدير الأولي هنا."
 
 stats:
   view: "عرض %name%"
