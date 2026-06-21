@@ -332,6 +332,7 @@ sales_document:
   invoice_progress_already_invoiced: "Déjà facturé"
   invoice_progress_remaining: "Reste à facturer"
   invoice_progress_overrun: "Attention : les factures dépassent le devis de %amount%."
+  linked_invoices_count: "Factures liées : %count%"
   linked_pre_estimate: "Pré-estimation liée"
   no_payments: "Aucun paiement enregistré."
   items_title: "Lignes d'articles"

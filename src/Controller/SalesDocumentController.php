@@ -46,7 +46,8 @@ final class SalesDocumentController extends AbstractController
         Request $request,
         PaginationService $paginator,
         FilterService $filterService,
-        CompanySettings $settings
+        CompanySettings $settings,
+        SalesDocumentInvoiceProgress $invoiceProgress
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
@@ -87,6 +88,12 @@ final class SalesDocumentController extends AbstractController
         }
 
         $pagination = $paginator->paginate($qb, $page, $limit);
+        $invoiceProgressByDocumentId = [];
+        foreach ($pagination['items'] as $document) {
+            if ($document->isEstimate() && $document->getStatus() === 'accepted' && $document->getEstimate() !== null) {
+                $invoiceProgressByDocumentId[$document->getId()] = $invoiceProgress->getProgress($document);
+            }
+        }
 
         $overdueDays = $settings->getInt($company, CompanySettings::KEY_OVERDUE_DAYS, 45);
         $overdueBefore = (new \DateTimeImmutable('now'))->modify(sprintf('-%d days', $overdueDays));
@@ -97,6 +104,7 @@ final class SalesDocumentController extends AbstractController
             'filterForm' => $filterForm->createView(), // on envoie le form à la vu
             'overdueInvoices' => $overdueInvoices,
             'overdueDays' => $overdueDays,
+            'invoiceProgressByDocumentId' => $invoiceProgressByDocumentId,
         ]);
     }
 

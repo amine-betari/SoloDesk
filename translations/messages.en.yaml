@@ -332,6 +332,7 @@ sales_document:
   invoice_progress_already_invoiced: "Already invoiced"
   invoice_progress_remaining: "Remaining to invoice"
   invoice_progress_overrun: "Warning: invoices exceed the estimate by %amount%."
+  linked_invoices_count: "Linked invoices: %count%"
   linked_pre_estimate: "Linked pre-estimate"
   no_payments: "No payments recorded."
   items_title: "Items"

@@ -331,6 +331,7 @@ sales_document:
   invoice_progress_already_invoiced: "تمت فوترته"
   invoice_progress_remaining: "المتبقي للفوترة"
   invoice_progress_overrun: "تنبيه: الفواتير تتجاوز العرض بمقدار %amount%."
+  linked_invoices_count: "الفواتير المرتبطة: %count%"
   linked_pre_estimate: "التقدير الأولي المرتبط"
   no_payments: "لا توجد مدفوعات مسجلة."
   items_title: "بنود الفاتورة"

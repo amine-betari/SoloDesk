@@ -17,12 +17,13 @@ final class SalesDocumentInvoiceProgress
     }
 
     /**
-     * @return array{estimate_ht: float, invoiced_ht: float, remaining_ht: float, over_invoiced_ht: float, estimate_ttc: float, invoiced_ttc: float, remaining_ttc: float, over_invoiced_ttc: float}
+     * @return array{estimate_ht: float, invoiced_ht: float, remaining_ht: float, over_invoiced_ht: float, estimate_ttc: float, invoiced_ttc: float, remaining_ttc: float, over_invoiced_ttc: float, invoices_count: int}
      */
     public function getProgress(SalesDocument $commercialEstimate): array
     {
         $estimateTotalHT = $commercialEstimate->getTotalHT();
         $estimateTotalTTC = $commercialEstimate->getTotalTTC();
+        $invoices = $this->findInvoicesForCommercialEstimate($commercialEstimate);
         $invoicedTotalHT = $this->getInvoicedTotalHT($commercialEstimate);
         $invoicedTotalTTC = $this->getInvoicedTotalTTC($commercialEstimate);
 
@@ -35,6 +36,7 @@ final class SalesDocumentInvoiceProgress
             'invoiced_ttc' => $invoicedTotalTTC,
             'remaining_ttc' => max(0.0, $estimateTotalTTC - $invoicedTotalTTC),
             'over_invoiced_ttc' => max(0.0, $invoicedTotalTTC - $estimateTotalTTC),
+            'invoices_count' => count(array_filter($invoices, static fn (SalesDocument $document): bool => $document->getStatus() !== InvoiceStatus::CANCELLED)),
         ];
     }
 
