@@ -9,6 +9,7 @@
                 <tr>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'common.reference_short'|trans }}</th>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.type'|trans }}</th>
+                    <th class="px-4 py-2 border-b border-gray-600">{{ 'sales_document.status'|trans }}</th>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'common.date'|trans }}</th>
                     <th class="px-4 py-2 border-b border-gray-600">{{ 'table.actions'|trans }}</th>
                 </tr>
@@ -17,7 +18,14 @@
                 {% for doc in estimate.salesDocuments %}
                     <tr class="hover:bg-gray-600">
                         <td class="px-4 py-2">{{ doc.reference }}</td>
-                        <td class="px-4 py-2">{{ doc.type }}</td>
+                        <td class="px-4 py-2">{{ doc.type|document_type_label }}</td>
+                        <td class="px-4 py-2">
+                            {% set status_class = doc.status == 'paid' or doc.status == 'accepted'
+                                ? 'bg-green-100 text-green-800'
+                                : (doc.status == 'cancelled' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800')
+                            %}
+                            <span class="px-2 py-1 rounded-full text-xs font-semibold {{ status_class }}">{{ doc.status|trans }}</span>
+                        </td>
                         <td class="px-4 py-2">{{ doc.createdAt ? doc.createdAt|date('d/m/Y') : 'common.dash'|trans }}</td>
                         <td class="px-4 py-2">
                             <div class="flex flex-col sm:flex-row gap-2">
