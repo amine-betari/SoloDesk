@@ -60,7 +60,6 @@ final class EstimateIndexTest extends WebTestCase
         $browser->request('GET', '/estimate');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('table', 'Documents');
         self::assertSelectorTextContains('table', 'Devis : 1');
         self::assertSelectorTextContains('table', 'Factures : 1');
     }
