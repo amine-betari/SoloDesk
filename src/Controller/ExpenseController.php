@@ -44,12 +44,22 @@ final class ExpenseController extends AbstractController
         if (!$company) {
             throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
         }
-        $currentYearSummary = $this->buildCurrentYearSummary(
+        $activityStartDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $firstAvailableYear = (int) $activityStartDate->format('Y');
+        $currentYear = (int) (new \DateTimeImmutable())->format('Y');
+        $availableSummaryYears = range($firstAvailableYear, $currentYear);
+        $selectedSummaryYear = $request->query->getInt('summaryYear', $currentYear);
+        if (!\in_array($selectedSummaryYear, $availableSummaryYears, true)) {
+            $selectedSummaryYear = $currentYear;
+        }
+
+        $currentYearSummary = $this->buildYearSummary(
             $company,
             $expenseRepository,
             $paymentRepository,
             $prestationRepository,
-            $settings
+            $activityStartDate,
+            $selectedSummaryYear
         );
 
         $qb = $expenseRepository->createQueryBuilder('e')
@@ -112,6 +122,8 @@ final class ExpenseController extends AbstractController
             'filteredTotals' => $filteredTotals,
             'displayedTotals' => $displayedTotals,
             'currentYearSummary' => $currentYearSummary,
+            'availableSummaryYears' => $availableSummaryYears,
+            'selectedSummaryYear' => $selectedSummaryYear,
         ]);
     }
 
@@ -323,17 +335,16 @@ final class ExpenseController extends AbstractController
      *     gainAfterCharges: array<string, float>
      * }
      */
-    private function buildCurrentYearSummary(
+    private function buildYearSummary(
         Company $company,
         ExpenseRepository $expenseRepository,
         PaymentRepository $paymentRepository,
         PrestationRepository $prestationRepository,
-        CompanySettings $settings
+        \DateTimeImmutable $activityStartDate,
+        int $year
     ): array {
-        $currentYear = (int) (new \DateTimeImmutable())->format('Y');
-        $yearStart = new \DateTimeImmutable($currentYear.'-01-01 00:00:00');
-        $yearEnd = new \DateTimeImmutable($currentYear.'-12-31 23:59:59');
-        $activityStartDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $yearStart = new \DateTimeImmutable($year.'-01-01 00:00:00');
+        $yearEnd = new \DateTimeImmutable($year.'-12-31 23:59:59');
         $effectiveStart = $activityStartDate > $yearStart ? $activityStartDate : $yearStart;
 
         $caByCurrency = [];
@@ -416,7 +427,7 @@ final class ExpenseController extends AbstractController
         }
 
         return [
-            'year' => $currentYear,
+            'year' => $year,
             'ca' => $caByCurrency,
             'gainBeforeCharges' => $gainBeforeChargesByCurrency,
             'expenses' => $expensesByCurrency,

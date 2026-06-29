@@ -90,6 +90,17 @@ final class ExpenseFlowTest extends WebTestCase
         self::assertSelectorTextNotContains('body', $hiddenLabel);
     }
 
+    public function testExpenseSummaryYearCanBeSelectedIndependentlyFromListFilters(): void
+    {
+        $browser = $this->createAuthenticatedBrowser();
+
+        $browser->request('GET', '/expenses?summaryYear=2025&q=hosting');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('body', 'Synthèse 2025');
+        self::assertSelectorExists('input[name="summaryYear"][value="2025"]');
+    }
+
     public function testExpenseCanBeDuplicatedIntoPrefilledCreationForm(): void
     {
         $browser = $this->createAuthenticatedBrowser();
