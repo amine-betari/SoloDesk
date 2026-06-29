@@ -1,0 +1,7 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'expense.new_title'|trans }}{% endblock %}
+
+{% block body %}
+    {{ include('expense/_form.html.twig', {'new_mode': true}) }}
+{% endblock %}

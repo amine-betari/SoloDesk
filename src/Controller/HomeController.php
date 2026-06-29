@@ -535,6 +535,8 @@ class HomeController extends AbstractController
         // CA depuis le début (toutes années)
         $totauxParDeviseGlobal = [];
         $totauxParDeviseGlobalExternes = [];
+        $totauxParAnneeParDevise = [];
+        $totauxExternesParAnneeParDevise = [];
         foreach ($payments as $payment) {
             $paymentDate = $payment->getDate();
             if (!$paymentDate) continue;
@@ -548,13 +550,18 @@ class HomeController extends AbstractController
             if (!$client) continue;
 
             $devise = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+            $year = (int) $paymentDate->format('Y');
 
             $totauxParDeviseGlobal[$devise] =
                 ($totauxParDeviseGlobal[$devise] ?? 0) + $payment->getAmount();
+            $totauxParAnneeParDevise[$devise][$year] =
+                ($totauxParAnneeParDevise[$devise][$year] ?? 0) + $payment->getAmount();
 
             if ($salesDocument && $salesDocument->isExternalInvoice()) {
                 $totauxParDeviseGlobalExternes[$devise] =
                     ($totauxParDeviseGlobalExternes[$devise] ?? 0) + $payment->getAmount();
+                $totauxExternesParAnneeParDevise[$devise][$year] =
+                    ($totauxExternesParAnneeParDevise[$devise][$year] ?? 0) + $payment->getAmount();
             }
         }
 
@@ -565,6 +572,31 @@ class HomeController extends AbstractController
 
         $caGlobalTexte = $caGlobalAffichage ? implode(' • ', $caGlobalAffichage) : '0';
 
+        $bestYearsAffichage = [];
+        $bestYears = [];
+        $annualRevenueDetails = [];
+        foreach ($totauxParAnneeParDevise as $devise => $totauxParAnnee) {
+            if ($totauxParAnnee === []) {
+                continue;
+            }
+
+            arsort($totauxParAnnee);
+            $bestYear = (int) array_key_first($totauxParAnnee);
+            $bestAmount = (float) $totauxParAnnee[$bestYear];
+            $bestYears[$devise] = [
+                'year' => $bestYear,
+                'amount' => $bestAmount,
+            ];
+            $bestYearsAffichage[] = sprintf('%s : %d (%s %s)', $devise, $bestYear, $fmt->format($bestAmount), $devise);
+
+            krsort($totauxParAnnee);
+            foreach ($totauxParAnnee as $year => $amount) {
+                $annualRevenueDetails[] = sprintf('%d · %s : %s %s', (int) $year, $devise, $fmt->format((float) $amount), $devise);
+            }
+        }
+
+        $bestYearTexte = $bestYearsAffichage ? implode(' • ', $bestYearsAffichage) : '0';
+
         $caGlobalExternesAffichage = [];
         foreach ($totauxParDeviseGlobalExternes as $devise => $montant) {
             $caGlobalExternesAffichage[] = $fmt->format($montant) . ' ' . $devise;
@@ -573,6 +605,7 @@ class HomeController extends AbstractController
             $caGlobalExternesAffichage ? implode(' • ', $caGlobalExternesAffichage) : '0';
 
         $gainGlobalTexte = null;
+        $bestYearEstimatedGainTexte = null;
         if ($company->getLegalForm() === 'AE') {
             $prestationsGlobal = $prestationRepository->createQueryBuilder('p')
                 ->innerJoin('p.salesDocument', 'sd')
@@ -585,6 +618,7 @@ class HomeController extends AbstractController
                 ->getResult();
 
             $prestationsGlobalParDevise = [];
+            $prestationsParAnneeParDevise = [];
             foreach ($prestationsGlobal as $prestation) {
                 $salesDocument = $prestation->getSalesDocument();
                 if (!$salesDocument) {
@@ -593,6 +627,14 @@ class HomeController extends AbstractController
                 $devise = $salesDocument->getResolvedCurrency();
                 $prestationsGlobalParDevise[$devise] =
                     ($prestationsGlobalParDevise[$devise] ?? 0) + $prestation->getTotal();
+
+                $invoiceDate = $salesDocument->getInvoiceDate() ?? $salesDocument->getCreatedAt();
+                if ($invoiceDate === null) {
+                    continue;
+                }
+                $year = (int) $invoiceDate->format('Y');
+                $prestationsParAnneeParDevise[$devise][$year] =
+                    ($prestationsParAnneeParDevise[$devise][$year] ?? 0) + $prestation->getTotal();
             }
 
             $allDevisesGlobal = array_unique(array_merge(
@@ -610,6 +652,17 @@ class HomeController extends AbstractController
             }
 
             $gainGlobalTexte = $gainGlobalAffichage ? implode(' • ', $gainGlobalAffichage) : '0';
+
+            $bestYearEstimatedGainAffichage = [];
+            foreach ($bestYears as $devise => $bestYearData) {
+                $year = $bestYearData['year'];
+                $gain = $bestYearData['amount']
+                    - ($totauxExternesParAnneeParDevise[$devise][$year] ?? 0)
+                    - ($prestationsParAnneeParDevise[$devise][$year] ?? 0);
+                $bestYearEstimatedGainAffichage[] = sprintf('%s : %d (%s %s)', $devise, $year, $fmt->format($gain), $devise);
+            }
+
+            $bestYearEstimatedGainTexte = $bestYearEstimatedGainAffichage ? implode(' • ', $bestYearEstimatedGainAffichage) : '0';
         }
 
         // Ratios par trimestre (impôts)
@@ -741,6 +794,9 @@ class HomeController extends AbstractController
             'anneeSelectionnee' => $anneeSelectionnee,
             'caAnneeTexte' => $caAnneeTexte,
             'caGlobalTexte' => $caGlobalTexte,
+            'bestYearTexte' => $bestYearTexte,
+            'bestYearEstimatedGainTexte' => $bestYearEstimatedGainTexte,
+            'annualRevenueDetails' => $annualRevenueDetails,
             'caGlobalExternesTexte' => $caGlobalExternesTexte,
             'gainGlobalTexte' => $gainGlobalTexte,
             'caAnneePrecedenteTexte' => $caAnneePrecedenteTexte,

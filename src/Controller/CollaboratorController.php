@@ -25,7 +25,7 @@ final class CollaboratorController extends AbstractController
         PaginationService $paginator
     ): Response {
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 10;
+        $limit = 30;
         $q = trim((string) $request->query->get('q', ''));
         $type = trim((string) $request->query->get('type', ''));
         $skillId = $request->query->getInt('skill', 0);

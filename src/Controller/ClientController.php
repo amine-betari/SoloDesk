@@ -26,7 +26,7 @@ final class ClientController extends AbstractController
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 10;
+        $limit = 30;
         $q = trim((string) $request->query->get('q', ''));
         $country = trim((string) $request->query->get('country', ''));
         $currency = trim((string) $request->query->get('currency', ''));

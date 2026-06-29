@@ -168,6 +168,7 @@ final class NewFormFlowTest extends WebTestCase
         yield 'client' => ['/client/new', 'client_form'];
         yield 'collaborator' => ['/collaborateurs/new', 'collaborator_form'];
         yield 'estimate' => ['/estimate/new', 'estimate_form'];
+        yield 'expense' => ['/expenses/new', 'expense_form'];
         yield 'payment' => ['/payment/new', 'payment_form'];
         yield 'prestation' => ['/prestations/new', 'prestation_form'];
         yield 'project' => ['/project/new', 'project_form'];

@@ -51,7 +51,7 @@ final class SalesDocumentController extends AbstractController
     ): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 10;
+        $limit = 30;
         $session = $request->getSession();
 
         // Search Form

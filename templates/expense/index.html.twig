@@ -1,0 +1,174 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'expense.title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="w-full px-6 py-8">
+        <div class="space-y-6">
+            <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white">{{ 'expense.title'|trans }}</h1>
+                    <p class="text-sm text-gray-400 mt-2">{{ 'expense.subtitle'|trans }}</p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="hidden sm:flex items-center gap-2 rounded-full bg-[#1F2732] border border-[#2A3747] px-4 py-2 text-sm text-gray-300">
+                        <span class="text-gray-500">{{ 'common.total'|trans }}</span>
+                        <span class="text-white font-semibold">{{ pagination.total }}</span>
+                    </div>
+                    <a href="{{ path('app_expense_new') }}"
+                       class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
+                        {{ 'expense.new'|trans }}
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.count_total'|trans }}</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.total }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.count_shown'|trans }}</div>
+                    <div class="mt-2 text-2xl font-semibold text-white">{{ pagination.items|length }}</div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.filtered_total'|trans }}</div>
+                    <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-white">
+                        {% for currency, total in filteredTotals %}
+                            <span>{{ total|format_currency(currency, app.request.locale ?: 'fr_FR') }}</span>
+                        {% else %}
+                            <span>{{ 'common.dash'|trans }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
+                    <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.displayed_total'|trans }}</div>
+                    <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-white">
+                        {% for currency, total in displayedTotals %}
+                            <span>{{ total|format_currency(currency, app.request.locale ?: 'fr_FR') }}</span>
+                        {% else %}
+                            <span>{{ 'common.dash'|trans }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-4">
+                <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-3 md:items-end">
+                    <div class="md:col-span-2">
+                        <label for="expense-q" class="block text-sm font-semibold text-gray-700 mb-1">{{ 'actions.search'|trans }}</label>
+                        <input
+                            id="expense-q"
+                            type="text"
+                            name="q"
+                            value="{{ q }}"
+                            placeholder="{{ 'expense.search_placeholder'|trans }}"
+                            class="w-full rounded-md border border-gray-300 bg-white text-gray-900 placeholder-gray-400 px-4 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label for="expense-category" class="block text-sm font-semibold text-gray-700 mb-1">{{ 'expense.category'|trans }}</label>
+                        <select id="expense-category" name="category" class="w-full rounded-md border border-gray-300 bg-white text-gray-900 px-4 py-2">
+                            <option value="">{{ 'expense.filter_category'|trans }}</option>
+                            {% for item in categories %}
+                                <option value="{{ item }}" {{ category == item ? 'selected' : '' }}>{{ ('expense.category_' ~ item)|trans }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="expense-date-from" class="block text-sm font-semibold text-gray-700 mb-1">{{ 'expense.date_from'|trans }}</label>
+                        <input id="expense-date-from" type="date" name="dateFrom" value="{{ dateFrom }}" class="w-full rounded-md border border-gray-300 bg-white text-gray-900 px-4 py-2">
+                    </div>
+                    <div>
+                        <label for="expense-date-to" class="block text-sm font-semibold text-gray-700 mb-1">{{ 'expense.date_to'|trans }}</label>
+                        <input id="expense-date-to" type="date" name="dateTo" value="{{ dateTo }}" class="w-full rounded-md border border-gray-300 bg-white text-gray-900 px-4 py-2">
+                    </div>
+                    <div class="flex gap-2 md:col-span-5">
+                        <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md btn-mobile">
+                            {{ 'actions.search'|trans }}
+                        </button>
+                        {% if q or category or dateFrom or dateTo %}
+                            <a href="{{ path('app_expense_index') }}"
+                               class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold rounded-md btn-mobile">
+                                {{ 'actions.reset'|trans }}
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+
+            {% if pagination.items is not empty %}
+                <div class="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-lg">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'expense.table_expense'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'expense.category'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'expense.supplier'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'expense.spent_at'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'expense.amount'|trans }}</th>
+                            <th class="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">{{ 'table.actions'|trans }}</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                        {% for expense in pagination.items %}
+                            <tr class="hover:bg-gray-50 transition-colors cursor-pointer"
+                                tabindex="0"
+                                role="link"
+                                onclick="if (!event.target.closest('a, button, summary, details, form')) window.location.href='{{ path('app_expense_show', {'id': expense.id}) }}'"
+                                onkeydown="if ((event.key === 'Enter' || event.key === ' ') && !event.target.closest('a, button, summary, details, form')) { event.preventDefault(); window.location.href='{{ path('app_expense_show', {'id': expense.id}) }}'; }">
+                                <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ expense.label }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                                        {{ ('expense.category_' ~ expense.category)|trans }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-700">{{ expense.supplier ?: 'common.dash'|trans }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700">{{ expense.spentAt|date('d/m/Y') }}</td>
+                                <td class="px-6 py-4 text-sm font-semibold text-gray-900">
+                                    {{ expense.amount|format_currency(expense.currency, app.request.locale ?: 'fr_FR') }}
+                                </td>
+                                <td class="px-6 py-4 text-sm">
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{{ path('app_expense_show', {'id': expense.id}) }}" class="px-3 py-1.5 rounded bg-gray-100 text-gray-700 text-xs font-semibold hover:bg-gray-200 transition">
+                                            {{ 'actions.view'|trans }}
+                                        </a>
+                                        <a href="{{ path('app_expense_edit', {'id': expense.id}) }}" class="px-3 py-1.5 rounded bg-blue-600 text-white text-xs font-semibold hover:bg-blue-700 transition">
+                                            {{ 'actions.edit'|trans }}
+                                        </a>
+                                        <a href="{{ path('app_expense_new', {'duplicate': expense.id}) }}" class="px-3 py-1.5 rounded bg-amber-100 text-amber-800 text-xs font-semibold hover:bg-amber-200 transition">
+                                            {{ 'actions.duplicate'|trans }}
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <p class="text-sm text-gray-400">
+                        {{ 'expense.pagination'|trans({'%count%': pagination.items|length, '%total%': pagination.total}) }}
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for i in 1..pagination.pages %}
+                            <a href="?page={{ i }}{% if q %}&q={{ q|url_encode }}{% endif %}{% if category %}&category={{ category|url_encode }}{% endif %}{% if dateFrom %}&dateFrom={{ dateFrom|url_encode }}{% endif %}{% if dateTo %}&dateTo={{ dateTo|url_encode }}{% endif %}"
+                               class="px-3 py-1.5 rounded-lg text-sm font-medium {{ i == pagination.page ? 'bg-blue-600 text-white' : 'bg-[#223044] text-gray-200 hover:bg-[#2E415B]' }}">
+                                {{ i }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="rounded-2xl border border-dashed border-[#2A3747] bg-[#111922] p-10 text-center">
+                    <p class="text-gray-400 mb-4">{{ 'expense.none'|trans }}</p>
+                    <a href="{{ path('app_expense_new') }}"
+                       class="inline-flex items-center justify-center px-5 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold rounded-lg transition-colors btn-mobile">
+                        {{ 'expense.create_first'|trans }}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

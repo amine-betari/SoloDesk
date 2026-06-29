@@ -27,7 +27,7 @@ final class PrestationController extends AbstractController
         PaginationService $paginator
     ): Response {
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 10;
+        $limit = 30;
         $q = trim((string) $request->query->get('q', ''));
         $status = trim((string) $request->query->get('status', ''));
         $collaboratorRaw = trim((string) $request->query->get('collaborator', ''));

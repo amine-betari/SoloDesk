@@ -23,7 +23,7 @@ final class SkillController extends AbstractController
         PaginationService $paginator
     ): Response {
         $page = max(1, $request->query->getInt('page', 1));
-        $limit = 12;
+        $limit = 30;
         $q = trim((string) $request->query->get('q', ''));
         $filter = trim((string) $request->query->get('filter', 'all'));
         $allowedFilters = ['all', 'core', 'non_core', 'used', 'unused'];
