@@ -22,6 +22,55 @@
                 </div>
             </div>
 
+            <div class="rounded-2xl border border-[#2A3747] bg-[#111922] p-5">
+                <div class="mb-4">
+                    <h2 class="text-lg font-semibold text-white">{{ 'expense.current_year_summary'|trans({'%year%': currentYearSummary.year}) }}</h2>
+                    <p class="mt-1 text-sm text-gray-400">{{ 'expense.current_year_summary_help'|trans }}</p>
+                </div>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+                    <div class="rounded-xl border border-[#2A3747] bg-[#1F2732] p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.summary_ca'|trans }}</div>
+                        <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-blue-300">
+                            {% for currency, total in currentYearSummary.ca %}
+                                <span>{{ total|format_currency(currency, app.request.locale ?: 'fr_FR') }}</span>
+                            {% else %}
+                                <span>{{ 'common.dash'|trans }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="rounded-xl border border-[#2A3747] bg-[#1F2732] p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.summary_gain_before_charges'|trans }}</div>
+                        <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-emerald-300">
+                            {% for currency, total in currentYearSummary.gainBeforeCharges %}
+                                <span>{{ total|format_currency(currency, app.request.locale ?: 'fr_FR') }}</span>
+                            {% else %}
+                                <span>{{ 'common.dash'|trans }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="rounded-xl border border-[#2A3747] bg-[#1F2732] p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.summary_expenses'|trans }}</div>
+                        <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-rose-300">
+                            {% for currency, total in currentYearSummary.expenses %}
+                                <span>{{ total|format_currency(currency, app.request.locale ?: 'fr_FR') }}</span>
+                            {% else %}
+                                <span>{{ 'common.dash'|trans }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="rounded-xl border border-[#2A3747] bg-[#1F2732] p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.summary_gain_after_charges'|trans }}</div>
+                        <div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm font-semibold text-cyan-300">
+                            {% for currency, total in currentYearSummary.gainAfterCharges %}
+                                <span>{{ total|format_currency(currency, app.request.locale ?: 'fr_FR') }}</span>
+                            {% else %}
+                                <span>{{ 'common.dash'|trans }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div class="rounded-2xl border border-[#2A3747] bg-[#1F2732] p-4">
                     <div class="text-xs uppercase tracking-wider text-gray-400">{{ 'expense.count_total'|trans }}</div>

@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Company;
 use App\Entity\Expense;
 use App\Form\ExpenseForm;
 use App\Repository\ExpenseRepository;
 use App\Repository\PaginationService;
+use App\Repository\PaymentRepository;
+use App\Repository\PrestationRepository;
+use App\Service\CompanySettings;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,6 +24,9 @@ final class ExpenseController extends AbstractController
     #[Route(name: 'app_expense_index', methods: ['GET'])]
     public function index(
         ExpenseRepository $expenseRepository,
+        PaymentRepository $paymentRepository,
+        PrestationRepository $prestationRepository,
+        CompanySettings $settings,
         Request $request,
         PaginationService $paginator
     ): Response {
@@ -36,6 +43,13 @@ final class ExpenseController extends AbstractController
         if (!$company) {
             throw $this->createAccessDeniedException('Aucune entreprise associée à cet utilisateur.');
         }
+        $currentYearSummary = $this->buildCurrentYearSummary(
+            $company,
+            $expenseRepository,
+            $paymentRepository,
+            $prestationRepository,
+            $settings
+        );
 
         $qb = $expenseRepository->createQueryBuilder('e')
             ->andWhere('e.company = :company')
@@ -96,6 +110,7 @@ final class ExpenseController extends AbstractController
             'categories' => Expense::CATEGORIES,
             'filteredTotals' => $filteredTotals,
             'displayedTotals' => $displayedTotals,
+            'currentYearSummary' => $currentYearSummary,
         ]);
     }
 
@@ -213,5 +228,115 @@ final class ExpenseController extends AbstractController
             ->setCategory($sourceExpense->getCategory())
             ->setSupplier($sourceExpense->getSupplier())
             ->setNotes($sourceExpense->getNotes());
+    }
+
+    /**
+     * @return array{
+     *     year: int,
+     *     ca: array<string, float>,
+     *     gainBeforeCharges: array<string, float>,
+     *     expenses: array<string, float>,
+     *     gainAfterCharges: array<string, float>
+     * }
+     */
+    private function buildCurrentYearSummary(
+        Company $company,
+        ExpenseRepository $expenseRepository,
+        PaymentRepository $paymentRepository,
+        PrestationRepository $prestationRepository,
+        CompanySettings $settings
+    ): array {
+        $currentYear = (int) (new \DateTimeImmutable())->format('Y');
+        $yearStart = new \DateTimeImmutable($currentYear.'-01-01 00:00:00');
+        $yearEnd = new \DateTimeImmutable($currentYear.'-12-31 23:59:59');
+        $activityStartDate = $settings->getDate($company, CompanySettings::KEY_ACTIVITY_START_DATE, new \DateTimeImmutable('2017-01-01'));
+        $effectiveStart = $activityStartDate > $yearStart ? $activityStartDate : $yearStart;
+
+        $caByCurrency = [];
+        $externalInvoicesByCurrency = [];
+        foreach ($paymentRepository->findPaymentsForReports($company) as $payment) {
+            $paymentDate = $payment->getDate();
+            if ($paymentDate < $effectiveStart || $paymentDate > $yearEnd) {
+                continue;
+            }
+
+            $salesDocument = $payment->getSalesDocument();
+            $project = $salesDocument?->getProject();
+            $client = $salesDocument?->getClient() ?? $project?->getClient();
+            if (!$client) {
+                continue;
+            }
+
+            $currency = $client->getCurrency() ?? $project?->getCurrency() ?? 'EUR';
+            $amount = (float) $payment->getAmount();
+            $caByCurrency[$currency] = ($caByCurrency[$currency] ?? 0.0) + $amount;
+            if ($salesDocument?->isExternalInvoice() === true) {
+                $externalInvoicesByCurrency[$currency] = ($externalInvoicesByCurrency[$currency] ?? 0.0) + $amount;
+            }
+        }
+
+        $prestationsByCurrency = [];
+        $prestations = $prestationRepository->createQueryBuilder('p')
+            ->innerJoin('p.salesDocument', 'sd')
+            ->andWhere('p.company = :company')
+            ->andWhere('sd.company = :company')
+            ->andWhere('COALESCE(sd.invoiceDate, sd.createdAt) >= :start')
+            ->andWhere('COALESCE(sd.invoiceDate, sd.createdAt) <= :end')
+            ->setParameter('company', $company)
+            ->setParameter('start', $effectiveStart)
+            ->setParameter('end', $yearEnd)
+            ->getQuery()
+            ->getResult();
+
+        foreach ($prestations as $prestation) {
+            $salesDocument = $prestation->getSalesDocument();
+            if (!$salesDocument) {
+                continue;
+            }
+
+            $currency = $salesDocument->getResolvedCurrency();
+            $prestationsByCurrency[$currency] = ($prestationsByCurrency[$currency] ?? 0.0) + $prestation->getTotal();
+        }
+
+        $expensesByCurrency = [];
+        $expenseRows = $expenseRepository->createQueryBuilder('e')
+            ->select('e.currency AS currency, SUM(e.amount) AS total')
+            ->andWhere('e.company = :company')
+            ->andWhere('e.spentAt >= :start')
+            ->andWhere('e.spentAt <= :end')
+            ->setParameter('company', $company)
+            ->setParameter('start', $effectiveStart)
+            ->setParameter('end', $yearEnd)
+            ->groupBy('e.currency')
+            ->getQuery()
+            ->getArrayResult();
+        foreach ($expenseRows as $row) {
+            $expensesByCurrency[(string) $row['currency']] = (float) $row['total'];
+        }
+
+        $currencies = array_unique(array_merge(
+            array_keys($caByCurrency),
+            array_keys($externalInvoicesByCurrency),
+            array_keys($prestationsByCurrency),
+            array_keys($expensesByCurrency)
+        ));
+
+        $gainBeforeChargesByCurrency = [];
+        $gainAfterChargesByCurrency = [];
+        foreach ($currencies as $currency) {
+            $gainBeforeCharges = ($caByCurrency[$currency] ?? 0.0)
+                - ($externalInvoicesByCurrency[$currency] ?? 0.0)
+                - ($prestationsByCurrency[$currency] ?? 0.0);
+            $gainBeforeChargesByCurrency[$currency] = $gainBeforeCharges;
+            $gainAfterChargesByCurrency[$currency] = $gainBeforeCharges - ($expensesByCurrency[$currency] ?? 0.0);
+        }
+
+        return [
+            'year' => $currentYear,
+            'ca' => $caByCurrency,
+            'gainBeforeCharges' => $gainBeforeChargesByCurrency,
+            'expenses' => $expensesByCurrency,
+            'gainAfterCharges' => $gainAfterChargesByCurrency,
+        ];
     }
 }
