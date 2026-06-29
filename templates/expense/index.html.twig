@@ -188,6 +188,7 @@
                                         <a href="{{ path('app_expense_new', {'duplicate': expense.id}) }}" class="px-3 py-1.5 rounded bg-amber-100 text-amber-800 text-xs font-semibold hover:bg-amber-200 transition">
                                             {{ 'actions.duplicate'|trans }}
                                         </a>
+                                        {{ include('expense/_generate_monthly_form.html.twig', {expense: expense}) }}
                                     </div>
                                 </td>
                             </tr>

@@ -127,6 +127,69 @@ final class ExpenseFlowTest extends WebTestCase
         self::assertSame($expenseCountBefore, $entityManager->getRepository(Expense::class)->count(['company' => $company]));
     }
 
+    public function testMonthlyExpensesCanBeGeneratedWithoutDuplicatingExistingMonths(): void
+    {
+        $browser = $this->createAuthenticatedBrowser();
+        $entityManager = self::getContainer()->get(EntityManagerInterface::class);
+        $user = self::getContainer()->get('security.token_storage')->getToken()?->getUser();
+        self::assertInstanceOf(User::class, $user);
+        $company = $user->getCompany();
+        self::assertInstanceOf(Company::class, $company);
+
+        $sourceExpense = (new Expense())
+            ->setCompany($company)
+            ->setSpentAt(new \DateTimeImmutable('2026-01-31'))
+            ->setLabel('Monthly VPS '.bin2hex(random_bytes(4)))
+            ->setAmount('49.90')
+            ->setCurrency('EUR')
+            ->setCategory(Expense::CATEGORY_HOSTING)
+            ->setSupplier('Monthly Provider')
+            ->setNotes('Monthly generated cost');
+        $existingFebruaryExpense = (new Expense())
+            ->setCompany($company)
+            ->setSpentAt(new \DateTimeImmutable('2026-02-28'))
+            ->setLabel((string) $sourceExpense->getLabel())
+            ->setAmount($sourceExpense->getAmount())
+            ->setCurrency($sourceExpense->getCurrency())
+            ->setCategory($sourceExpense->getCategory())
+            ->setSupplier($sourceExpense->getSupplier())
+            ->setNotes($sourceExpense->getNotes());
+
+        $entityManager->persist($sourceExpense);
+        $entityManager->persist($existingFebruaryExpense);
+        $entityManager->flush();
+        $sourceId = $sourceExpense->getId();
+        self::assertIsInt($sourceId);
+
+        $crawler = $browser->request('GET', '/expenses/'.$sourceId);
+        self::assertResponseIsSuccessful();
+        $csrfToken = $crawler->filter('form[action$="/generate-monthly"] input[name="_token"]')->attr('value');
+        self::assertNotNull($csrfToken);
+
+        $browser->request('POST', '/expenses/'.$sourceId.'/generate-monthly', [
+            '_token' => $csrfToken,
+            'months' => '3',
+        ]);
+
+        self::assertResponseRedirects('/expenses');
+
+        $generatedExpenses = $entityManager->getRepository(Expense::class)->findBy([
+            'company' => $company,
+            'label' => $sourceExpense->getLabel(),
+            'supplier' => $sourceExpense->getSupplier(),
+            'amount' => $sourceExpense->getAmount(),
+            'currency' => $sourceExpense->getCurrency(),
+        ]);
+
+        $generatedDates = array_map(
+            static fn (Expense $expense): string => $expense->getSpentAt()->format('Y-m-d'),
+            $generatedExpenses
+        );
+        sort($generatedDates);
+
+        self::assertSame(['2026-01-31', '2026-02-28', '2026-03-31', '2026-04-30'], $generatedDates);
+    }
+
     private function createAuthenticatedBrowser(): KernelBrowser
     {
         $browser = static::createClient();

@@ -17,6 +17,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/expenses')]
 final class ExpenseController extends AbstractController
@@ -185,6 +186,45 @@ final class ExpenseController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/generate-monthly', name: 'app_expense_generate_monthly', requirements: ['id' => '\\d+'], methods: ['POST'])]
+    public function generateMonthly(
+        Request $request,
+        Expense $expense,
+        EntityManagerInterface $entityManager,
+        TranslatorInterface $translator
+    ): Response {
+        $this->denyAccessUnlessCompanyOwns($expense);
+
+        if (!$this->isCsrfTokenValid('generate_monthly'.$expense->getId(), $request->getPayload()->getString('_token'))) {
+            $this->addFlash('error', $translator->trans('expense.generate_invalid_token'));
+
+            return $this->redirectToRoute('app_expense_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        $months = $request->getPayload()->getInt('months', 12);
+        if (!\in_array($months, [3, 6, 12], true)) {
+            $this->addFlash('error', $translator->trans('expense.generate_invalid_months'));
+
+            return $this->redirectToRoute('app_expense_index', [], Response::HTTP_SEE_OTHER);
+        }
+
+        $createdCount = 0;
+        for ($monthOffset = 1; $monthOffset <= $months; ++$monthOffset) {
+            $spentAt = $this->getClampedMonthlyDate($expense->getSpentAt(), $monthOffset);
+            if ($this->monthlyExpenseExists($expense, $spentAt, $entityManager)) {
+                continue;
+            }
+
+            $entityManager->persist($this->createMonthlyExpenseFrom($expense, $spentAt));
+            ++$createdCount;
+        }
+
+        $entityManager->flush();
+        $this->addFlash('success', $translator->trans('expense.generate_success', ['%count%' => $createdCount]));
+
+        return $this->redirectToRoute('app_expense_index', [], Response::HTTP_SEE_OTHER);
+    }
+
     #[Route('/{id}', name: 'app_expense_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
     public function delete(Request $request, Expense $expense, EntityManagerInterface $entityManager): Response
     {
@@ -228,6 +268,50 @@ final class ExpenseController extends AbstractController
             ->setCategory($sourceExpense->getCategory())
             ->setSupplier($sourceExpense->getSupplier())
             ->setNotes($sourceExpense->getNotes());
+    }
+
+    private function createMonthlyExpenseFrom(Expense $sourceExpense, \DateTimeImmutable $spentAt): Expense
+    {
+        return (new Expense())
+            ->setCompany($sourceExpense->getCompany())
+            ->setSpentAt($spentAt)
+            ->setLabel((string) $sourceExpense->getLabel())
+            ->setAmount($sourceExpense->getAmount())
+            ->setCurrency($sourceExpense->getCurrency())
+            ->setCategory($sourceExpense->getCategory())
+            ->setSupplier($sourceExpense->getSupplier())
+            ->setNotes($sourceExpense->getNotes());
+    }
+
+    private function getClampedMonthlyDate(\DateTimeImmutable $sourceDate, int $monthOffset): \DateTimeImmutable
+    {
+        $targetMonth = $sourceDate
+            ->modify('first day of this month')
+            ->modify(sprintf('+%d months', $monthOffset));
+        $day = min((int) $sourceDate->format('d'), (int) $targetMonth->format('t'));
+
+        return $targetMonth
+            ->setDate((int) $targetMonth->format('Y'), (int) $targetMonth->format('m'), $day)
+            ->setTime(
+                (int) $sourceDate->format('H'),
+                (int) $sourceDate->format('i'),
+                (int) $sourceDate->format('s')
+            );
+    }
+
+    private function monthlyExpenseExists(
+        Expense $sourceExpense,
+        \DateTimeImmutable $spentAt,
+        EntityManagerInterface $entityManager
+    ): bool {
+        return $entityManager->getRepository(Expense::class)->findOneBy([
+            'company' => $sourceExpense->getCompany(),
+            'label' => $sourceExpense->getLabel(),
+            'supplier' => $sourceExpense->getSupplier(),
+            'amount' => $sourceExpense->getAmount(),
+            'currency' => $sourceExpense->getCurrency(),
+            'spentAt' => $spentAt,
+        ]) instanceof Expense;
     }
 
     /**
