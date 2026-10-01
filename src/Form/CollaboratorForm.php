@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Form;
 
 use App\Entity\Collaborator;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -14,6 +18,7 @@ use App\Repository\SkillRepository;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\File;
 
 class CollaboratorForm extends AbstractType
 {
@@ -62,6 +67,23 @@ class CollaboratorForm extends AbstractType
                 'attr' => [
                     'class' => 'mt-1 w-full rounded-md border-gray-300 bg-gray-50 text-gray-900',
                 ],
+            ])
+            ->add('cvFile', FileType::class, [
+                'label' => 'collaborator.cv',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File(
+                        maxSize: '5M',
+                        mimeTypes: ['application/pdf'],
+                        mimeTypesMessage: 'Le CV doit être un fichier PDF valide.',
+                    ),
+                ],
+            ])
+            ->add('removeCv', CheckboxType::class, [
+                'label' => 'collaborator.cv_remove',
+                'mapped' => false,
+                'required' => false,
             ])
             ->add('notes', TextareaType::class, [
                 'label' => 'collaborator.notes',

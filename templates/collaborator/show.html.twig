@@ -67,6 +67,19 @@
                         {% endif %}
                     </div>
                 </div>
+                <div class="bg-gray-50 rounded-xl p-5 border border-gray-200 md:col-span-2">
+                    <div class="text-xs uppercase tracking-wider text-gray-500">{{ 'collaborator.cv'|trans }}</div>
+                    <div class="mt-2 text-gray-800">
+                        {% if collaborator.cvFilename %}
+                            <a href="{{ path('app_collaborator_cv_download', {'id': collaborator.id}) }}"
+                               class="font-medium text-blue-600 hover:text-blue-800">
+                                {{ 'collaborator.cv_download'|trans }} — {{ collaborator.cvOriginalName }}
+                            </a>
+                        {% else %}
+                            {{ 'collaborator.cv_empty'|trans }}
+                        {% endif %}
+                    </div>
+                </div>
             </div>
 
             <div class="mt-8">

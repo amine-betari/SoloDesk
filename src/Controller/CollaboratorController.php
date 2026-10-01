@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\Collaborator;
@@ -7,10 +9,14 @@ use App\Form\CollaboratorForm;
 use App\Repository\CollaboratorRepository;
 use App\Repository\PaginationService;
 use App\Repository\SkillRepository;
+use App\Service\CollaboratorCvStorage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/collaborateurs')]
@@ -125,7 +131,11 @@ final class CollaboratorController extends AbstractController
     }
 
     #[Route('/new', name: 'app_collaborator_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        CollaboratorCvStorage $cvStorage,
+    ): Response
     {
         $collaborator = new Collaborator();
         $company = $this->getUser()?->getCompany();
@@ -139,6 +149,15 @@ final class CollaboratorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var UploadedFile|null $cvFile */
+            $cvFile = $form->get('cvFile')->getData();
+            if ($cvFile !== null) {
+                $originalName = $cvStorage->originalName($cvFile);
+                $collaborator
+                    ->setCvFilename($cvStorage->store($cvFile))
+                    ->setCvOriginalName($originalName);
+            }
+
             $entityManager->persist($collaborator);
             $entityManager->flush();
 
@@ -165,7 +184,12 @@ final class CollaboratorController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_collaborator_edit', requirements: ['id' => '\\d+'], methods: ['GET', 'POST'])]
-    public function edit(Request $request, Collaborator $collaborator, EntityManagerInterface $entityManager): Response
+    public function edit(
+        Request $request,
+        Collaborator $collaborator,
+        EntityManagerInterface $entityManager,
+        CollaboratorCvStorage $cvStorage,
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $collaborator->getCompany()?->getId() !== $company->getId()) {
@@ -178,7 +202,27 @@ final class CollaboratorController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $previousFilename = $collaborator->getCvFilename();
+            /** @var UploadedFile|null $cvFile */
+            $cvFile = $form->get('cvFile')->getData();
+            $removeCv = true === $form->get('removeCv')->getData();
+
+            if ($cvFile !== null) {
+                $originalName = $cvStorage->originalName($cvFile);
+                $collaborator
+                    ->setCvFilename($cvStorage->store($cvFile))
+                    ->setCvOriginalName($originalName);
+            } elseif ($removeCv) {
+                $collaborator
+                    ->setCvFilename(null)
+                    ->setCvOriginalName(null);
+            }
+
             $entityManager->flush();
+
+            if (($cvFile !== null || $removeCv) && $previousFilename !== $collaborator->getCvFilename()) {
+                $cvStorage->remove($previousFilename);
+            }
 
             return $this->redirectToRoute('app_collaborator_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -189,8 +233,43 @@ final class CollaboratorController extends AbstractController
         ]);
     }
 
+    #[Route('/{id}/cv', name: 'app_collaborator_cv_download', requirements: ['id' => '\\d+'], methods: ['GET'])]
+    public function downloadCv(
+        Request $request,
+        Collaborator $collaborator,
+        CollaboratorCvStorage $cvStorage,
+    ): BinaryFileResponse
+    {
+        $company = $this->getUser()?->getCompany();
+        if (!$company || $collaborator->getCompany()?->getId() !== $company->getId()) {
+            throw $this->createAccessDeniedException('Accès refusé.');
+        }
+
+        $filename = $collaborator->getCvFilename();
+        if ($filename === null || !is_file($cvStorage->path($filename))) {
+            throw $this->createNotFoundException('CV introuvable.');
+        }
+
+        $response = new BinaryFileResponse($cvStorage->path($filename));
+        $response->setContentDisposition(
+            $request->query->getBoolean('inline')
+                ? ResponseHeaderBag::DISPOSITION_INLINE
+                : ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $collaborator->getCvOriginalName() ?? 'cv.pdf',
+        );
+        $response->headers->set('X-Content-Type-Options', 'nosniff');
+        $response->setPrivate();
+
+        return $response;
+    }
+
     #[Route('/{id}', name: 'app_collaborator_delete', requirements: ['id' => '\\d+'], methods: ['POST'])]
-    public function delete(Request $request, Collaborator $collaborator, EntityManagerInterface $entityManager): Response
+    public function delete(
+        Request $request,
+        Collaborator $collaborator,
+        EntityManagerInterface $entityManager,
+        CollaboratorCvStorage $cvStorage,
+    ): Response
     {
         $company = $this->getUser()?->getCompany();
         if (!$company || $collaborator->getCompany()?->getId() !== $company->getId()) {
@@ -198,8 +277,10 @@ final class CollaboratorController extends AbstractController
         }
 
         if ($this->isCsrfTokenValid('delete'.$collaborator->getId(), $request->getPayload()->getString('_token'))) {
+            $cvFilename = $collaborator->getCvFilename();
             $entityManager->remove($collaborator);
             $entityManager->flush();
+            $cvStorage->remove($cvFilename);
         }
 
         return $this->redirectToRoute('app_collaborator_index', [], Response::HTTP_SEE_OTHER);

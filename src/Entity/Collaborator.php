@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
 use App\Repository\CollaboratorRepository;
@@ -30,6 +32,12 @@ class Collaborator
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $notes = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cvFilename = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $cvOriginalName = null;
 
     /**
      * @var Collection<int, Skill>
@@ -131,6 +139,30 @@ class Collaborator
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
+        return $this;
+    }
+
+    public function getCvFilename(): ?string
+    {
+        return $this->cvFilename;
+    }
+
+    public function setCvFilename(?string $cvFilename): static
+    {
+        $this->cvFilename = $cvFilename;
+
+        return $this;
+    }
+
+    public function getCvOriginalName(): ?string
+    {
+        return $this->cvOriginalName;
+    }
+
+    public function setCvOriginalName(?string $cvOriginalName): static
+    {
+        $this->cvOriginalName = $cvOriginalName;
+
         return $this;
     }
 
